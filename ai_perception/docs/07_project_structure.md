@@ -1,11 +1,26 @@
 # 07. 프로젝트 구조
 
+## 목차
+
+- [1. 전체 구조](#ai-toc-07-01)
+- [2. Global Vision](#ai-toc-07-02)
+- [3. Global Vision Config](#ai-toc-07-03)
+- [4. Depth Vision](#ai-toc-07-04)
+- [5. Runtime 외부 의존 자산](#ai-toc-07-05)
+- [6. 공개 저장소 포함 범위](#ai-toc-07-06)
+- [7. 공개 저장소 제외 범위](#ai-toc-07-07)
+- [8. 개발 Workspace와 저장소 분리](#ai-toc-07-08)
+- [9. 문서 구조](#ai-toc-07-09)
+- [10. 구조 설계 목적](#ai-toc-07-10)
+
+
 이 디렉터리는 팀 통합 저장소에서 **AI Perception / Vision 담당 구현을 선별해 정리한 영역**입니다.
 
 개발 Workspace 전체를 복사하지 않고, 최종 Runtime과 Interface를 이해하는 데 필요한 코드·설정·문서만 포함합니다.
 
 ---
 
+<a id="ai-toc-07-01"></a>
 ## 1. 전체 구조
 
 ```text
@@ -36,6 +51,7 @@ ai_perception/
 
 ---
 
+<a id="ai-toc-07-02"></a>
 ## 2. Global Vision
 
 ### 2.1 Global Camera ROS2
@@ -163,6 +179,7 @@ Incoming Annotated Image를 HMV1 UDP Video로 변환해 Unity에 전달합니다
 
 ---
 
+<a id="ai-toc-07-03"></a>
 ## 3. Global Vision Config
 
 경로:
@@ -189,6 +206,7 @@ harmony_unified_model_contract_v1.json
 
 ---
 
+<a id="ai-toc-07-04"></a>
 ## 4. Depth Vision
 
 ### 4.1 PRE_ROOF 5-View Runtime
@@ -291,6 +309,7 @@ Global HMV1 Wire Format을 재사용하고 PRE_ROOF Stream을 별도로 구분�
 
 ---
 
+<a id="ai-toc-07-05"></a>
 ## 5. Runtime 외부 의존 자산
 
 공개한 Runtime 중 일부는 개발 Workspace의 별도 Asset을 참조합니다.
@@ -320,6 +339,7 @@ Global HMV1 Wire Format을 재사용하고 PRE_ROOF Stream을 별도로 구분�
 
 ---
 
+<a id="ai-toc-07-06"></a>
 ## 6. 공개 저장소 포함 범위
 
 포함:
@@ -340,6 +360,7 @@ Global HMV1 Wire Format을 재사용하고 PRE_ROOF Stream을 별도로 구분�
 
 ---
 
+<a id="ai-toc-07-07"></a>
 ## 7. 공개 저장소 제외 범위
 
 다음 항목은 공개 소스에서 제외합니다.
@@ -366,6 +387,7 @@ API Key / Token / Password
 
 ---
 
+<a id="ai-toc-07-08"></a>
 ## 8. 개발 Workspace와 저장소 분리
 
 개발 Workspace와 팀 Git 저장소는 분리해 운영합니다.
@@ -382,6 +404,7 @@ Team Git Repository
 
 ---
 
+<a id="ai-toc-07-09"></a>
 ## 9. 문서 구조
 
 ```text
@@ -414,6 +437,7 @@ docs/07_project_structure.md
 
 ---
 
+<a id="ai-toc-07-10"></a>
 ## 10. 구조 설계 목적
 
 이 구조는 다음 내용을 빠르게 확인할 수 있도록 구성했습니다.
