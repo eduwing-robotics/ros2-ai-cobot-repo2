@@ -1,0 +1,114 @@
+{
+  "project": "HARMONY_UNIFIED_VISION_V1",
+  "contract_version": "v1",
+  "architecture": "SHARED_BACKBONE_MULTI_HEAD",
+  "one_model_lineage": true,
+  "runtime_checkpoint": "models/harmony_unified_vision_v1/weights/best.pt",
+  "runtime_checkpoint_status": "NOT_CREATED",
+  "production_runtime_authorized": false,
+  "generic_pretrained_backbone_allowed": true,
+  "legacy_harmony_checkpoint_allowed": false,
+  "legacy_checkpoint_ensemble_allowed": false,
+  "material_contract": "configs/harmony_house_vision_v1_class_contract.json",
+  "material_head": [
+    "base_house_a",
+    "base_house_b",
+    "wall_ext_back_window",
+    "wall_ext_door",
+    "wall_ext_left_window",
+    "wall_ext_right",
+    "wall_int_house_a",
+    "wall_int_house_a_door",
+    "wall_int_house_b",
+    "roof_zip",
+    "roof_nozip"
+  ],
+  "quality_head": [
+    "COLOR_NG",
+    "CRACK_DAMAGE",
+    "COMPONENT_MISSING",
+    "INCOMPLETE_FORMATION"
+  ],
+  "wrong_part_policy": "predicted_material != expected_material",
+  "missing_policy": "DETERMINISTIC_RULE_FIRST_WHERE_VALIDATED",
+  "color_policy": "UNIFIED_AI_MULTI_LABEL_PLUS_DETERMINISTIC_RULE_AND_NEVER_OVERRIDDEN_BY_STRUCTURE_OK",
+  "unknown_policy": {
+    "known_defect": "QUALITY_HEAD_CLASS",
+    "unknown_ood_defect": "FUTURE_EMBEDDING_OOD_GATE",
+    "softmax_unknown_assumption_allowed": false,
+    "runtime_v1_status": "NOT_CALIBRATED_FAIL_CLOSED"
+  },
+  "fusion_priority": [
+    "MISSING",
+    "COLOR_NG",
+    "WRONG_PART",
+    "STRUCTURAL_QUALITY",
+    "UNKNOWN_NG",
+    "PASS"
+  ],
+  "training_contract": {
+    "deterministic_seed": 20260902,
+    "material_loss_weight": 1.0,
+    "quality_loss_weight": 1.0,
+    "generic_pretrained_backbone": "TORCHVISION_RESNET18_DEFAULT",
+    "group_based_split_required": true,
+    "physical_take_must_not_cross_splits": true,
+    "previous_authorized_data_replay_required": true,
+    "latest_failure_only_finetuning_allowed": false,
+    "heldout_leakage_is_fatal": true,
+    "contract_sha_required": true,
+    "dataset_manifest_sha_required": true,
+    "checkpoint_sha_required": true,
+    "training_authorization_required": true,
+    "quality_imbalance_policy": "TRAIN_SPLIT_DERIVED_PER_FLAG_POS_WEIGHT",
+    "quality_pos_weight_formula": "negative_count / positive_count",
+    "quality_pos_weight_sources": "TRAIN_SPLIT_ONLY",
+    "manual_quality_weight_allowed": false
+  },
+  "lineage_policy": "HARMONY_UNIFIED_VISION_V1_TO_V2_TO_V3_CUMULATIVE_REPLAY",
+  "known_live_failure": {
+    "slot": "B05",
+    "material": "wall_int_house_b",
+    "quality": "INCOMPLETE_FORMATION",
+    "frozen_v3_prediction": "STRUCTURE_OK 1.000",
+    "status": "REQUIRED_FUTURE_HARD_EXAMPLE_CAPTURE",
+    "training_authorized": false
+  },
+  "quality_head_type": "MULTI_LABEL_SIGMOID",
+  "structure_ok_encoding": "ALL_QUALITY_FLAGS_ZERO",
+  "quality_loss": "BCEWithLogitsLoss",
+  "validation_contract": {
+    "quality_threshold": 0.5,
+    "threshold_tuning_allowed_in_v1": false,
+    "metrics": [
+      "material_accuracy",
+      "material_per_class_accuracy",
+      "material_confusion_summary",
+      "quality_per_flag_precision",
+      "quality_per_flag_recall",
+      "quality_per_flag_f1",
+      "quality_macro_f1",
+      "quality_exact_match_accuracy",
+      "quality_normal_false_positive_rate"
+    ],
+    "best_checkpoint_selection": "MIN_VALIDATION_TOTAL_LOSS",
+    "quality_macro_f1_reported_but_not_used_as_composite_score": true,
+    "component_missing_validation_support_expected": 0,
+    "component_missing_validation_status": "DEFERRED_TO_POST_TRAIN_STRICT_HELDOUT",
+    "zero_support_flag_must_be_reported": true,
+    "attempt02_validation_selection_quality_loss": "BCE_WITH_SAME_TRAIN_DERIVED_POS_WEIGHT",
+    "metric_threshold_interpretation": "UNWEIGHTED_SIGMOID_0.5",
+    "quality_macro_f1_all_flags_required": true,
+    "quality_macro_f1_supported_required": true,
+    "composite_score_used": false
+  },
+  "post_train_evaluation_contract": {
+    "best_checkpoint_selection_uses_strict_heldout": false,
+    "required_sources": [
+      "datasets/harmony_house_vision_v1/raw/global/incoming_inspection/house_b/defects/component_missing/front/B01_take02_HELDOUT_LIVE",
+      "datasets/harmony_house_vision_v1/raw/global/incoming_inspection/house_b/defects/component_missing/front/B03_take02_HELDOUT_LIVE",
+      "datasets/harmony_house_vision_v1/raw/global/incoming_inspection/house_b/unified_training_variation_v1/B05/incomplete_formation/take03_hard_example_heldout"
+    ],
+    "sequence": "TRAIN_VAL_SELECT_BEST_THEN_STRICT_HELDOUT_GENERALIZATION_EVALUATION"
+  }
+}
