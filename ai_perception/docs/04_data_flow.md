@@ -38,12 +38,12 @@ Incoming QA는 검사 Mode에 따라 Raw 또는 Aligned Frame을 사용합니다
 
 ```mermaid
 flowchart LR
-    RAW[/vision/global_camera/image_raw]
-    ALIGN[HOUSE B Auto Alignment]
-    ALIGNED[/vision/global_camera/image_aligned]
-    BASE[BASE A/B]
-    HA[HOUSE A]
-    HB[HOUSE B]
+    RAW["/vision/global_camera/image_raw"]
+    ALIGN["HOUSE B Auto Alignment"]
+    ALIGNED["/vision/global_camera/image_aligned"]
+    BASE["BASE A/B"]
+    HA["HOUSE A"]
+    HB["HOUSE B"]
 
     RAW --> BASE
     RAW --> HA
@@ -332,7 +332,7 @@ Server Request
 → Final Result
 ```
 
-현재 Actual E2E에서는 Robot View Pose 이동을 수동으로 운영합니다.
+현재 실제 장비 통합 운용 기준에서는 Robot View Pose를 수동으로 전환합니다.
 
 ---
 

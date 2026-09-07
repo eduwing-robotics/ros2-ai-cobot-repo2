@@ -231,7 +231,7 @@ Intel RealSense D435는 Robot Control PC에 연결되어 있으며 Vision PC는 
 
 ---
 
-## 6. PRE_ROOF 5-View Runtime 검증
+## 6. PRE_ROOF 5-View 개별 Runtime 검증
 
 최종 View Runtime:
 
@@ -243,7 +243,9 @@ Intel RealSense D435는 Robot Control PC에 연결되어 있으며 Vision PC는 
 | FRONT | V1 | PASS |
 | BEHIND | V4 | PASS |
 
-View별 Runtime은 각각 독립적인 Golden / ROI / Threshold / Metric Profile을 사용합니다.
+아래 PASS는 각 View의 개별 Runtime 기준이며, D435 + Robot을 포함한 5-View Actual E2E PASS를 의미하지 않습니다.
+
+각 View Runtime은 독립적인 Golden / ROI / Threshold / Metric Profile을 사용합니다.
 
 최종 View Result:
 
@@ -375,20 +377,20 @@ Dummy ROS Image 1280x720 BGR8
 | Incoming Runtime | PASS |
 | Actual Team Server Communication E2E | PASS |
 | Actual Unity HMV1 E2E | PASS |
-| 전체 실제 물리검사 Production Scenario | 미완료 |
+| 전체 실제 물리검사 Production Scenario | 최종 통합 검증 전 |
 
 ### Depth Vision / PRE_ROOF
 
 | 항목 | 상태 |
 |:---|:---:|
 | D435 RGB / Depth 입력 | PASS |
-| 5-View Runtime | PASS |
+| 5-View 개별 Runtime 기준 | PASS |
 | Controller V3 Self-Test | PASS |
 | Dummy Server Full E2E | PASS |
 | Local HMV1 Wire E2E | PASS |
-| Actual Team Server PRE_ROOF | 대기 |
-| Actual Unity PRE_ROOF | 대기 |
-| D435 + Manual Robot 5-View Actual E2E | 대기 |
+| Actual Team Server PRE_ROOF | 최종 통합 검증 전 |
+| Actual Unity PRE_ROOF | 최종 통합 검증 전 |
+| D435 + Manual Robot 5-View Actual E2E | 최종 통합 검증 전 |
 
 ---
 

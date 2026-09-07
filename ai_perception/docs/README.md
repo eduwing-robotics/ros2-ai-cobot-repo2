@@ -27,6 +27,6 @@ AI Perception / Vision 구현을 **Global Vision**과 **Depth Vision**으로 구
 
 ## 미디어
 
-대표 이미지와 실제 동작 영상은 최종 통합 검증 완료 후 2차 작업에서 각 기능 및 검증 항목에 직접 추가합니다.
+대표 미디어는 실제 검증이 완료된 항목에 한해 관련 기능 또는 검증 문서에 직접 배치합니다.
 
 [AI Perception README로 돌아가기](../README.md)

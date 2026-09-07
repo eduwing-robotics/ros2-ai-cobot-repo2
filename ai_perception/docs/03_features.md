@@ -487,7 +487,7 @@ Vision
 → Result 생성
 ```
 
-현재 PRE_ROOF Actual E2E에서는 View Pose 이동을 수동으로 운영합니다.
+현재 실제 장비 통합 운용 기준에서는 View Pose를 수동으로 전환합니다.
 
 ---
 

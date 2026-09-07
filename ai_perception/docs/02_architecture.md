@@ -6,38 +6,39 @@ AI Perception 시스템은 **Global Vision**과 **Depth Vision**을 독립 Runti
 
 ```mermaid
 flowchart LR
-    subgraph GV[Global Vision]
-        CAM[RTSP Camera]
-        FF[FFmpeg Direct Pipe]
-        RAW[/vision/global_camera/image_raw]
-        ALIGN[HOUSE B Auto Alignment]
-        ALIGNED[/vision/global_camera/image_aligned]
-        IQA[Incoming QA Runtime]
+    subgraph GV["Global Vision"]
+        CAM["RTSP Camera"]
+        FF["FFmpeg Direct Pipe"]
+        RAW["/vision/global_camera/image_raw"]
+        ALIGN["HOUSE B Auto Alignment"]
+        ALIGNED["/vision/global_camera/image_aligned"]
+        IQA["Incoming QA Runtime"]
 
         CAM --> FF --> RAW
         RAW --> IQA
         RAW --> ALIGN --> ALIGNED --> IQA
     end
 
-    subgraph DV[Depth Vision]
-        D435[RealSense D435]
-        RPC[Robot Control PC]
-        VIEWS[PRE_ROOF 5-View Runtime]
-        CTRL[Integration Controller V3]
+    subgraph DV["Depth Vision"]
+        D435["RealSense D435"]
+        RPC["Robot Control PC"]
+        VIEWS["PRE_ROOF 5-View Runtime"]
+        CTRL["Integration Controller V3"]
+        PIMG["/vision/pre_roof/annotated_image"]
 
         D435 --> RPC --> VIEWS --> CTRL
     end
 
-    IQA --> SG[Incoming UDP Gateway]
-    CTRL --> PG[PRE_ROOF UDP Gateway]
+    IQA --> SG["Incoming UDP Gateway"]
+    CTRL --> PG["PRE_ROOF UDP Gateway"]
 
-    SG --> SERVER[Team Server / FMS]
+    SG --> SERVER["Team Server / FMS"]
     PG --> SERVER
 
-    IQA --> H1[HMV1 stream_id=1]
-    CTRL --> H2[HMV1 stream_id=2]
+    IQA --> H1["HMV1 stream_id=1"]
+    PIMG --> H2["HMV1 stream_id=2"]
 
-    H1 --> UNITY[Unity]
+    H1 --> UNITY["Unity"]
     H2 --> UNITY
 ```
 
@@ -476,7 +477,7 @@ Vision
 → View Result 생성
 ```
 
-현재 Actual E2E 기준에서는 TOP / LEFT / RIGHT / FRONT / BEHIND Pose 이동을 수동 운영합니다.
+현재 실제 장비 통합 운용 기준에서는 TOP / LEFT / RIGHT / FRONT / BEHIND View Pose를 수동으로 전환합니다.
 
 이를 통해 Vision Inspection Logic과 Robot Control Logic을 분리했습니다.
 

@@ -368,19 +368,17 @@ API Key / Token / Password
 
 ## 8. 개발 Workspace와 저장소 분리
 
-실제 개발 원본:
+개발 Workspace와 팀 Git 저장소는 분리해 운영합니다.
 
 ```text
-~/vision_project
+Development Workspace
+→ 실제 개발·검증 원본 보존
+
+Team Git Repository
+→ 검토된 최종 코드만 ai_perception/에 선별 반영
 ```
 
-팀 GitHub 작업 Clone:
-
-```text
-~/Portfolio_Projects/ros2-ai-cobot-repo2
-```
-
-개발 원본은 보존하고, 검토된 최종 코드만 `ai_perception/`에 선별해 반영합니다.
+개발 원본을 직접 정리하거나 삭제하지 않고, 공개·공유에 필요한 최종 구현만 별도 저장소 구조에 반영합니다.
 
 ---
 
