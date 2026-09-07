@@ -1,13 +1,4 @@
 # 04. 데이터 흐름
-
-## 목차
-
-- [1. Global Vision 데이터 흐름](#ai-toc-04-01)
-- [2. Depth Vision 데이터 흐름](#ai-toc-04-02)
-- [3. 공통 상태 흐름](#ai-toc-04-03)
-- [4. Production Validity](#ai-toc-04-04)
-
-
 AI Perception 시스템의 Runtime 데이터 흐름을 **Global Vision**과 **Depth Vision**으로 구분해 정리합니다.
 
 세부 구성은 [02. 시스템 아키텍처](02_architecture.md), 기능 설명은 [03. 주요 기능](03_features.md), 실제 검증 상태는 [05. 검증](05_validation.md)에서 확인할 수 있습니다.
@@ -566,3 +557,12 @@ vision_production_valid=false
 ```
 
 실제 검증 단계별 결과는 [05. 검증](05_validation.md)에 별도로 기록합니다.
+
+---
+
+## 목차
+
+- [1. Global Vision 데이터 흐름](#ai-toc-04-01)
+- [2. Depth Vision 데이터 흐름](#ai-toc-04-02)
+- [3. 공통 상태 흐름](#ai-toc-04-03)
+- [4. Production Validity](#ai-toc-04-04)

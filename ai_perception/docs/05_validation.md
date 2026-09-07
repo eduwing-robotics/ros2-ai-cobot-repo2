@@ -1,21 +1,4 @@
 # 05. 검증
-
-## 목차
-
-- [1. Global Vision 검증](#ai-toc-05-01)
-- [2. Global Server 실제 E2E](#ai-toc-05-02)
-- [3. Global Unity 실제 E2E](#ai-toc-05-03)
-- [4. Global Model / Dataset 검증](#ai-toc-05-04)
-- [5. Depth Vision 입력 검증](#ai-toc-05-05)
-- [6. PRE_ROOF 5-View 개별 Runtime 검증](#ai-toc-05-06)
-- [7. PRE_ROOF Integration Controller V3 Self-Test](#ai-toc-05-07)
-- [8. PRE_ROOF Dummy Full E2E](#ai-toc-05-08)
-- [9. PRE_ROOF HMV1 Local Wire E2E](#ai-toc-05-09)
-- [10. 현재 Actual Integration 상태](#ai-toc-05-10)
-- [11. Production Validity 기준](#ai-toc-05-11)
-- [12. 검증 결과 해석 원칙](#ai-toc-05-12)
-
-
 AI Perception 검증 결과는 **학습/Validation**, **Runtime 검증**, **Dummy E2E**, **Local Wire E2E**, **Actual Server E2E**, **Actual Unity E2E**, **실제 장비 통합 검증**을 구분해 기록합니다.
 
 단순히 한 번 성공한 로그를 최종 PASS로 취급하지 않고, 실제 검증 범위와 조건이 확인된 항목만 PASS로 표시합니다.
@@ -471,3 +454,20 @@ Communication E2E
 ```
 
 각 PASS는 해당 검증 범위에서만 유효하며, 최종 문서에서도 동일한 기준으로 구분해 기록합니다.
+
+---
+
+## 목차
+
+- [1. Global Vision 검증](#ai-toc-05-01)
+- [2. Global Server 실제 E2E](#ai-toc-05-02)
+- [3. Global Unity 실제 E2E](#ai-toc-05-03)
+- [4. Global Model / Dataset 검증](#ai-toc-05-04)
+- [5. Depth Vision 입력 검증](#ai-toc-05-05)
+- [6. PRE_ROOF 5-View 개별 Runtime 검증](#ai-toc-05-06)
+- [7. PRE_ROOF Integration Controller V3 Self-Test](#ai-toc-05-07)
+- [8. PRE_ROOF Dummy Full E2E](#ai-toc-05-08)
+- [9. PRE_ROOF HMV1 Local Wire E2E](#ai-toc-05-09)
+- [10. 현재 Actual Integration 상태](#ai-toc-05-10)
+- [11. Production Validity 기준](#ai-toc-05-11)
+- [12. 검증 결과 해석 원칙](#ai-toc-05-12)

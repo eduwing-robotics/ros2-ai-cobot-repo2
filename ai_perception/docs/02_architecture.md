@@ -1,21 +1,4 @@
 # 02. 시스템 아키텍처
-
-## 목차
-
-- [전체 구조](#ai-toc-02-01)
-- [1. Global Vision 아키텍처](#ai-toc-02-02)
-- [2. Global Server/FMS Interface](#ai-toc-02-03)
-- [3. Global Unity Interface](#ai-toc-02-04)
-- [4. Depth Vision 아키텍처](#ai-toc-02-05)
-- [5. PRE_ROOF 5-View Runtime](#ai-toc-02-06)
-- [6. PRE_ROOF Integration Controller](#ai-toc-02-07)
-- [7. PRE_ROOF Result 규칙](#ai-toc-02-08)
-- [8. PRE_ROOF Server/FMS Interface](#ai-toc-02-09)
-- [9. PRE_ROOF Unity Interface](#ai-toc-02-10)
-- [10. Robot과 Vision의 책임 경계](#ai-toc-02-11)
-- [11. 시스템 책임 분리](#ai-toc-02-12)
-
-
 <a id="ai-toc-02-01"></a>
 ## 전체 구조
 
@@ -544,3 +527,20 @@ Vision
 - 실제 공정 동작
 
 이 구조를 통해 Vision이 공정 전체 Control Authority를 가지지 않고, 각 시스템의 책임을 분리했습니다.
+
+---
+
+## 목차
+
+- [전체 구조](#ai-toc-02-01)
+- [1. Global Vision 아키텍처](#ai-toc-02-02)
+- [2. Global Server/FMS Interface](#ai-toc-02-03)
+- [3. Global Unity Interface](#ai-toc-02-04)
+- [4. Depth Vision 아키텍처](#ai-toc-02-05)
+- [5. PRE_ROOF 5-View Runtime](#ai-toc-02-06)
+- [6. PRE_ROOF Integration Controller](#ai-toc-02-07)
+- [7. PRE_ROOF Result 규칙](#ai-toc-02-08)
+- [8. PRE_ROOF Server/FMS Interface](#ai-toc-02-09)
+- [9. PRE_ROOF Unity Interface](#ai-toc-02-10)
+- [10. Robot과 Vision의 책임 경계](#ai-toc-02-11)
+- [11. 시스템 책임 분리](#ai-toc-02-12)

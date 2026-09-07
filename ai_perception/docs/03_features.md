@@ -1,12 +1,4 @@
 # 03. 주요 기능
-
-## 목차
-
-- [1. Global Vision](#ai-toc-03-01)
-- [2. Depth Vision](#ai-toc-03-02)
-- [3. 공통 기능 설계](#ai-toc-03-03)
-
-
 AI Perception 시스템에서 직접 구현한 주요 기능을 **Global Vision**과 **Depth Vision**으로 구분해 정리합니다.
 
 세부 시스템 구조는 [02. 시스템 아키텍처](02_architecture.md), 실제 데이터 흐름은 [04. 데이터 흐름](04_data_flow.md), 검증 상태는 [05. 검증](05_validation.md)에서 별도로 확인할 수 있습니다.
@@ -564,3 +556,11 @@ vision_production_valid=false
 ```
 
 실제 통합 검증 범위와 현재 상태는 [05. 검증](05_validation.md)에 별도로 기록합니다.
+
+---
+
+## 목차
+
+- [1. Global Vision](#ai-toc-03-01)
+- [2. Depth Vision](#ai-toc-03-02)
+- [3. 공통 기능 설계](#ai-toc-03-03)
