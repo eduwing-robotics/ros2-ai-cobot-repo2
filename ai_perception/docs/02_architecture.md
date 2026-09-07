@@ -1,5 +1,22 @@
 # 02. 시스템 아키텍처
 
+## 목차
+
+- [전체 구조](#ai-toc-02-01)
+- [1. Global Vision 아키텍처](#ai-toc-02-02)
+- [2. Global Server/FMS Interface](#ai-toc-02-03)
+- [3. Global Unity Interface](#ai-toc-02-04)
+- [4. Depth Vision 아키텍처](#ai-toc-02-05)
+- [5. PRE_ROOF 5-View Runtime](#ai-toc-02-06)
+- [6. PRE_ROOF Integration Controller](#ai-toc-02-07)
+- [7. PRE_ROOF Result 규칙](#ai-toc-02-08)
+- [8. PRE_ROOF Server/FMS Interface](#ai-toc-02-09)
+- [9. PRE_ROOF Unity Interface](#ai-toc-02-10)
+- [10. Robot과 Vision의 책임 경계](#ai-toc-02-11)
+- [11. 시스템 책임 분리](#ai-toc-02-12)
+
+
+<a id="ai-toc-02-01"></a>
 ## 전체 구조
 
 AI Perception 시스템은 **Global Vision**과 **Depth Vision**을 독립 Runtime으로 구성하고, 결과 단계에서 Team Server/FMS 및 Unity와 연결합니다.
@@ -44,6 +61,7 @@ flowchart LR
 
 ---
 
+<a id="ai-toc-02-02"></a>
 ## 1. Global Vision 아키텍처
 
 ### 1.1 Global Camera 입력
@@ -165,6 +183,7 @@ V4는 ROI, Threshold, Pixel Position, Server Integration, Unity Integration을 �
 
 ---
 
+<a id="ai-toc-02-03"></a>
 ## 2. Global Server/FMS Interface
 
 ### 2.1 Request / ACK / Result
@@ -217,6 +236,7 @@ Vision DB는 Vision 측 통신 및 검사 Transaction 보호를 위한 Runtime P
 
 ---
 
+<a id="ai-toc-02-04"></a>
 ## 3. Global Unity Interface
 
 Global Incoming은 다음 Annotated Topic을 HMV1 UDP Video로 변환합니다.
@@ -251,6 +271,7 @@ Vision → Unity 직접 연결은 Annotated Video 전용입니다.
 
 ---
 
+<a id="ai-toc-02-05"></a>
 ## 4. Depth Vision 아키텍처
 
 ### 4.1 D435 입력 구조
@@ -280,6 +301,7 @@ Vision Runtime
 
 ---
 
+<a id="ai-toc-02-06"></a>
 ## 5. PRE_ROOF 5-View Runtime
 
 PRE_ROOF 검사는 하나의 공통 조립 품질 검사이지만 Camera 방향별 가시성 차이 때문에 View를 분리합니다.
@@ -313,6 +335,7 @@ View별 Runtime은 실제 Image Inspection에 집중하고 전체 검사 상태�
 
 ---
 
+<a id="ai-toc-02-07"></a>
 ## 6. PRE_ROOF Integration Controller
 
 Integration Controller V3는 하나의 Server Request를 하나의 5-View Inspection Cycle로 관리합니다.
@@ -364,6 +387,7 @@ Runtime Offline 또는 Result Not Ready 상태에서는 `expected_view`를 유�
 
 ---
 
+<a id="ai-toc-02-08"></a>
 ## 7. PRE_ROOF Result 규칙
 
 공식 View Result:
@@ -394,6 +418,7 @@ NOT_EVALUATED 1개 이상
 
 ---
 
+<a id="ai-toc-02-09"></a>
 ## 8. PRE_ROOF Server/FMS Interface
 
 통신 구조:
@@ -430,6 +455,7 @@ ACK는 검사 완료가 아니라 Request 수신 및 Transaction 수락을 의�
 
 ---
 
+<a id="ai-toc-02-10"></a>
 ## 9. PRE_ROOF Unity Interface
 
 PRE_ROOF는 Global Incoming에서 검증한 HMV1 Wire Format을 재사용합니다.
@@ -462,6 +488,7 @@ Global과 PRE_ROOF는 같은 Wire Format을 사용하지만 Stream ID와 Port를
 
 ---
 
+<a id="ai-toc-02-11"></a>
 ## 10. Robot과 Vision의 책임 경계
 
 PRE_ROOF 실제 운용에서 Robot은 View Pose 이동을 담당합니다.
@@ -483,6 +510,7 @@ Vision
 
 ---
 
+<a id="ai-toc-02-12"></a>
 ## 11. 시스템 책임 분리
 
 ### Vision

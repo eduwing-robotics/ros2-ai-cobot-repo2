@@ -1,11 +1,28 @@
 # 05. 검증
 
+## 목차
+
+- [1. Global Vision 검증](#ai-toc-05-01)
+- [2. Global Server 실제 E2E](#ai-toc-05-02)
+- [3. Global Unity 실제 E2E](#ai-toc-05-03)
+- [4. Global Model / Dataset 검증](#ai-toc-05-04)
+- [5. Depth Vision 입력 검증](#ai-toc-05-05)
+- [6. PRE_ROOF 5-View 개별 Runtime 검증](#ai-toc-05-06)
+- [7. PRE_ROOF Integration Controller V3 Self-Test](#ai-toc-05-07)
+- [8. PRE_ROOF Dummy Full E2E](#ai-toc-05-08)
+- [9. PRE_ROOF HMV1 Local Wire E2E](#ai-toc-05-09)
+- [10. 현재 Actual Integration 상태](#ai-toc-05-10)
+- [11. Production Validity 기준](#ai-toc-05-11)
+- [12. 검증 결과 해석 원칙](#ai-toc-05-12)
+
+
 AI Perception 검증 결과는 **학습/Validation**, **Runtime 검증**, **Dummy E2E**, **Local Wire E2E**, **Actual Server E2E**, **Actual Unity E2E**, **실제 장비 통합 검증**을 구분해 기록합니다.
 
 단순히 한 번 성공한 로그를 최종 PASS로 취급하지 않고, 실제 검증 범위와 조건이 확인된 항목만 PASS로 표시합니다.
 
 ---
 
+<a id="ai-toc-05-01"></a>
 ## 1. Global Vision 검증
 
 ### 1.1 Global Camera
@@ -100,6 +117,7 @@ step=3840
 
 ---
 
+<a id="ai-toc-05-02"></a>
 ## 2. Global Server 실제 E2E
 
 Global Incoming Vision은 실제 Team Server와 UDP Request / ACK / Final Result 흐름을 검증했습니다.
@@ -148,6 +166,7 @@ Actual Physical Inspection Production Scenario
 
 ---
 
+<a id="ai-toc-05-03"></a>
 ## 3. Global Unity 실제 E2E
 
 Incoming Annotated Image를 HMV1 UDP로 실제 Unity에 전달했습니다.
@@ -182,6 +201,7 @@ Incoming Annotated Image를 HMV1 UDP로 실제 Unity에 전달했습니다.
 
 ---
 
+<a id="ai-toc-05-04"></a>
 ## 4. Global Model / Dataset 검증
 
 Incoming Runtime은 데이터 보강과 재학습을 누적한 계보를 사용합니다.
@@ -212,6 +232,7 @@ Attempt06 기준:
 
 ---
 
+<a id="ai-toc-05-05"></a>
 ## 5. Depth Vision 입력 검증
 
 Intel RealSense D435는 Robot Control PC에 연결되어 있으며 Vision PC는 네트워크 Endpoint를 통해 RGB / Depth Image를 수신합니다.
@@ -231,6 +252,7 @@ Intel RealSense D435는 Robot Control PC에 연결되어 있으며 Vision PC는 
 
 ---
 
+<a id="ai-toc-05-06"></a>
 ## 6. PRE_ROOF 5-View 개별 Runtime 검증
 
 최종 View Runtime:
@@ -257,6 +279,7 @@ NOT_EVALUATED
 
 ---
 
+<a id="ai-toc-05-07"></a>
 ## 7. PRE_ROOF Integration Controller V3 Self-Test
 
 Controller V3 Self-Test에서 다음 상태 전이를 확인했습니다.
@@ -278,6 +301,7 @@ Controller는 Runtime Offline 또는 Result Not Ready 상태에서 View Commit�
 
 ---
 
+<a id="ai-toc-05-08"></a>
 ## 8. PRE_ROOF Dummy Full E2E
 
 Actual Server 연결 전 Vision 측 전체 Transaction 경로를 Dummy Harness로 검증했습니다.
@@ -328,6 +352,7 @@ Robot NOT USED
 
 ---
 
+<a id="ai-toc-05-09"></a>
 ## 9. PRE_ROOF HMV1 Local Wire E2E
 
 Actual Unity 연결 전 HMV1 Wire Format을 Local Receiver로 검증했습니다.
@@ -367,6 +392,7 @@ Dummy ROS Image 1280x720 BGR8
 
 ---
 
+<a id="ai-toc-05-10"></a>
 ## 10. 현재 Actual Integration 상태
 
 ### Global Vision
@@ -394,6 +420,7 @@ Dummy ROS Image 1280x720 BGR8
 
 ---
 
+<a id="ai-toc-05-11"></a>
 ## 11. Production Validity 기준
 
 현재 최종 실제 통합 검증이 완료되지 않은 항목은 Production PASS로 표현하지 않습니다.
@@ -424,6 +451,7 @@ vision_production_valid=false
 
 ---
 
+<a id="ai-toc-05-12"></a>
 ## 12. 검증 결과 해석 원칙
 
 이 프로젝트에서는 다음 결과를 서로 대체하지 않습니다.
