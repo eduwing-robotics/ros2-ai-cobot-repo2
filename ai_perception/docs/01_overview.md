@@ -1,18 +1,4 @@
 # 01. 프로젝트 개요
-
-## 목차
-
-- [프로젝트 배경](#ai-toc-01-01)
-- [문제 정의](#ai-toc-01-02)
-- [개발 목적](#ai-toc-01-03)
-- [전체 시스템에서의 역할](#ai-toc-01-04)
-- [Global Vision 개요](#ai-toc-01-05)
-- [Depth Vision 개요](#ai-toc-01-06)
-- [핵심 설계 방향](#ai-toc-01-07)
-- [주요 구현 결과](#ai-toc-01-08)
-- [현재 검증 상태](#ai-toc-01-09)
-
-
 <a id="ai-toc-01-01"></a>
 ## 프로젝트 배경
 
@@ -265,3 +251,17 @@ PRE_ROOF는 Vision 측 Pre-Integration 단계에서 다음 항목을 검증했�
 - D435 + Manual Robot 5-View Actual E2E
 
 따라서 완료되지 않은 항목은 Production PASS로 표현하지 않습니다.
+
+---
+
+## 목차
+
+- [프로젝트 배경](#ai-toc-01-01)
+- [문제 정의](#ai-toc-01-02)
+- [개발 목적](#ai-toc-01-03)
+- [전체 시스템에서의 역할](#ai-toc-01-04)
+- [Global Vision 개요](#ai-toc-01-05)
+- [Depth Vision 개요](#ai-toc-01-06)
+- [핵심 설계 방향](#ai-toc-01-07)
+- [주요 구현 결과](#ai-toc-01-08)
+- [현재 검증 상태](#ai-toc-01-09)
