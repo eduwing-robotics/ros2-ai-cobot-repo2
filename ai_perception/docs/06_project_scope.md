@@ -160,7 +160,7 @@ Vision → Unity 직접 연결은 **Annotated Video 전송 전용**입니다.
 
 Vision은 Robot Motion Command를 직접 생성하지 않습니다.
 
-현재 PRE_ROOF Actual E2E에서는 View Pose를 수동으로 전환하는 운용 방식을 사용합니다.
+현재 실제 장비 통합 운용 기준에서는 View Pose를 수동으로 전환합니다.
 
 ---
 

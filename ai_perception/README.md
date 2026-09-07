@@ -155,7 +155,7 @@ ACK는 검사 완료가 아니라 **Request 수신 및 Transaction 수락**을 �
 | Incoming Annotated Image | PASS |
 | Team Server Request / ACK / Result E2E | PASS |
 | Unity HMV1 실제 영상 E2E | PASS |
-| 전체 실제 물리검사 Production Scenario | 미완료 |
+| 전체 실제 물리검사 Production Scenario | 최종 통합 검증 전 |
 
 Team Server 통신 E2E는 Request / ACK / Result Contract 검증이며 실제 물리검사 Production PASS와 구분합니다.
 
@@ -165,13 +165,13 @@ Team Server 통신 E2E는 Request / ACK / Result Contract 검증이며 실제 �
 |:---|:---:|
 | D435 RGB `1280x720` 입력 | PASS |
 | D435 Depth Image `1280x720` 입력 | PASS |
-| PRE_ROOF 5-View Runtime | PASS |
+| PRE_ROOF 5-View 개별 Runtime 기준 | PASS |
 | Controller V3 Self-Test | PASS |
 | Dummy Server 5-View Full E2E | PASS |
 | HMV1 `stream_id=2` Local E2E | PASS |
-| Actual Team Server PRE_ROOF | 대기 |
-| Actual Unity PRE_ROOF | 대기 |
-| D435 + Manual Robot 5-View Actual E2E | 대기 |
+| Actual Team Server PRE_ROOF | 최종 통합 검증 전 |
+| Actual Unity PRE_ROOF | 최종 통합 검증 전 |
+| D435 + Manual Robot 5-View Actual E2E | 최종 통합 검증 전 |
 
 Dummy / Local 검증과 실제 시스템 E2E를 구분하며, 완료되지 않은 항목은 Production PASS로 표현하지 않습니다.
 
@@ -207,8 +207,7 @@ ai_perception/
    ├─ 04_data_flow.md
    ├─ 05_validation.md
    ├─ 06_project_scope.md
-   ├─ 07_project_structure.md
-   └─ images/
+   └─ 07_project_structure.md
 ```
 
 Raw / Synthetic Dataset 전체, Model Weight, Runtime DB, Probe, Canary, Legacy, Backup 파일은 공개 저장소에서 제외합니다.
@@ -225,4 +224,4 @@ Raw / Synthetic Dataset 전체, Model Weight, Runtime DB, Probe, Canary, Legacy,
 6. [프로젝트 범위](docs/06_project_scope.md)
 7. [프로젝트 구조](docs/07_project_structure.md)
 
-이미지와 실제 동작 영상은 최종 통합 검증 완료 후 2차 작업에서 추가합니다.
+대표 미디어는 실제 검증이 완료된 항목에 한해 관련 기능 또는 검증 문서에 배치합니다.
