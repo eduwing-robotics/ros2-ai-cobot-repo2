@@ -5,7 +5,6 @@
 
 ---
 
-<a id="ai-toc-06-01"></a>
 ## 1. 전체 팀 시스템
 
 팀 프로젝트 전체는 다음 영역으로 구성됩니다.
@@ -23,7 +22,6 @@ AI 기반 조립식 주택 자동화 공장
 
 ---
 
-<a id="ai-toc-06-02"></a>
 ## 2. 직접 담당 범위
 
 ### 2.1 Global Vision
@@ -83,7 +81,6 @@ AI 기반 조립식 주택 자동화 공장
 
 ---
 
-<a id="ai-toc-06-03"></a>
 ## 3. Team Server / FMS와의 책임 경계
 
 ### Vision 측 구현
@@ -113,7 +110,6 @@ Vision은 Server/FMS의 Request를 받아 검사하고 Result를 반환하는 **
 
 ---
 
-<a id="ai-toc-06-04"></a>
 ## 4. Unity와의 책임 경계
 
 ### Vision 측 구현
@@ -143,7 +139,6 @@ Vision → Unity 직접 연결은 **Annotated Video 전송 전용**입니다.
 
 ---
 
-<a id="ai-toc-06-05"></a>
 ## 5. Robot과의 책임 경계
 
 ### Vision 역할
@@ -168,7 +163,6 @@ Vision은 Robot Motion Command를 직접 생성하지 않습니다.
 
 ---
 
-<a id="ai-toc-06-06"></a>
 ## 6. Camera 장비와의 책임 경계
 
 ### Global Camera
@@ -196,7 +190,6 @@ D435 Driver 자체 구현과 Robot Control PC의 Camera Server 내부 구현은 
 
 ---
 
-<a id="ai-toc-06-07"></a>
 ## 7. AI Model / Dataset 범위
 
 직접 수행한 주요 영역:
@@ -218,7 +211,6 @@ D435 Driver 자체 구현과 Robot Control PC의 Camera Server 내부 구현은 
 
 ---
 
-<a id="ai-toc-06-08"></a>
 ## 8. 설계상 제외한 기능
 
 다음 기능은 AI Perception 직접 담당 범위에 포함하지 않습니다.
@@ -245,7 +237,6 @@ Server Request
 
 ---
 
-<a id="ai-toc-06-09"></a>
 ## 9. 검증 책임 범위
 
 ### Global Vision
@@ -275,7 +266,6 @@ Actual Team Server / Unity / D435 + Robot 통합 상태는 [05. 검증](05_valid
 
 ---
 
-<a id="ai-toc-06-10"></a>
 ## 10. 공개 범위 원칙
 
 `ai_perception`은 개발 Workspace 전체 복사본이 아니라 최종 구현 이해에 필요한 코드만 선별한 영역입니다.
@@ -304,7 +294,6 @@ Actual Team Server / Unity / D435 + Robot 통합 상태는 [05. 검증](05_valid
 
 ---
 
-<a id="ai-toc-06-11"></a>
 ## 11. 표현 원칙
 
 문서에서는 다음 구분을 유지합니다.
@@ -324,16 +313,12 @@ Actual Team Server / Unity / D435 + Robot 통합 상태는 [05. 검증](05_valid
 
 ---
 
-## 목차
+## 상세 문서
 
-- [1. 전체 팀 시스템](#ai-toc-06-01)
-- [2. 직접 담당 범위](#ai-toc-06-02)
-- [3. Team Server / FMS와의 책임 경계](#ai-toc-06-03)
-- [4. Unity와의 책임 경계](#ai-toc-06-04)
-- [5. Robot과의 책임 경계](#ai-toc-06-05)
-- [6. Camera 장비와의 책임 경계](#ai-toc-06-06)
-- [7. AI Model / Dataset 범위](#ai-toc-06-07)
-- [8. 설계상 제외한 기능](#ai-toc-06-08)
-- [9. 검증 책임 범위](#ai-toc-06-09)
-- [10. 공개 범위 원칙](#ai-toc-06-10)
-- [11. 표현 원칙](#ai-toc-06-11)
+1. [프로젝트 개요](01_overview.md)
+2. [시스템 아키텍처](02_architecture.md)
+3. [주요 기능](03_features.md)
+4. [데이터 흐름](04_data_flow.md)
+5. [검증](05_validation.md)
+6. [프로젝트 범위](06_project_scope.md)
+7. [프로젝트 구조](07_project_structure.md)
