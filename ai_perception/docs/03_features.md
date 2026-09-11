@@ -83,6 +83,18 @@ HOUSE B 수입검사에서 불량 자재를 검출하고 FAIL로 판정하는 �
 
 https://github.com/user-attachments/assets/5fd878ed-f8ff-4fef-872c-ecb6a15aa08e
 
+#### HOUSE A - 베이스 A자재 정상품 판정
+
+HOUSE A 수입검사에서 정상 자재를 검사하고 PASS로 판정하는 과정입니다.
+
+https://github.com/user-attachments/assets/d4fe6eab-78e1-4c12-b795-b144971dad1f
+
+#### HOUSE A - 베이스 A자재 불량 판정
+
+HOUSE A 수입검사에서 불량 자재를 검출하고 FAIL로 판정하는 과정입니다.
+
+https://github.com/user-attachments/assets/1475b359-8920-4c33-a93a-550d2caf4a83
+
 ---
 
 ### 1.4 Incoming Final Runtime Chain
