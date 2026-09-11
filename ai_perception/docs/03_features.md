@@ -1,3 +1,4 @@
+
 # 03. 주요 기능
 AI Perception 시스템에서 직접 구현한 주요 기능을 **Global Vision**과 **Depth Vision**으로 구분해 정리합니다.
 
@@ -63,12 +64,24 @@ Gate 기준:
 Incoming QA는 조립 상태에 따라 세 검사 Mode를 지원합니다.
 
 | Mode | 검사 대상 | Camera Source |
-|:---|:---|:---|
+| --- | --- | --- |
 | BASE A/B | Base A / Base B | Raw |
-| HOUSE B | B01~B06 | Aligned |
+| HOUSE B | B01~B06 | Raw |
 | HOUSE A | A01~A07 | Raw |
 
 Mode별로 필요한 Camera Source와 ROI / 검사 Logic을 분리했습니다.
+
+#### HOUSE B - 베이스 B자재 정상품 판정
+
+HOUSE B 수입검사에서 정상 자재를 검사하고 PASS로 판정하는 과정입니다.
+
+https://github.com/user-attachments/assets/8568c3e3-7e25-4f02-8cb6-c659a05fa915
+
+#### HOUSE B - 베이스 B자재 불량 판정
+
+HOUSE B 수입검사에서 불량 자재를 검출하고 FAIL로 판정하는 과정입니다.
+
+https://github.com/user-attachments/assets/5fd878ed-f8ff-4fef-872c-ecb6a15aa08e
 
 ---
 
