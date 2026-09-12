@@ -1,0 +1,316 @@
+aruco_detector:
+  ros__parameters:
+    image_topic: /camera/image_raw
+    camera_info_topic: /camera/camera_info
+    debug_image_topic: /forklift/aruco/debug_image
+    fallback_camera_matrix: [641.16387, 0.0, 158.74866, 0.0, 643.87291, 130.36306, 0.0, 0.0, 1.0]
+    fallback_distortion_coefficients: [0.128834, -0.065037, 0.008062, 0.009493, 0.0]
+    dictionary: DICT_4X4_50
+    # Rack 40/41과 Drop 42는 모두 5cm 마커입니다.
+    marker_size_m: 0.05
+    marker_42_size_m: 0.05
+    allowed_marker_ids: [40, 41, 42]
+    # 5cm Marker 42를 HOME_BEHIND 탐색 거리에서도 검출합니다.
+    minimum_perimeter_px: 40.0
+    # OpenCV tvec.x는 오른쪽이 +이므로 ROS 제어에서 왼쪽을 +로 사용하도록 -1.
+    lateral_sign: -1.0
+    # 실물에서 yaw 방향이 반대로 출력되면 -1.0으로 변경합니다.
+    yaw_sign: 1.0
+
+aruco_docking:
+  ros__parameters:
+    control_hz: 20.0
+    distance_tolerance_m: 0.012
+    lateral_tolerance_m: 0.012
+    yaw_tolerance_rad: 0.052
+    linear_kp: 0.55
+    heading_kp: 0.60
+    yaw_kp: 0.40
+    max_linear_mps: 0.02
+    min_linear_mps: 0.012
+    max_angular_rps: 0.08
+    detection_filter_alpha: 0.20
+    search_angular_rps: 0.0
+    # START_SEARCH에서만 사용하는 제한 회전 탐색 속도/시간.
+    search_command_angular_rps: 0.08
+    # HOME_BEHIND에서 왼쪽으로 Marker 42를 찾는 회전 속도.
+    marker_42_search_angular_rps: 0.15
+    # HOME_BEHIND에서 마커 41을 찾기 전에는 오른쪽으로 빠르게 회전하고,
+    # 검출 후에는 home_fast_max_angular_rps로 자동 감속합니다.
+    home_search_command_angular_rps: -0.20
+    # 약 150도 빠른 회전 후 2초 정지 관측, 미검출 시 15도 회전/1초 정지 반복.
+    home_search_fast_turn_rad: 2.62
+    home_search_initial_pause_sec: 2.0
+    home_search_step_rad: 0.262
+    home_search_step_angular_rps: -0.10
+    home_search_step_pause_sec: 1.0
+    home_search_acquire_stable_frames: 3
+    # HOME은 팔레트 삽입 지점이 아니므로 odom 도착 후 짧게 검증합니다.
+    # HOME 앞뒤 위치는 목표 기준 ±2cm 안에서만 성공 처리합니다.
+    home_distance_tolerance_m: 0.020
+    home_lateral_tolerance_m: 0.015
+    home_yaw_tolerance_rad: 0.140
+    # HOME은 마커 41을 실시간으로 보는 동안에만 전진합니다.
+    home_detection_timeout_sec: 0.30
+    home_max_visible_marker_forward_m: 2.00
+    home_max_visible_forward_travel_m: 1.00
+    # 통합 시나리오에서 사용하는 빠른 HOME 곡선 정렬 설정.
+    home_fast_forward_stop_error_m: 0.020
+    # 앞뒤와 측면이 모두 실측 허용값 안에 들어와야 성공으로 판정합니다.
+    # 오차가 남으면 정면을 확인한 뒤 짧게 직선 후진하여 재접근합니다.
+    home_fast_lateral_tolerance_m: 0.015
+    home_fast_max_angular_rps: 0.100
+    # 후진 중에는 회전 명령을 절대 주지 않으며 방향이 틀어지면 즉시 멈춥니다.
+    home_recovery_backoff_m: 0.050
+    home_recovery_backoff_speed_mps: 0.012
+    home_recovery_yaw_tolerance_rad: 0.035
+    home_recovery_yaw_stable_cycles: 5
+    home_recovery_max_count: 2
+    home_recovery_timeout_sec: 10.0
+    # GO_HOME 도착 후 마커 41 거리 오차를 보며 제한적으로 앞뒤 보정합니다.
+    home_correction_min_linear_mps: 0.008
+    home_correction_max_linear_mps: 0.020
+    home_correction_max_reverse_m: 0.050
+    home_stable_cycles: 3
+    home_detection_loss_wait_sec: 15.0
+    home_max_linear_mps: 0.040
+    home_min_linear_mps: 0.020
+    home_max_angular_rps: 0.120
+    # 측정된 좌우 오차의 절반만 이동하고 정면 복귀 후 다시 측정합니다.
+    home_side_move_gain: 0.50
+    home_side_move_max_m: 0.015
+    home_side_move_max_count: 4
+    # 실측 결과: 로봇이 오른쪽으로 이동하면 lateral 값이 증가합니다.
+    # 따라서 + lateral 오차는 왼쪽 이동으로 줄입니다.
+    home_lateral_direction_sign: 1.0
+    home_side_rotate_speed_rps: 0.25
+    home_side_drive_speed_mps: 0.025
+    search_timeout_sec: 240.0
+    detection_timeout_sec: 1.0
+    # 최종 삽입 중 검출이 끊기면 즉시 정지하고 최대 5초간 재검출을 기다립니다.
+    final_insert_detection_grace_sec: 5.0
+    lost_after_seen_abort_sec: 15.0
+    # 2차 접근에서 마커가 가려지면 최대 12cm 직선 후진하며 재획득합니다.
+    final_lost_recovery_speed_mps: 0.015
+    final_lost_recovery_timeout_sec: 12.0
+    final_lost_recovery_max_m: 0.12
+    overall_timeout_sec: 600.0
+    stable_cycles: 10
+    # 최종점 5cm 이내에서 좌우/각도 오차가 남으면 그 자리에서 회전하지 않습니다.
+    # 목표보다 12cm 먼 지점까지 직선 후진한 후 제자리 회전을 시작합니다.
+    reposition_trigger_forward_error_m: 0.05
+    reposition_lateral_threshold_m: 0.012
+    reposition_yaw_threshold_rad: 0.052
+    reposition_forward_margin_m: 0.12
+
+    # 실제 도킹 완료 위치에서 측정한 ArUco pose로 각각 교체하세요.
+    marker_40_target_forward_m: 0.16
+    marker_40_target_lateral_m: 0.0
+    marker_40_target_yaw_rad: 0.0
+    marker_41_target_forward_m: 0.183
+    marker_41_target_lateral_m: 0.0
+    marker_41_target_yaw_rad: 0.0
+    # Drop 42는 창문 마커와 실제 Drop 사이의 고정 오프셋이므로 반드시 실측합니다.
+    marker_42_target_forward_m: 0.50
+    marker_42_target_lateral_m: 0.0
+    marker_42_target_yaw_rad: 0.0
+
+    backoff_rack_distance_m: 0.20
+    backoff_drop_distance_m: 0.20
+    backoff_home_distance_m: 0.20
+    backoff_speed_mps: 0.03
+    backoff_yaw_kp: 1.2
+    backoff_timeout_sec: 60.0
+    # Rack1/2의 1차 staging에서는 삽입하지 않고,
+    # 모든 마커는 측정된 최종 위치까지만 이동하며 추가 삽입하지 않습니다.
+    final_insert_distance_m: 0.0
+    final_insert_speed_mps: 0.015
+    final_insert_timeout_sec: 180.0
+    # 최종 직선 삽입은 odom 또는 신선한 ArUco 거리 중 먼저 도달한 값으로 종료합니다.
+    final_marker_tolerance_m: 0.005
+    # RACK 40/41은 포크 끝단 유도면을 고려해 최종 전후 오차 10mm까지 허용합니다.
+    rack_final_marker_tolerance_m: 0.010
+    # RACK1은 팔레트에 물리적으로 막힌 실측 성공값 forward=0.207m를 허용합니다.
+    # 가까운 방향 허용값은 위의 10mm를 유지하여 과도한 삽입은 허용하지 않습니다.
+    marker_41_final_forward_max_m: 0.210
+    # 아래 marker_42_* 값은 marker_42_use_rack_docking=false 롤백 전용입니다.
+    marker_42_final_insert_extension_m: 0.030
+    final_marker_stable_cycles: 5
+    # odom은 성공 조건이 아니라 이동 상한입니다. 아래 이상은 즉시 안전 정지합니다.
+    final_insert_max_lateral_error_m: 0.025
+    final_insert_max_yaw_error_rad: 0.20
+    final_insert_wrong_direction_margin_m: 0.015
+    final_insert_marker_ids: [40, 41, 42]
+    # 새 5cm Marker 42는 Marker 40/41과 동일한 근거리 2단 도킹을 사용합니다.
+    # false는 기존 원거리 Marker 42 로직으로 되돌릴 때만 사용합니다.
+    marker_42_use_rack_docking: true
+    # 최종점 11cm 전에서 ArUco 정렬을 판정하고 이후에는 회전 없이 직선 삽입합니다.
+    # 실제 직선 이동량은 남은 거리만 사용하며 추가 삽입은 0m입니다.
+    final_handoff_forward_margin_m: 0.11
+    # 최종 무회전 삽입은 좌우 오차 6mm 이내에서만 허용합니다.
+    final_handoff_lateral_tolerance_m: 0.006
+    final_handoff_yaw_tolerance_rad: 0.14
+    # 42도 팔레트 기둥 충돌을 막기 위해 좌우 6mm 안에서만 직선 삽입합니다.
+    marker_42_final_handoff_lateral_tolerance_m: 0.006
+    # 좌우가 맞으면 원격 마커 yaw 노이즈 때문에 포크를 다시 빼지 않습니다.
+    marker_42_final_handoff_yaw_tolerance_rad: 0.10
+    # 이전 기둥 충돌은 14.5mm였으므로 12mm에서 먼저 안전 정지합니다.
+    marker_42_final_max_lateral_error_m: 0.012
+    marker_42_final_lateral_tolerance_m: 0.010
+    marker_42_final_yaw_tolerance_rad: 0.087
+    # 42도 처음부터 Rack처럼 회전→직진으로 구멍 중심을 추종합니다.
+    marker_42_axis_rotate_deadband_rad: 0.05
+    marker_42_staging_lateral_tolerance_m: 0.015
+    marker_42_staging_yaw_tolerance_rad: 0.18
+    # 먼 거리의 42는 작은 방위 흔들림에 반응하지 않고 전진을 우선합니다.
+    marker_42_staging_steering_deadband_rad: 0.03
+    # staging 접근 중 잠깐 가려지면 정지한 뒤 회전 탐색으로 다시 획득합니다.
+    marker_42_staging_reacquire_delay_sec: 1.0
+    # 연속 접근 중 마커가 시야를 벗어나지 않도록 천천히 조향합니다.
+    marker_42_continuous_max_angular_rps: 0.03
+    marker_42_continuous_min_linear_mps: 0.008
+    # Rack1, Rack2, Drop 모두 입구 전까지 저속 곡선으로 마커를 추종합니다.
+    continuous_visual_marker_ids: [40, 41, 42]
+    continuous_max_angular_rps: 0.03
+    continuous_min_linear_mps: 0.008
+    marker_42_lost_pause_sec: 1.5
+    marker_42_lost_backoff_m: 0.12
+    # 시나리오 2의 DROP 직접 재도킹(START)은 마커 유실 시 정지만 허용.
+    marker_42_direct_start_no_reverse: true
+    # 포크 끝이 팔레트 구멍에 처음 진입한 실측 자세입니다.
+    # 이 지점부터 angular.z=0으로 고정하고 완전 도킹점까지 직진합니다.
+    marker_42_handoff_forward_m: 0.27643
+    marker_42_handoff_lateral_m: 0.00169
+    marker_42_handoff_yaw_rad: 0.01449
+    marker_42_handoff_forward_tolerance_m: 0.006
+    marker_42_handoff_max_overshoot_m: 0.025
+    marker_42_handoff_lateral_tolerance_m: 0.006
+    marker_42_handoff_yaw_tolerance_rad: 0.12
+    marker_42_handoff_stable_cycles: 5
+    # 모든 작업점은 20cm 전 staging에서 측면/각도를 먼저 맞춘 뒤 접근합니다.
+    two_stage_marker_ids: [40, 41, 42]
+    staging_check_marker_ids: [40, 41, 42]
+    # 42도 입구 오차가 남으면 팔레트와 떨어진 staging에서만 최대 5mm씩
+    # 측면 보정합니다. 포크가 입구에 닿은 상태에서는 절대 회전하지 않습니다.
+    staging_side_move_marker_ids: [40, 41, 42]
+    # 작은 오차는 허용하고, 큰 좌우 오차만 실제 측면 이동으로 제거합니다.
+    staging_forward_tolerance_m: 0.015
+    # 25mm 이내는 팔레트 입구의 경사면이 받아주므로 측면 왕복 보정을 생략합니다.
+    staging_lateral_tolerance_m: 0.025
+    staging_yaw_tolerance_rad: 0.14
+    staging_near_distance_m: 0.02
+    staging_side_move_max_m: 0.005
+    staging_side_rotate_speed_rps: 0.20
+    staging_side_drive_speed_mps: 0.02
+    staging_side_turn_tolerance_rad: 0.035
+    staging_lateral_direction_sign: 1.0
+    # Marker 42 실물 검증: dl 음수일 때 우측으로 이동해야 목표 중심에 접근합니다.
+    marker_42_staging_lateral_direction_sign: 1.0
+    marker_42_staging_side_move_gain: 1.0
+    # 과보정을 막기 위해 매번 최대 5mm만 움직이고 마커를 다시 측정합니다.
+    marker_42_staging_side_move_max_m: 0.005
+    # 42는 입구에서 회전하지 않고 staging까지 후진한 뒤 측면 보정합니다.
+    marker_42_staging_retry_backoff_m: 0.12
+    marker_42_staging_retry_speed_mps: 0.02
+    marker_42_staging_retry_max_count: 3
+    # 1차 접근에서는 작은 조향 오차를 무시하고 그대로 직진합니다.
+    staging_steering_deadband_rad: 0.10
+    staging_min_forward_m: 0.20
+    staging_max_forward_m: 0.80
+    # 42는 Drop에서 멀리 설치된 15.1cm 원격 기준 마커입니다.
+    marker_42_staging_min_forward_m: 1.00
+    marker_42_staging_max_forward_m: 2.00
+    # HOME_BEHIND START_SEARCH 전용 최초 획득 범위입니다.
+    marker_42_search_min_forward_m: 0.80
+    marker_42_search_max_forward_m: 2.50
+    marker_42_search_max_lateral_error_m: 0.70
+    marker_42_search_max_yaw_error_rad: 0.70
+    marker_42_acquire_max_lateral_error_m: 0.08
+    marker_42_acquire_max_yaw_error_rad: 0.35
+    marker_42_acquire_stable_frames: 5
+    staging_max_lateral_error_m: 0.20
+    staging_max_yaw_error_rad: 0.52
+    # 제자리 회전과 직선 이동을 번갈아 수행합니다.
+    axis_rotate_deadband_rad: 0.025
+    axis_rotate_min_rps: 0.035
+
+odom_axis_driver:
+  ros__parameters:
+    # Unity mobile_robot_pose용 HOME/ArUco 보정 논리 좌표입니다.
+    pose_topic: /forklift/mobile_robot_pose
+    pose_frame_id: map
+    pose_publish_hz: 10.0
+    # scan이 2초 이상 끊기면 즉시 정지하고, 이 시간 동안 복구를 기다립니다.
+    scan_recovery_timeout_sec: 30.0
+
+forklift_lift_servo:
+  ros__parameters:
+    # fk_jogd.py UDP 데몬은 같은 Raspberry Pi에서 실행합니다.
+    udp_host: 127.0.0.1
+    udp_port: 5005
+    request_timeout_sec: 0.35
+    poll_period_sec: 0.25
+    motion_timeout_sec: 120.0
+    position_tolerance_mm: 0.5
+    # 실물 공정: J2=RACK/DROP 진입·배치, J3=팔레트 운반 높이(약 35mm).
+    # HEIGHT_1은 호환용 이름만 유지하며 실제로는 J2로 이동합니다.
+    height_1_preset: 2
+    height_2_preset: 2
+    height_3_preset: 3
+    # 수동 명령도 J2/J3 범위를 벗어나지 않습니다.
+    up_preset: 3
+    down_preset: 2
+    park_preset: 2
+    # 아래 값은 구형 DROP_LOWER/RAISE 명령 호환용입니다.
+    # 통합 Action은 HEIGHT_2/HEIGHT_3 프리셋만 사용합니다.
+    drop_release_mm: 10.0
+    drop_j1_reference_mm: 0.0
+    drop_j1_tolerance_mm: 1.0
+    position_direction_sign: 1.0
+    # 위치 센서가 없으므로 실제 H2 확인 후 매 기동마다 기준 복구가 필수입니다.
+    require_zero_before_motion: true
+    use_mock_lift: false
+    mock_motion_time_sec: 0.5
+
+transport_action_server:
+  ros__parameters:
+    use_mock_route: false
+    mock_route_delay_sec: 0.25
+    # Keep lift mocked until final hardware integration.
+    use_mock_lift: false
+    mock_lift_delay_sec: 0.25
+    route_timeout_sec: 300.0
+    device_timeout_sec: 720.0
+    endpoint_wait_sec: 10.0
+    # 최종 ReturnHome: ArUco HOME 정렬 → 리프트 H2 주차 → 20cm 후진.
+    return_home_final_backoff_enabled: true
+    initial_location_code: HOME
+    rack1_marker_id: 41
+    rack2_marker_id: 40
+    drop_marker_id: 42
+
+mock_aruco_docking:
+  ros__parameters:
+    delay_sec: 0.5
+
+cmd_vel_arbiter:
+  ros__parameters:
+    # Unity가 이 주기보다 오래 속도 명령을 보내지 않으면 정지 상태로 잠깁니다.
+    manual_timeout_sec: 0.30
+    auto_timeout_sec: 0.50
+    output_period_sec: 0.05
+    state_heartbeat_sec: 1.0
+    max_forward_mps: 0.08
+    max_reverse_mps: 0.05
+    max_angular_rps: 0.35
+
+manual_websocket_gateway:
+  ros__parameters:
+    manual_ws_bind_host: 0.0.0.0
+    manual_ws_port: 8765
+    # 현재 팀 운용은 토큰 없이 같은 신뢰된 LAN에서만 사용합니다.
+    manual_ws_token: ''
+    max_forward_mps: 0.08
+    max_reverse_mps: 0.05
+    max_angular_rps: 0.35
+

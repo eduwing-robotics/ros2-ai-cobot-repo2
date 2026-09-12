@@ -1,0 +1,12 @@
+# Goal
+string req_id
+---
+# Result
+string status
+string error_code
+string detail
+---
+# Feedback
+string phase
+float32 progress
+string detail

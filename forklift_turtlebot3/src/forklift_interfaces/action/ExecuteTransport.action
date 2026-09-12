@@ -1,0 +1,16 @@
+# Goal
+string req_id
+int64 job_id
+int64 delivery_id
+string pickup_code
+string dropoff_code
+---
+# Result
+string status
+string error_code
+string detail
+---
+# Feedback
+string phase
+float32 progress
+string detail

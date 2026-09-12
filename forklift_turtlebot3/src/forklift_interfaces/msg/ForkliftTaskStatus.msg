@@ -1,0 +1,9 @@
+string task_id
+string command_id
+string state
+float32 progress
+bool success
+string message
+int32 current_rack_marker_id
+int32 cycle_index
+int32 cycle_total

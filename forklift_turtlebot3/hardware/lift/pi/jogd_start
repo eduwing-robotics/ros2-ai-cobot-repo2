@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+for p in $(pgrep -f 'fk_jog[d]\.py'); do kill "$p" 2>/dev/null; done
+for p in $(pgrep -f 'forklift_p[i]\.py'); do kill "$p" 2>/dev/null; done
+sleep 1
+cd "$HOME/forklift"
+setsid nohup python3 -u fk_jogd.py --pins 26,19,13,6 --port 5005 > /tmp/fk_jogd.log 2>&1 &
+sleep 2
+cat /tmp/fk_jogd.log

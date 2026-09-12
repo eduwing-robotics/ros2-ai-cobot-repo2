@@ -1,0 +1,88 @@
+# 실물 측정값 전용 파일입니다. Python 코드는 수정하지 말고 이 파일만 바꾸세요.
+
+aruco_detector:
+  ros__parameters:
+    marker_size_m: 0.05
+    marker_42_size_m: 0.05
+    lateral_sign: -1.0
+    yaw_sign: 1.0
+
+aruco_docking:
+  ros__parameters:
+    # 실물 배치: Rack1=41, Rack2=40, Drop=42
+    # 2026-09-02 재배치 후 최종 자세와 20cm 후진 staging 자세.
+    # 2026-09-09 HOME 기준 자세 재측정 2회의 평균값.
+    home_marker_id: 41
+    home_marker_41_target_forward_m: 0.66753
+    home_marker_41_target_lateral_m: 0.03151
+    home_marker_41_target_yaw_rad: 0.02721
+    marker_40_target_forward_m: 0.17681
+    marker_40_target_lateral_m: -0.00529
+    marker_40_target_yaw_rad: 0.02458
+    marker_40_staging_forward_m: 0.39426
+    marker_40_staging_lateral_m: -0.00489
+    marker_40_staging_yaw_rad: -0.05431
+    # Rack1은 후진 이탈 때 팔레트에 걸리지 않도록 기존보다 10 mm 얕게 정지.
+    marker_41_target_forward_m: 0.18300
+    marker_41_target_lateral_m: 0.00430
+    marker_41_target_yaw_rad: 0.01262
+    marker_41_staging_forward_m: 0.39230
+    marker_41_staging_lateral_m: 0.00593
+    marker_41_staging_yaw_rad: -0.02916
+    # 2026-09-07 가까운 위치의 5cm 마커로 교체 후 2회 측정한 평균값.
+    # 실물 시험에서 기존 위치가 약 10mm 깊어 최종 삽입을 10mm 줄임.
+    marker_42_target_forward_m: 0.18727
+    marker_42_target_lateral_m: 0.00016
+    marker_42_target_yaw_rad: 0.03417
+    marker_42_staging_forward_m: 0.38618
+    marker_42_staging_lateral_m: 0.00052
+    marker_42_staging_yaw_rad: 0.00733
+    backoff_rack_distance_m: 0.20
+    backoff_drop_distance_m: 0.20
+    backoff_home_distance_m: 0.20
+
+forklift_lift_servo:
+  ros__parameters:
+    # J2=RACK/DROP 진입·하차 및 HOME 주차, J3=운반 높이(약 35mm)
+    # HEIGHT_1은 사용하지 않으며 호환을 위해 J2로 연결합니다.
+    height_1_preset: 2
+    height_2_preset: 2
+    height_3_preset: 3
+    up_preset: 3
+    down_preset: 2
+    park_preset: 2
+
+odom_axis_driver:
+  ros__parameters:
+    # Point A = Rack1 ArUco 41 접근 위치 (고정 HOME 기준 odom)
+    point_a_pose: [0.26804, 0.02592, 0.01007]
+    point_a_marker_id: 41
+    # Point B = Rack2 ArUco 40 접근 위치 (2026-09-02 HOME 기준 재측정)
+    point_b_pose: [0.271, -0.189, 0.030]
+    # HOME에서 Rack2(마커40) 중심선으로 이동하는 오른쪽 18.5cm 차선.
+    rack2_lane_pose: [0.0, -0.185, 0.0]
+    # HOME의 바퀴 틈을 빠져나온 뒤 회전하도록 먼저 직진하는 거리.
+    rack2_lane_clearance_forward_m: 0.03
+    # HOME 원시 odom [0.005,-0.769,0.297] 기준으로 계산한 뒤쪽 경유점.
+    # HOME에서 기존 경유점 방향으로 2cm 더 진행한 위치.
+    home_behind_pose: [-0.2350, 0.0087, 3.112]
+    # Point C = Drop ArUco 42 접근 위치
+    drop_pose: [-0.216, -0.430, -1.364]
+    drop_marker_id: 42
+    linear_speed_mps: 0.04
+    angular_speed_rps: 0.25
+    front_stop_distance_m: 0.25
+    # Wi-Fi/DDS 순간 지연은 허용하되 2초 이상 scan 유실 시 안전 정지합니다.
+    scan_timeout_sec: 2.0
+    # 각 마커에서 20cm 후진 성공 시 해당 staging 좌표로 odom 누적오차를 보정합니다.
+    # 각 station의 20cm 후진 위치를 다시 측정하기 전까지 false로 유지합니다.
+    landmark_reanchor_enabled: false
+
+
+forklift_calibration_validator:
+  ros__parameters:
+    # 실측을 끝낸 항목만 true로 변경합니다.
+    camera_calibrated: true
+    docking_targets_measured: true
+    lift_presets_measured: true
+    calibration_file: ''

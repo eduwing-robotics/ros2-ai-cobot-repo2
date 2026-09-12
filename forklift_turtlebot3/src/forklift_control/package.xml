@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>forklift_control</name>
+  <version>0.2.0</version>
+  <description>Two-rack odometry transport, ArUco docking, and lift control for a TurtleBot forklift.</description>
+  <maintainer email="eduwing-robotics@users.noreply.github.com">forklift_turtlebot3 team</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>ament_index_python</depend>
+  <depend>forklift_interfaces</depend>
+  <depend>cv_bridge</depend>
+  <exec_depend>python3-opencv</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>python3-websockets</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>
