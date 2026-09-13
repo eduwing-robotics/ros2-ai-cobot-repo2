@@ -558,6 +558,19 @@ Server/FMS
 → Request / Result 관리
 
 Unity
+
+
+
+https://github.com/user-attachments/assets/f2408d1c-41af-4c6d-950c-8beb4e620597
+
+
+
+
+
+
+
+
+
 → Digital Twin / Visualization
 
 Robot
@@ -576,6 +589,10 @@ Dummy, Local Wire, Communication 검증이 실제 Production Acceptance를 대�
 production_valid=false
 vision_production_valid=false
 ```
+
+
+
+
 
 실제 통합 검증 범위와 현재 상태는 [05. 검증](05_validation.md)에 별도로 기록합니다.
 
