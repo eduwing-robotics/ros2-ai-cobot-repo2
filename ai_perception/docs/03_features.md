@@ -95,6 +95,21 @@ HOUSE A 수입검사에서 불량 자재를 검출하고 FAIL로 판정하는 �
 
 https://github.com/user-attachments/assets/1475b359-8920-4c33-a93a-550d2caf4a83
 
+
+
+
+
+
+
+
+https://github.com/user-attachments/assets/4b866fdb-ac78-4951-bcdf-b03d5bad8572
+
+
+
+https://github.com/user-attachments/assets/d1e2b7ba-336d-4712-9728-73fd8633b090
+
+
+
 ---
 
 ### 1.4 Incoming Final Runtime Chain
@@ -558,18 +573,6 @@ Server/FMS
 → Request / Result 관리
 
 Unity
-
-
-
-https://github.com/user-attachments/assets/f2408d1c-41af-4c6d-950c-8beb4e620597
-
-
-
-
-
-
-
-
 
 → Digital Twin / Visualization
 
