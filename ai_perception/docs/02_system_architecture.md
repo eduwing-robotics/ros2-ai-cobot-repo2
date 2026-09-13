@@ -31,7 +31,12 @@ Vision은 다음 네 시스템 사이에서 동작합니다.
 3. **Team Server/FMS**
 4. **Robot Control / Unity**
 
-![Vision 전체 시스템 구성](assets/final/system_architecture.svg)
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/eduwing-robotics/ros2-ai-cobot-repo2/main/ai_perception/docs/assets/final/system_architecture.svg"
+    alt="Vision 전체 시스템 구성"
+    width="1200">
+</p>
 
 전체 아키텍처에서 Vision은 **검사 결과 생성과 실영상 제공**에 집중하고, 생산 순서와 로봇 이동은 각 담당 시스템이 관리합니다.
 
