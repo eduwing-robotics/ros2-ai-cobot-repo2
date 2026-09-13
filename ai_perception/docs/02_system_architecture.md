@@ -32,40 +32,43 @@ Vision은 다음 네 시스템 사이에서 동작합니다.
 4. **Robot Control / Unity**
 
 ```mermaid
-flowchart TB
+flowchart LR
+    subgraph EXT["외부 시스템"]
+        direction TB
+        S["Team Server / FMS"]
+        R["Robot Control"]
+        U["Unity Digital Twin"]
+        S <--> R
+    end
+
+    subgraph VIS["AI Perception / Vision"]
+        direction TB
+        I["입고 자재 검사<br/>YOLO + Auto Alignment + QA"]
+        F["Factory View Pipeline<br/>FFmpeg + ROS2"]
+        Q["PRE_ROOF 5방향 QC"]
+        H["HMV1 영상 전송"]
+
+        I --> H
+        F --> H
+        Q --> H
+    end
+
     subgraph CAM["카메라"]
+        direction TB
         C1["Incoming Inspection Camera"]
         C2["Factory View Camera<br/>Logitech C270"]
         C3["Intel RealSense D435<br/>RGB + Depth"]
     end
 
-    subgraph VIS["AI Perception / Vision"]
-        V1["입고 자재 검사<br/>YOLO + Auto Alignment + QA"]
-        V2["Factory View Pipeline<br/>FFmpeg + ROS2"]
-        V3["PRE_ROOF 5방향 QC"]
-        V4["HMV1 영상 전송"]
-    end
+    C1 --> I
+    C2 --> F
+    C3 --> Q
 
-    subgraph EXT["외부 시스템"]
-        S["Team Server / FMS"]
-        R["Robot Control"]
-        U["Unity Digital Twin"]
-    end
+    S <--> I
+    S <--> Q
+    R -. "D435 View 이동" .-> C3
 
-    C1 --> V1
-    C2 --> V2
-    C3 --> V3
-
-    V1 <--> S
-    V3 <--> S
-
-    S --> R
-    R -. D435 View 이동 .-> C3
-
-    V1 --> V4
-    V2 --> V4
-    V3 --> V4
-    V4 --> U
+    H --> U
 ```
 
 전체 아키텍처에서 Vision은 **검사 결과 생성과 실영상 제공**에 집중하고, 생산 순서와 로봇 이동은 각 담당 시스템이 관리합니다.
