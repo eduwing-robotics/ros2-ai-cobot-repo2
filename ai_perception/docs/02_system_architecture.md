@@ -31,45 +31,7 @@ Vision은 다음 네 시스템 사이에서 동작합니다.
 3. **Team Server/FMS**
 4. **Robot Control / Unity**
 
-```mermaid
-flowchart LR
-    subgraph EXT["외부 시스템"]
-        direction TB
-        S["Team Server / FMS"]
-        R["Robot Control"]
-        U["Unity Digital Twin"]
-        S <--> R
-    end
-
-    subgraph VIS["AI Perception / Vision"]
-        direction TB
-        I["입고 자재 검사<br/>YOLO + Auto Alignment + QA"]
-        F["Factory View Pipeline<br/>FFmpeg + ROS2"]
-        Q["PRE_ROOF 5방향 QC"]
-        H["HMV1 영상 전송"]
-
-        I --> H
-        F --> H
-        Q --> H
-    end
-
-    subgraph CAM["카메라"]
-        direction TB
-        C1["Incoming Inspection Camera"]
-        C2["Factory View Camera<br/>Logitech C270"]
-        C3["Intel RealSense D435<br/>RGB + Depth"]
-    end
-
-    C1 --> I
-    C2 --> F
-    C3 --> Q
-
-    S <--> I
-    S <--> Q
-    R -. "D435 View 이동" .-> C3
-
-    H --> U
-```
+![Vision 전체 시스템 구성](assets/final/system_architecture.svg)
 
 전체 아키텍처에서 Vision은 **검사 결과 생성과 실영상 제공**에 집중하고, 생산 순서와 로봇 이동은 각 담당 시스템이 관리합니다.
 
