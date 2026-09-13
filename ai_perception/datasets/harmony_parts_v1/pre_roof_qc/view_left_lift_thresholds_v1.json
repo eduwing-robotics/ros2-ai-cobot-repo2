@@ -1,0 +1,33 @@
+{
+  "schema": "harmony_pre_roof_view_left_lift_thresholds_v1",
+  "inspection": "PRE_ROOF",
+  "view": "LEFT",
+  "production_valid": false,
+
+  "method": "GRAY_TEMPLATE_VERTICAL_SHIFT",
+
+  "target_roi": "CORNER_LEFT",
+
+  "normal_validation": {
+    "samples": 40,
+    "gray_dy_min": -5,
+    "gray_dy_max": -4
+  },
+
+  "lift_ng_validation": {
+    "samples": 40,
+    "gray_dy_min": -14,
+    "gray_dy_max": -14
+  },
+
+  "decision": {
+    "gray_dy_fail_if_le": -9,
+    "minimum_gray_score": 0.70,
+    "search_margin_px": 24
+  },
+
+  "scope": {
+    "detect": "obvious wall lift / incomplete seating on VIEW_LEFT",
+    "ignore": "small normal assembly and pixel variation"
+  }
+}

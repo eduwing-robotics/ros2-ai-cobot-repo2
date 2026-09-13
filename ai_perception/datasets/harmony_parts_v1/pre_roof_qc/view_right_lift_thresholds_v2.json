@@ -1,0 +1,66 @@
+{
+  "schema": "harmony_pre_roof_view_right_lift_thresholds_v2",
+  "inspection": "PRE_ROOF",
+  "view": "RIGHT",
+  "method": "GRAY_TEMPLATE_SHIFT",
+  "search_margin_px": 24,
+  "policy": {
+    "run_only_if": "WALL_BODY_PASS",
+    "low_confidence": "FAIL",
+    "note": "DX is diagnostic only; final lift decision uses GRAY_DY"
+  },
+  "corners": {
+    "CORNER_LEFT": {
+      "gray_dy_fail_if_lte": -13,
+      "min_gray_score": 0.8,
+      "evidence": {
+        "normal_dy": [
+          -6,
+          -5
+        ],
+        "lift_ng_dy": [
+          -21,
+          -20
+        ],
+        "opposite_corner_lift_normal_dy": [
+          -6,
+          -6
+        ]
+      }
+    },
+    "CORNER_RIGHT": {
+      "gray_dy_fail_if_lte": -12,
+      "min_gray_score": 0.8,
+      "evidence": {
+        "normal_dy": [
+          -8,
+          -8
+        ],
+        "left_lift_right_still_normal_dy": [
+          -10,
+          -10
+        ],
+        "lift_ng_dy": [
+          -16,
+          -16
+        ]
+      }
+    }
+  },
+  "references": {
+    "normal": "view_right_corner_normal_probe_v1",
+    "left_lift": "view_right_corner_left_lift_probe_v2",
+    "right_lift": "view_right_corner_right_lift_probe_v1"
+  },
+  "production_valid": false,
+  "v2_adjustment": {
+    "reason": "RIGHT fixed lift measured DY=-13 exactly at V1 threshold",
+    "normal_right_dy": -8,
+    "right_normal_during_left_lift_dy": -10,
+    "right_lift_current_dy": -13,
+    "right_lift_previous_dy": -16,
+    "decision": "RIGHT threshold changed from -13 to -12",
+    "debounce": "NOT_REQUIRED_YET",
+    "validation": "Current fixed RIGHT lift was FAIL 60/60 at DY=-13"
+  }
+}

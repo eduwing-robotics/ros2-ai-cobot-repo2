@@ -1,0 +1,46 @@
+{
+  "schema": "harmony_pre_roof_view_left_roi_v2",
+  "inspection": "PRE_ROOF",
+  "view": "LEFT",
+  "production_valid": false,
+  "roi_count": 3,
+  "canonical_transform": {
+    "rotation_deg": 180
+  },
+  "rois": [
+    {
+      "name": "WALL_BODY",
+      "group": "WALL",
+      "x": 278,
+      "y": 127,
+      "w": 732,
+      "h": 433
+    },
+    {
+      "name": "CORNER_LEFT",
+      "group": "CORNER",
+      "x": 65,
+      "y": 126,
+      "w": 206,
+      "h": 87
+    },
+    {
+      "name": "CORNER_RIGHT",
+      "group": "CORNER",
+      "x": 1019,
+      "y": 119,
+      "w": 195,
+      "h": 85
+    }
+  ],
+  "decision_scope": {
+    "WALL_BODY": "wall presence / major shape / major lift",
+    "CORNER_LEFT": "left corner major position / tilt abnormality",
+    "CORNER_RIGHT": "right corner major position / tilt abnormality"
+  },
+  "excluded_scope": [
+    "micro gap measurement",
+    "sub-millimeter insertion depth",
+    "minor normal seam variation"
+  ]
+}

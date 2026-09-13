@@ -1,0 +1,37 @@
+{
+  "project": "HARMONY_HOUSE_VISION_V1",
+  "inspection": "HOUSE_B_INCOMING_INSPECTION",
+  "slot": "B02",
+  "class_name": "wall_ext_door",
+  "audit": "POSITION_TOLERANT_PRESENCE_V1",
+  "method": "gradient_fraction",
+  "training_used": false,
+  "design": {
+    "gradient_threshold": 10,
+    "pass_min": 0.13024585477415665,
+    "pass_mean": 0.13146035829998096,
+    "missing_max": 0.041395082904516864,
+    "missing_mean": 0.040194396798170384,
+    "gap": 0.08885077186963979,
+    "presence_threshold_candidate": 0.08582046883933675
+  },
+  "validation": {
+    "pass_take02_count": 30,
+    "reinsert_pass_take03_count": 30,
+    "heldout_missing_count": 6,
+    "pass_take02_min": 0.128830760434534,
+    "reinsert_pass_take03_min": 0.12898799313893652,
+    "missing_max": 0.042152658662092626,
+    "overall_pass_min": 0.128830760434534,
+    "gap": 0.08667810177244138,
+    "separable": true,
+    "classification": {
+      "pass_take02_correct": 30,
+      "pass_take02_total": 30,
+      "reinsert_pass_take03_correct": 30,
+      "reinsert_pass_take03_total": 30,
+      "missing_correct": 6,
+      "missing_total": 6
+    }
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "project": "HARMONY_UNIFIED_VISION_V1",
+  "recipe_version": "HARMONY_UNIFIED_INSPECTION_RECIPE_V2",
+  "input_topic": "/vision/global_camera/image_aligned",
+  "runtime_model_path": "models/harmony_unified_vision_v1/training_attempts/attempt06_base_ab/weights/best.pt",
+  "production_runtime_authorized": false,
+  "modes": {
+    "HOUSE_B": {
+      "layout_status": "LOCKED",
+      "runtime_status": "VALIDATION_RUNTIME_READY",
+      "roi_contract": "datasets/harmony_house_vision_v1/audits/house_b_incoming_board_roi_v1/roi_contract_locked_v1.json",
+      "image_space": "AUTO_ALIGNED_CANONICAL_1280X720",
+      "slots": [
+        {
+          "slot": "B01",
+          "expected_material": "wall_ext_back_window",
+          "required_component": "window"
+        },
+        {
+          "slot": "B02",
+          "expected_material": "wall_ext_door",
+          "required_component": "door"
+        },
+        {
+          "slot": "B03",
+          "expected_material": "wall_ext_left_window",
+          "required_component": "window"
+        },
+        {
+          "slot": "B04",
+          "expected_material": "wall_ext_right",
+          "required_component": null
+        },
+        {
+          "slot": "B05",
+          "expected_material": "wall_int_house_b",
+          "required_component": null
+        },
+        {
+          "slot": "B06",
+          "expected_material": "roof_zip",
+          "required_component": null
+        }
+      ],
+      "rules": {
+        "missing": "REUSE_HOUSE_B_MISSING_V5_LOCKED",
+        "color": "REUSE_VALIDATED_RULES_WITH_VALIDATION_FLAGS",
+        "debounce": {
+          "window": 5,
+          "required": 3
+        }
+      },
+      "input_topic": "/vision/global_camera/image_aligned"
+    },
+    "HOUSE_A": {
+      "layout_status": "LOCKED",
+      "runtime_status": "VALIDATION_RUNTIME_READY",
+      "roi_contract": "datasets/harmony_house_vision_v1/audits/house_a_incoming_board_roi_v1/roi_contract_locked_v1.json",
+      "input_topic": "/vision/global_camera/image_raw",
+      "image_space": "RAW_LOCKED_1280X720",
+      "slots": [
+        {
+          "slot": "A01",
+          "expected_material": "wall_ext_back_window",
+          "required_component": "window"
+        },
+        {
+          "slot": "A02",
+          "expected_material": "wall_ext_door",
+          "required_component": "door"
+        },
+        {
+          "slot": "A03",
+          "expected_material": "wall_ext_left_window",
+          "required_component": "window"
+        },
+        {
+          "slot": "A04",
+          "expected_material": "wall_ext_right",
+          "required_component": null
+        },
+        {
+          "slot": "A05",
+          "expected_material": "wall_int_house_a",
+          "required_component": null
+        },
+        {
+          "slot": "A06",
+          "expected_material": "roof_nozip",
+          "required_component": null
+        },
+        {
+          "slot": "A07",
+          "expected_material": "wall_int_house_a_door",
+          "required_component": null
+        }
+      ],
+      "rules": {
+        "quality": "ATTEMPT06_MULTI_HEAD",
+        "quality_threshold": 0.5,
+        "color": "AI_MULTI_HEAD",
+        "structural": "AI_MULTI_HEAD",
+        "debounce": {
+          "window": 5,
+          "required": 3
+        }
+      }
+    },
+    "BASE_AB": {
+      "layout_status": "LOCKED",
+      "runtime_status": "VALIDATION_RUNTIME_READY",
+      "roi_contract": "datasets/harmony_house_vision_v1/audits/base_ab_global_roi_v1/roi_contract_locked_v1.json",
+      "input_topic": "/vision/global_camera/image_raw",
+      "image_space": "RAW_LOCKED_1280X720",
+      "slots": [
+        {
+          "slot": "C08",
+          "expected_material": "base_house_a",
+          "required_component": null
+        },
+        {
+          "slot": "C09",
+          "expected_material": "base_house_b",
+          "required_component": null
+        }
+      ],
+      "identity_policy": {
+        "color_required": true,
+        "slot_layout_required": true,
+        "top_hole_pattern_required": true,
+        "magnet_layout_required": true,
+        "color_only_classification_forbidden": true
+      },
+      "rules": {
+        "quality": "ATTEMPT06_MULTI_HEAD",
+        "quality_threshold": 0.5,
+        "color": "AI_MULTI_HEAD",
+        "structural": "AI_MULTI_HEAD",
+        "debounce": {
+          "window": 5,
+          "required": 3
+        }
+      }
+    }
+  }
+}

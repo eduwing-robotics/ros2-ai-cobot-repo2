@@ -1,0 +1,82 @@
+{
+  "schema": "harmony_pre_roof_view_front_thresholds_v1",
+  "inspection": "PRE_ROOF",
+  "view": "FRONT",
+  "robot_pose": "VIEW_FRONT_FIXED",
+  "canonical_transform": "ROTATE_180",
+  "golden": "view_front_golden_v1",
+  "roi": "view_front_roi_v2",
+  "normal_baseline": "view_front_baseline_v1",
+  "validation_probe": "view_front_representative_anomaly_probe_v2",
+  "decision_policy": {
+    "enabled_metrics": [
+      "mean_absdiff",
+      "p95_absdiff",
+      "changed_fraction_20"
+    ],
+    "diagnostic_only_metrics": [
+      "edge_change_fraction"
+    ],
+    "source_fail_if_exceed_count_gte": 2,
+    "roi_fail_if": "RGB_FAIL_OR_DEPTH_FAIL",
+    "view_fail_if": "ANY_ROI_FAIL"
+  },
+  "thresholds": {
+    "FRONT_BODY": {
+      "rgb": {
+        "mean_absdiff": 15.0,
+        "p95_absdiff": 25.0,
+        "changed_fraction_20": 0.05
+      },
+      "depth": {
+        "mean_absdiff": 4.0,
+        "p95_absdiff": 10.0,
+        "changed_fraction_20": 0.025
+      }
+    },
+    "UPPER_REGION": {
+      "rgb": {
+        "mean_absdiff": 15.0,
+        "p95_absdiff": 25.0,
+        "changed_fraction_20": 0.05
+      },
+      "depth": {
+        "mean_absdiff": 4.0,
+        "p95_absdiff": 10.0,
+        "changed_fraction_20": 0.025
+      }
+    },
+    "MIDDLE_REGION": {
+      "rgb": {
+        "mean_absdiff": 15.0,
+        "p95_absdiff": 25.0,
+        "changed_fraction_20": 0.05
+      },
+      "depth": {
+        "mean_absdiff": 4.0,
+        "p95_absdiff": 10.0,
+        "changed_fraction_20": 0.025
+      }
+    },
+    "LOWER_REGION": {
+      "rgb": {
+        "mean_absdiff": 15.0,
+        "p95_absdiff": 25.0,
+        "changed_fraction_20": 0.05
+      },
+      "depth": {
+        "mean_absdiff": 4.0,
+        "p95_absdiff": 10.0,
+        "changed_fraction_20": 0.025
+      }
+    }
+  },
+  "notes": [
+    "Thresholds implement normal-reference deviation QC.",
+    "ROIs do not represent exclusive defect classes.",
+    "Representative anomaly samples are validation examples only.",
+    "Edge-change is retained as a diagnostic metric but is not used for the V1 decision.",
+    "Depth is visualization/shape information only and is not metric millimeter depth."
+  ],
+  "production_valid": false
+}

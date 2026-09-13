@@ -1,0 +1,203 @@
+{
+  "project": "HARMONY_HOUSE_VISION_V1",
+  "inspection": "HOUSE_B_INCOMING_INSPECTION",
+  "audit": "PASS_ROBUSTNESS_VALIDATION_V2",
+  "new_pass_session": "/home/kimseongyeop/vision_project/datasets/harmony_house_vision_v1/raw/global/incoming_inspection/house_b/pass_validation_take02",
+  "new_pass_count": 30,
+  "training_used": false,
+  "all_slots_have_separable_metric": true,
+  "results": [
+    {
+      "slot": "B01",
+      "class_name": "wall_ext_back_window",
+      "metrics": {
+        "raw_mae": {
+          "new_pass_mean": 13.636115264892577,
+          "new_pass_max": 13.653148651123047,
+          "missing_mean": 147.52337646484375,
+          "missing_min": 145.26187133789062,
+          "gap": 131.60872268676758,
+          "separable": true
+        },
+        "brightness_aligned_mae": {
+          "new_pass_mean": 13.468201065063477,
+          "new_pass_max": 13.488484382629395,
+          "missing_mean": 32.25865904490153,
+          "missing_min": 31.71192169189453,
+          "gap": 18.223437309265137,
+          "separable": true
+        },
+        "gradient_mae": {
+          "new_pass_mean": 33.780890146891274,
+          "new_pass_max": 33.86429214477539,
+          "missing_mean": 27.39518928527832,
+          "missing_min": 27.307485580444336,
+          "gap": -6.556806564331055,
+          "separable": false
+        }
+      },
+      "recommended_metric": "raw_mae",
+      "robustly_separable": true
+    },
+    {
+      "slot": "B02",
+      "class_name": "wall_ext_door",
+      "metrics": {
+        "raw_mae": {
+          "new_pass_mean": 7.5124961853027346,
+          "new_pass_max": 7.6227898597717285,
+          "missing_mean": 29.559727509816486,
+          "missing_min": 29.157764434814453,
+          "gap": 21.534974575042725,
+          "separable": true
+        },
+        "brightness_aligned_mae": {
+          "new_pass_mean": 7.1962679068247475,
+          "new_pass_max": 7.279419898986816,
+          "missing_mean": 25.23153289159139,
+          "missing_min": 25.1514835357666,
+          "gap": 17.872063636779785,
+          "separable": true
+        },
+        "gradient_mae": {
+          "new_pass_mean": 21.133668200174967,
+          "new_pass_max": 21.26105308532715,
+          "missing_mean": 35.78992207845052,
+          "missing_min": 35.59838104248047,
+          "gap": 14.33732795715332,
+          "separable": true
+        }
+      },
+      "recommended_metric": "raw_mae",
+      "robustly_separable": true
+    },
+    {
+      "slot": "B03",
+      "class_name": "wall_ext_left_window",
+      "metrics": {
+        "raw_mae": {
+          "new_pass_mean": 22.0516939163208,
+          "new_pass_max": 22.10724639892578,
+          "missing_mean": 148.9473648071289,
+          "missing_min": 148.31747436523438,
+          "gap": 126.2102279663086,
+          "separable": true
+        },
+        "brightness_aligned_mae": {
+          "new_pass_mean": 22.006125450134277,
+          "new_pass_max": 22.062259674072266,
+          "missing_mean": 33.11358070373535,
+          "missing_min": 33.07680892944336,
+          "gap": 11.014549255371094,
+          "separable": true
+        },
+        "gradient_mae": {
+          "new_pass_mean": 39.758450444539385,
+          "new_pass_max": 39.8350944519043,
+          "missing_mean": 33.18022346496582,
+          "missing_min": 32.90852737426758,
+          "gap": -6.926567077636719,
+          "separable": false
+        }
+      },
+      "recommended_metric": "raw_mae",
+      "robustly_separable": true
+    },
+    {
+      "slot": "B04",
+      "class_name": "wall_ext_right",
+      "metrics": {
+        "raw_mae": {
+          "new_pass_mean": 21.61414648691813,
+          "new_pass_max": 21.68092918395996,
+          "missing_mean": 164.6967290242513,
+          "missing_min": 164.09474182128906,
+          "gap": 142.4138126373291,
+          "separable": true
+        },
+        "brightness_aligned_mae": {
+          "new_pass_mean": 21.338973553975425,
+          "new_pass_max": 21.40680694580078,
+          "missing_mean": 26.58793067932129,
+          "missing_min": 26.476076126098633,
+          "gap": 5.069269180297852,
+          "separable": true
+        },
+        "gradient_mae": {
+          "new_pass_mean": 39.42253672281901,
+          "new_pass_max": 39.47386932373047,
+          "missing_mean": 23.68566608428955,
+          "missing_min": 23.633987426757812,
+          "gap": -15.839881896972656,
+          "separable": false
+        }
+      },
+      "recommended_metric": "raw_mae",
+      "robustly_separable": true
+    },
+    {
+      "slot": "B05",
+      "class_name": "wall_int_house_b",
+      "metrics": {
+        "raw_mae": {
+          "new_pass_mean": 8.702716700236003,
+          "new_pass_max": 8.793105125427246,
+          "missing_mean": 6.696701129277547,
+          "missing_min": 6.667479515075684,
+          "gap": -2.1256256103515625,
+          "separable": false
+        },
+        "brightness_aligned_mae": {
+          "new_pass_mean": 5.127169481913248,
+          "new_pass_max": 5.165977478027344,
+          "missing_mean": 6.384045918782552,
+          "missing_min": 6.3693037033081055,
+          "gap": 1.2033262252807617,
+          "separable": true
+        },
+        "gradient_mae": {
+          "new_pass_mean": 8.706688022613525,
+          "new_pass_max": 8.771382331848145,
+          "missing_mean": 6.899782697359721,
+          "missing_min": 6.858307361602783,
+          "gap": -1.9130749702453613,
+          "separable": false
+        }
+      },
+      "recommended_metric": "brightness_aligned_mae",
+      "robustly_separable": true
+    },
+    {
+      "slot": "B06",
+      "class_name": "roof_zip",
+      "metrics": {
+        "raw_mae": {
+          "new_pass_mean": 12.675709597269694,
+          "new_pass_max": 12.749073028564453,
+          "missing_mean": 150.84133275349936,
+          "missing_min": 149.18235778808594,
+          "gap": 136.43328475952148,
+          "separable": true
+        },
+        "brightness_aligned_mae": {
+          "new_pass_mean": 12.12538938522339,
+          "new_pass_max": 12.15416431427002,
+          "missing_mean": 39.31419531504313,
+          "missing_min": 39.08553695678711,
+          "gap": 26.93137264251709,
+          "separable": true
+        },
+        "gradient_mae": {
+          "new_pass_mean": 21.712828572591146,
+          "new_pass_max": 21.768657684326172,
+          "missing_mean": 15.683192094167074,
+          "missing_min": 15.654094696044922,
+          "gap": -6.11456298828125,
+          "separable": false
+        }
+      },
+      "recommended_metric": "raw_mae",
+      "robustly_separable": true
+    }
+  ]
+}

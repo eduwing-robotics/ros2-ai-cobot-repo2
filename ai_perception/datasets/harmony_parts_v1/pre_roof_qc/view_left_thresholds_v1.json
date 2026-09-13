@@ -1,0 +1,139 @@
+{
+  "schema": "harmony_pre_roof_view_left_thresholds_v1",
+  "inspection": "PRE_ROOF",
+  "view": "LEFT",
+  "production_valid": false,
+  "decision_rule": {
+    "source_fail": "2_OR_MORE_METRICS_EXCEEDED",
+    "roi_fail": "RGB_FAIL_OR_DEPTH_FAIL",
+    "view_fail": "ANY_ROI_FAIL"
+  },
+  "policy": {
+    "purpose": "detect obvious assembly abnormality only",
+    "ignore": [
+      "minor normal seam variation",
+      "small lighting change",
+      "small exposure change",
+      "minor pixel shift"
+    ]
+  },
+  "rois": {
+    "WALL_BODY": {
+      "group": "WALL",
+      "rgb": {
+        "mean_absdiff": {
+          "threshold": 6.0,
+          "baseline_max": 0.7699586062418758
+        },
+        "p95_absdiff": {
+          "threshold": 25.0,
+          "baseline_max": 2.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.06,
+          "baseline_max": 0.0004353916631961534
+        },
+        "edge_change_fraction": {
+          "threshold": 0.04,
+          "baseline_max": 0.0016721563876374009
+        }
+      },
+      "depth": {
+        "mean_absdiff": {
+          "threshold": 18.0,
+          "baseline_max": 7.370987350505012
+        },
+        "p95_absdiff": {
+          "threshold": 50.0,
+          "baseline_max": 22.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.25207284291825993,
+          "baseline_max": 0.08402428097275332
+        },
+        "edge_change_fraction": {
+          "threshold": 0.12,
+          "baseline_max": 0.03213695276315955
+        }
+      }
+    },
+    "CORNER_LEFT": {
+      "group": "CORNER",
+      "rgb": {
+        "mean_absdiff": {
+          "threshold": 18.925417550124617,
+          "baseline_max": 11.828385968827885
+        },
+        "p95_absdiff": {
+          "threshold": 142.5,
+          "baseline_max": 95.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.20149536882044417,
+          "baseline_max": 0.1259346055127776
+        },
+        "edge_change_fraction": {
+          "threshold": 0.10204664657962281,
+          "baseline_max": 0.06204664657962281
+        }
+      },
+      "depth": {
+        "mean_absdiff": {
+          "threshold": 18.0,
+          "baseline_max": 7.764739798385597
+        },
+        "p95_absdiff": {
+          "threshold": 50.0,
+          "baseline_max": 29.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.2,
+          "baseline_max": 0.10713090056913291
+        },
+        "edge_change_fraction": {
+          "threshold": 0.12,
+          "baseline_max": 0.041569021314585425
+        }
+      }
+    },
+    "CORNER_RIGHT": {
+      "group": "CORNER",
+      "rgb": {
+        "mean_absdiff": {
+          "threshold": 15.0,
+          "baseline_max": 8.442795374560081
+        },
+        "p95_absdiff": {
+          "threshold": 37.0,
+          "baseline_max": 22.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.18,
+          "baseline_max": 0.07776772247360483
+        },
+        "edge_change_fraction": {
+          "threshold": 0.1,
+          "baseline_max": 0.05085972850678733
+        }
+      },
+      "depth": {
+        "mean_absdiff": {
+          "threshold": 18.0,
+          "baseline_max": 9.941820010055304
+        },
+        "p95_absdiff": {
+          "threshold": 147.0,
+          "baseline_max": 98.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.2,
+          "baseline_max": 0.08621417797888387
+        },
+        "edge_change_fraction": {
+          "threshold": 0.12,
+          "baseline_max": 0.02720965309200603
+        }
+      }
+    }
+  }
+}

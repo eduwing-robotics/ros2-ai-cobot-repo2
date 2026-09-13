@@ -1,0 +1,27 @@
+{
+  "schema": "harmony_pre_roof_view_left_structure_thresholds_v2",
+  "view": "VIEW_LEFT_FIXED",
+  "status": "PROTOTYPE_NOT_FINAL",
+  "reference": "datasets/harmony_parts_v1/pre_roof_qc/view_left_structure_reference_v2_current_pose/rgb.jpg",
+  "reference_transform": "ROTATE_180_TO_CANONICAL",
+  "search_margin_px": 4,
+  "policy": {
+    "absolute_rgb_brightness_final_decision": false,
+    "legacy_rgb_golden_final_decision": false,
+    "legacy_depth_golden_final_decision": false,
+    "depth": "DIAGNOSTIC_ONLY",
+    "structure": "PRIMARY",
+    "preserve_left_lift": true
+  },
+  "rois": {
+    "WALL_BODY": {
+      "min_score": 0.5
+    },
+    "CORNER_LEFT": {
+      "min_score": 0.45
+    },
+    "CORNER_RIGHT": {
+      "min_score": 0.45
+    }
+  }
+}

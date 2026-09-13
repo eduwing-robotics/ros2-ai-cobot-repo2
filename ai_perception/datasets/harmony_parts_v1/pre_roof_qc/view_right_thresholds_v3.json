@@ -1,0 +1,173 @@
+{
+  "schema": "harmony_pre_roof_view_right_thresholds_v3",
+  "inspection": "PRE_ROOF",
+  "view": "RIGHT",
+  "robot_pose": "VIEW_RIGHT_FIXED",
+  "canonical_transform": "ROTATE_180",
+  "golden": "view_right_golden_v2",
+  "roi_config": "view_right_roi_v1.json",
+  "baseline": "view_right_baseline_v2",
+  "rule": {
+    "source_fail_if_metric_count_gte": 2,
+    "roi_fail_if": "RGB_FAIL OR DEPTH_FAIL",
+    "view_fail_if": "ANY_ROI_FAIL"
+  },
+  "scope": {
+    "WALL_BODY": "gross wall shape / wrong material / wrong color / wrong wall type / large opening",
+    "CORNER_LEFT": "canonical left corner/end condition",
+    "CORNER_RIGHT": "canonical right corner/end condition"
+  },
+  "rois": {
+    "WALL_BODY": {
+      "group": "MAIN_WALL",
+      "rgb": {
+        "mean_absdiff": {
+          "threshold": 30.0,
+          "baseline_max": 6.68415006967675,
+          "recalibration": {
+            "normal_max": 13.6309,
+            "ng_min": 139.1501,
+            "normal_below_threshold": true,
+            "ng_above_threshold": true
+          }
+        },
+        "p95_absdiff": {
+          "threshold": 70.0,
+          "baseline_max": 13.0,
+          "recalibration": {
+            "normal_max": 29.0,
+            "ng_min": 210.0,
+            "normal_below_threshold": true,
+            "ng_above_threshold": true
+          }
+        },
+        "changed_fraction_20": {
+          "threshold": 0.6,
+          "baseline_max": 0.0171689274101494,
+          "recalibration": {
+            "normal_max": 0.4351,
+            "ng_min": 0.8835,
+            "normal_below_threshold": true,
+            "ng_above_threshold": true
+          }
+        },
+        "edge_change_fraction": {
+          "threshold": 0.03,
+          "baseline_max": 0.0047603443867905845,
+          "recalibration": {
+            "normal_max": 0.0094,
+            "ng_min": 0.0137,
+            "normal_below_threshold": true,
+            "ng_above_threshold": false
+          }
+        }
+      },
+      "depth": {
+        "mean_absdiff": {
+          "threshold": 24.0,
+          "baseline_max": 13.457956892837037
+        },
+        "p95_absdiff": {
+          "threshold": 162.0,
+          "baseline_max": 120.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.25,
+          "baseline_max": 0.11659963055118451
+        },
+        "edge_change_fraction": {
+          "threshold": 0.12,
+          "baseline_max": 0.03617429630083072
+        }
+      }
+    },
+    "CORNER_LEFT": {
+      "group": "CORNER",
+      "rgb": {
+        "mean_absdiff": {
+          "threshold": 26.0,
+          "baseline_max": 15.272177351221655
+        },
+        "p95_absdiff": {
+          "threshold": 145.0,
+          "baseline_max": 37.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.45,
+          "baseline_max": 0.305160352809976
+        },
+        "edge_change_fraction": {
+          "threshold": 0.11,
+          "baseline_max": 0.04960967861849887
+        }
+      },
+      "depth": {
+        "mean_absdiff": {
+          "threshold": 22.0,
+          "baseline_max": 12.572291124553637
+        },
+        "p95_absdiff": {
+          "threshold": 130.0,
+          "baseline_max": 49.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.3,
+          "baseline_max": 0.12574769355547294
+        },
+        "edge_change_fraction": {
+          "threshold": 0.14,
+          "baseline_max": 0.04011354803825488
+        }
+      }
+    },
+    "CORNER_RIGHT": {
+      "group": "CORNER",
+      "rgb": {
+        "mean_absdiff": {
+          "threshold": 40.0,
+          "baseline_max": 22.578615269890438
+        },
+        "p95_absdiff": {
+          "threshold": 185.0,
+          "baseline_max": 49.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.8,
+          "baseline_max": 0.566540469225033
+        },
+        "edge_change_fraction": {
+          "threshold": 0.1,
+          "baseline_max": 0.01626226122870418
+        }
+      },
+      "depth": {
+        "mean_absdiff": {
+          "threshold": 20.0,
+          "baseline_max": 9.461213407522132
+        },
+        "p95_absdiff": {
+          "threshold": 140.0,
+          "baseline_max": 56.0
+        },
+        "changed_fraction_20": {
+          "threshold": 0.28,
+          "baseline_max": 0.1173349394825905
+        },
+        "edge_change_fraction": {
+          "threshold": 0.14,
+          "baseline_max": 0.02868123673492801
+        }
+      }
+    }
+  },
+  "production_valid": false,
+  "wall_body_recalibration": {
+    "reason": "D435 photometric regime changed while geometry remained stable",
+    "normal_dataset": "view_right_photometric_probe_normal_v1",
+    "ng_dataset": "view_right_wall_body_ng_probe_v1",
+    "normal_state": "BLACK_RIGHT_WALL",
+    "ng_state": "WHITE_LEFT_WALL_WRONG_COMPONENT",
+    "policy": "RGB source FAIL if >=2 metrics exceed threshold",
+    "note": "edge threshold intentionally remains permissive; primary separation uses mean, p95, and changed fraction"
+  }
+}

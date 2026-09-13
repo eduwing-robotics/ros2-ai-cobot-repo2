@@ -1,0 +1,105 @@
+{
+  "project": "HARMONY_HOUSE_VISION_V1",
+  "inspection": "HOUSE_B_INCOMING_INSPECTION",
+  "version": "v1",
+  "status": "ROI_LOCKED",
+  "image_topic": "/vision/global_camera/image_raw",
+  "resolution": {
+    "width": 1280,
+    "height": 720
+  },
+  "base_house_b": {
+    "included": false,
+    "policy": "SEPARATE_BASE_INSPECTION"
+  },
+  "slots": [
+    {
+      "slot": "B01",
+      "class_name": "wall_ext_back_window",
+      "display_color": "red",
+      "x": 190,
+      "y": 55,
+      "width": 428,
+      "height": 168,
+      "x2": 618,
+      "y2": 223
+    },
+    {
+      "slot": "B02",
+      "class_name": "wall_ext_door",
+      "display_color": "orange",
+      "x": 167,
+      "y": 234,
+      "width": 460,
+      "height": 181,
+      "x2": 627,
+      "y2": 415
+    },
+    {
+      "slot": "B03",
+      "class_name": "wall_ext_left_window",
+      "display_color": "skyblue",
+      "x": 132,
+      "y": 454,
+      "width": 332,
+      "height": 203,
+      "x2": 464,
+      "y2": 657
+    },
+    {
+      "slot": "B04",
+      "class_name": "wall_ext_right",
+      "display_color": "teal",
+      "x": 525,
+      "y": 451,
+      "width": 311,
+      "height": 210,
+      "x2": 836,
+      "y2": 661
+    },
+    {
+      "slot": "B05",
+      "class_name": "wall_int_house_b",
+      "display_color": "pink",
+      "x": 879,
+      "y": 459,
+      "width": 298,
+      "height": 181,
+      "x2": 1177,
+      "y2": 640
+    },
+    {
+      "slot": "B06",
+      "class_name": "roof_zip",
+      "display_color": "green",
+      "x": 660,
+      "y": 73,
+      "width": 483,
+      "height": 311,
+      "x2": 1143,
+      "y2": 384
+    }
+  ],
+  "notes": [
+    "Display colors are human-readable ROI identifiers only.",
+    "Do not classify materials from ROI border colors.",
+    "No model training authorized by this ROI definition alone."
+  ],
+  "lock_version": "v1",
+  "inspection_policy": {
+    "house": "HOUSE_B",
+    "main_board_class_count": 6,
+    "base_house_b_included": false,
+    "base_policy": "SEPARATE_BASE_INSPECTION",
+    "camera": "GLOBAL_RGB",
+    "resolution": "1280x720",
+    "slot_positions_fixed": true,
+    "camera_position_fixed_after_lock": true
+  },
+  "artifacts": {
+    "reference_image": "/home/kimseongyeop/vision_project/datasets/harmony_house_vision_v1/audits/house_b_incoming_board_roi_v1/reference_1280x720.png",
+    "reference_sha256": "519e50ea1ced36d1fe4f3ebdb8b567bf977ce57a7416a754a7cab7004af5784d",
+    "overlay_image": "/home/kimseongyeop/vision_project/datasets/harmony_house_vision_v1/audits/house_b_incoming_board_roi_v1/roi_overlay_1280x720.png",
+    "overlay_sha256": "082bd533901d98a9d12747211595fd06032f2a13a34f396e3406907ca72bb20e"
+  }
+}

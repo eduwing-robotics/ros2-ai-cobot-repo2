@@ -1,0 +1,60 @@
+{
+  "schema": "harmony_pre_roof_view_top_structure_gallery_v1b",
+  "status": "PROTOTYPE_NOT_FINAL",
+  "purpose": "PRE_ROOF assembly completeness inspection",
+  "policy": {
+    "absolute_brightness_used": false,
+    "absolute_color_used": false,
+    "rgb_gradient_structure_used": true,
+    "search_tolerance_px": 10,
+    "decision": "PASS if best match against normal gallery is >= ROI threshold",
+    "inspection_scope": [
+      "component_presence",
+      "gross_position",
+      "gross_orientation",
+      "missing_component",
+      "major_misassembly"
+    ],
+    "out_of_scope": [
+      "surface_finish",
+      "minor_color_difference",
+      "minor_brightness_difference",
+      "minor_cosmetic_difference"
+    ]
+  },
+  "references": [
+    "view_top_normal_reinsert_v1/placement_01/rgb.png",
+    "view_top_normal_reinsert_v1/placement_03_retry2/rgb.png",
+    "view_top_normal_reinsert_v1/placement_04/rgb.png",
+    "view_top_normal_reinsert_v1/placement_05/rgb.png",
+    "view_top_normal_reinsert_v1/placement_06_post_final_holdout/rgb.png"
+  ],
+  "thresholds": {
+    "COLUMN_1": 0.5,
+    "COLUMN_2": 0.5,
+    "COLUMN_3": 0.5,
+    "COLUMN_4": 0.45,
+    "WALL_1": 0.5,
+    "WALL_2": 0.5,
+    "WALL_3": 0.2,
+    "WALL_4": 0.5,
+    "DOOR_WALL_1": 0.5,
+    "WINDOW_WALL_2": 0.7,
+    "WINDOW_WALL_3": 0.2
+  },
+  "base_holes": {
+    "mode": "KEEP_EXISTING_INDIVIDUAL_HOLE_LOGIC_FOR_V7_PROTOTYPE",
+    "large_roi_pixel_diff_used": false
+  },
+  "change_from_v1": {
+    "WALL_3_threshold": {
+      "old": 0.25,
+      "new": 0.2,
+      "reason": "normal recovery score 0.2444 fell below 0.25; PRE_ROOF uses loose assembly-state QC"
+    }
+  },
+  "excluded_invalid_normal": {
+    "placement": "placement_02",
+    "reason": "WALL_3 physically misaligned; invalid normal reference"
+  }
+}

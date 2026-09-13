@@ -6,3 +6,5 @@ __pycache__/
 *.sqlite3
 .env
 .env.*
+docs/assets/_capture_candidates/
+docs/assets/_contact_sheets/

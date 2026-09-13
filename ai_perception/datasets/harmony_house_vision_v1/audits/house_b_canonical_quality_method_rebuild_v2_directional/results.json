@@ -1,0 +1,294 @@
+{
+  "project": "HARMONY_HOUSE_VISION_V1",
+  "audit": "HOUSE_B_CANONICAL_QUALITY_METHOD_REBUILD_V2_DIRECTIONAL",
+  "status": "METHOD_REFINEMENT_REQUIRED",
+  "correction_from_v1": "V1 assumed defect scores must be higher than normal scores. V2 evaluates both HIGH_IS_NG and LOW_IS_NG directions.",
+  "cases": [
+    {
+      "name": "B02_COLOR_NG",
+      "slot": "B02",
+      "label": "COLOR_NG",
+      "method": "lab",
+      "normal_score": {
+        "min": 3.464101552963257,
+        "median": 3.464101552963257,
+        "max": 3.464101552963257
+      },
+      "defect_score": {
+        "min": 204.12005615234375,
+        "median": 204.13965606689453,
+        "max": 204.1592559814453
+      },
+      "high_side_gap": 200.6559545993805,
+      "low_side_gap": -200.69515442848206,
+      "selected_direction": "HIGH_IS_NG",
+      "separation_gap": 200.6559545993805,
+      "separable": true,
+      "candidate_threshold": 103.7920788526535,
+      "candidate_rule": "score >= threshold => NG",
+      "normal_pass": 30,
+      "normal_total": 30,
+      "defect_ng": 30,
+      "defect_total": 30,
+      "production_authorized": false
+    },
+    {
+      "name": "B03_COLOR_NG",
+      "slot": "B03",
+      "label": "COLOR_NG",
+      "method": "lab",
+      "normal_score": {
+        "min": 3.1622776985168457,
+        "median": 4.123105525970459,
+        "max": 4.123105525970459
+      },
+      "defect_score": {
+        "min": 188.07711791992188,
+        "median": 190.0762939453125,
+        "max": 190.0762939453125
+      },
+      "high_side_gap": 183.95401239395142,
+      "low_side_gap": -186.91401624679565,
+      "selected_direction": "HIGH_IS_NG",
+      "separation_gap": 183.95401239395142,
+      "separable": true,
+      "candidate_threshold": 96.10011172294617,
+      "candidate_rule": "score >= threshold => NG",
+      "normal_pass": 30,
+      "normal_total": 30,
+      "defect_ng": 30,
+      "defect_total": 30,
+      "production_authorized": false
+    },
+    {
+      "name": "B05_COLOR_NG",
+      "slot": "B05",
+      "label": "COLOR_NG",
+      "method": "lab",
+      "normal_score": {
+        "min": 5.196152210235596,
+        "median": 5.196152210235596,
+        "max": 5.196152210235596
+      },
+      "defect_score": {
+        "min": 212.0848846435547,
+        "median": 212.11553955078125,
+        "max": 212.11553955078125
+      },
+      "high_side_gap": 206.8887324333191,
+      "low_side_gap": -206.91938734054565,
+      "selected_direction": "HIGH_IS_NG",
+      "separation_gap": 206.8887324333191,
+      "separable": true,
+      "candidate_threshold": 108.64051842689514,
+      "candidate_rule": "score >= threshold => NG",
+      "normal_pass": 30,
+      "normal_total": 30,
+      "defect_ng": 30,
+      "defect_total": 30,
+      "production_authorized": false
+    },
+    {
+      "name": "B03_INCOMPLETE_FORMATION",
+      "slot": "B03",
+      "label": "INCOMPLETE_FORMATION",
+      "method": "hist",
+      "normal_score": {
+        "min": 0.14897139273946505,
+        "median": 0.15296955364860038,
+        "max": 0.15648677136476838
+      },
+      "defect_score": {
+        "min": 0.3578008922051439,
+        "median": 0.36419314895460964,
+        "max": 0.3710893730007273
+      },
+      "high_side_gap": 0.2013141208403755,
+      "low_side_gap": -0.22211798026126225,
+      "selected_direction": "HIGH_IS_NG",
+      "separation_gap": 0.2013141208403755,
+      "separable": true,
+      "candidate_threshold": 0.25714383178495615,
+      "candidate_rule": "score >= threshold => NG",
+      "normal_pass": 30,
+      "normal_total": 30,
+      "defect_ng": 30,
+      "defect_total": 30,
+      "production_authorized": false
+    },
+    {
+      "name": "B05_INCOMPLETE_FORMATION",
+      "slot": "B05",
+      "label": "INCOMPLETE_FORMATION",
+      "method": "edge_fraction",
+      "normal_score": {
+        "min": 0.030609217991026755,
+        "median": 0.03561496533056473,
+        "max": 0.03898920983351256
+      },
+      "defect_score": {
+        "min": 0.013571137231636304,
+        "median": 0.027012495828543884,
+        "max": 0.03759872446141865
+      },
+      "high_side_gap": -0.025418072601876257,
+      "low_side_gap": -0.0069895064703918985,
+      "selected_direction": "NOT_SEPARABLE",
+      "separation_gap": -0.0069895064703918985,
+      "separable": false,
+      "candidate_threshold": null,
+      "candidate_rule": null,
+      "normal_pass": null,
+      "normal_total": 30,
+      "defect_ng": null,
+      "defect_total": 30,
+      "production_authorized": false
+    },
+    {
+      "name": "B05_CRACK_DAMAGE",
+      "slot": "B05",
+      "label": "CRACK_DAMAGE",
+      "method": "gradient_image",
+      "normal_score": {
+        "min": 14.389294624328613,
+        "median": 14.448288917541504,
+        "max": 14.535487174987793
+      },
+      "defect_score": {
+        "min": 9.767158508300781,
+        "median": 9.903552532196045,
+        "max": 10.938438415527344
+      },
+      "high_side_gap": -4.768328666687012,
+      "low_side_gap": 3.4508562088012695,
+      "selected_direction": "LOW_IS_NG",
+      "separation_gap": 3.4508562088012695,
+      "separable": true,
+      "candidate_threshold": 12.663866519927979,
+      "candidate_rule": "score <= threshold => NG",
+      "normal_pass": 30,
+      "normal_total": 30,
+      "defect_ng": 30,
+      "defect_total": 30,
+      "production_authorized": false
+    },
+    {
+      "name": "B01_COMPONENT_MISSING",
+      "slot": "B01",
+      "label": "COMPONENT_MISSING",
+      "method": "gray_mean",
+      "normal_score": {
+        "min": 1.8866544281263984,
+        "median": 1.9627837116154936,
+        "max": 2.0613456831330694
+      },
+      "defect_score": {
+        "min": 1.333402870493984,
+        "median": 1.4090523475745371,
+        "max": 1.5151451935914508
+      },
+      "high_side_gap": -0.7279428126390854,
+      "low_side_gap": 0.37150923453494755,
+      "selected_direction": "LOW_IS_NG",
+      "separation_gap": 0.37150923453494755,
+      "separable": true,
+      "candidate_threshold": 1.7008998108589246,
+      "candidate_rule": "score <= threshold => NG",
+      "normal_pass": 30,
+      "normal_total": 30,
+      "defect_ng": 30,
+      "defect_total": 30,
+      "production_authorized": false
+    },
+    {
+      "name": "B03_COMPONENT_MISSING",
+      "slot": "B03",
+      "label": "COMPONENT_MISSING",
+      "method": "gray_mean",
+      "normal_score": {
+        "min": 2.489279779215387,
+        "median": 2.621527983856609,
+        "max": 2.7665217520327587
+      },
+      "defect_score": {
+        "min": 7.962334559914538,
+        "median": 9.353225710724672,
+        "max": 9.795529408273481
+      },
+      "high_side_gap": 5.195812807881779,
+      "low_side_gap": -7.306249629058094,
+      "selected_direction": "HIGH_IS_NG",
+      "separation_gap": 5.195812807881779,
+      "separable": true,
+      "candidate_threshold": 5.364428155973648,
+      "candidate_rule": "score >= threshold => NG",
+      "normal_pass": 30,
+      "normal_total": 30,
+      "defect_ng": 30,
+      "defect_total": 30,
+      "production_authorized": false
+    },
+    {
+      "name": "B06_WRONG_PART",
+      "slot": "B06",
+      "label": "WRONG_PART",
+      "method": "lab",
+      "normal_score": {
+        "min": 1.0,
+        "median": 1.0,
+        "max": 1.0
+      },
+      "defect_score": {
+        "min": 3.0,
+        "median": 3.0,
+        "max": 6.0
+      },
+      "high_side_gap": 2.0,
+      "low_side_gap": -5.0,
+      "selected_direction": "HIGH_IS_NG",
+      "separation_gap": 2.0,
+      "separable": true,
+      "candidate_threshold": 2.0,
+      "candidate_rule": "score >= threshold => NG",
+      "normal_pass": 30,
+      "normal_total": 30,
+      "defect_ng": 30,
+      "defect_total": 30,
+      "production_authorized": false
+    }
+  ],
+  "category_summary": {
+    "COLOR_NG": {
+      "cases": 3,
+      "separable": 3,
+      "all_current_cases_separable": true
+    },
+    "COMPONENT_MISSING": {
+      "cases": 2,
+      "separable": 2,
+      "all_current_cases_separable": true
+    },
+    "CRACK_DAMAGE": {
+      "cases": 1,
+      "separable": 1,
+      "all_current_cases_separable": true
+    },
+    "INCOMPLETE_FORMATION": {
+      "cases": 2,
+      "separable": 1,
+      "all_current_cases_separable": false
+    },
+    "WRONG_PART": {
+      "cases": 1,
+      "separable": 1,
+      "all_current_cases_separable": true
+    }
+  },
+  "failed_cases": [
+    "B05_INCOMPLETE_FORMATION"
+  ],
+  "data_modified": false,
+  "model_training_performed": false,
+  "production_runtime_authorized": false,
+  "created_at": "2026-09-01T18:20:15.077535+09:00"
+}

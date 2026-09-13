@@ -1,0 +1,28 @@
+{
+  "schema": "harmony_pre_roof_view_front_structure_thresholds_v2",
+  "view": "VIEW_FRONT_FIXED",
+  "status": "PROTOTYPE_NOT_FINAL",
+  "reference": "datasets/harmony_parts_v1/pre_roof_qc/view_front_structure_reference_v2_current_pose/rgb.jpg",
+  "reference_transform": "ROTATE_180_TO_CANONICAL",
+  "search_margin_px": 4,
+  "policy": {
+    "primary": "GRADIENT_STRUCTURE_CORRELATION",
+    "absolute_rgb_brightness_final_decision": false,
+    "legacy_depth_final_decision": false,
+    "legacy_rgb_depth": "DIAGNOSTIC_ONLY"
+  },
+  "rois": {
+    "FRONT_BODY": {
+      "min_score": 0.5
+    },
+    "UPPER_REGION": {
+      "min_score": 0.45
+    },
+    "MIDDLE_REGION": {
+      "min_score": 0.45
+    },
+    "LOWER_REGION": {
+      "min_score": 0.45
+    }
+  }
+}

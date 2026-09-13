@@ -1,0 +1,32 @@
+{
+  "schema": "harmony_pre_roof_view_behind_center_structure_thresholds_v1",
+  "inspection": "PRE_ROOF",
+  "view": "BEHIND",
+  "primary_roi": "CENTER_STRUCTURE",
+  "robot_pose": "VIEW_BEHIND_FIXED",
+  "canonical_transform": "IDENTITY",
+  "decision_policy": {
+    "name": "NORMAL_REFERENCE_STRUCTURAL_DEVIATION",
+    "enabled_metrics": [
+      "normalized_mean_absdiff",
+      "normalized_p95_absdiff",
+      "template_correlation"
+    ],
+    "fail_if_enabled_exceed_count_gte": 2,
+    "rules": {
+      "normalized_mean_absdiff": "FAIL_IF_GT",
+      "normalized_p95_absdiff": "FAIL_IF_GT",
+      "template_correlation": "FAIL_IF_LT"
+    },
+    "view_fail_if": "CENTER_STRUCTURE_FAIL",
+    "depth_shape": "DIAGNOSTIC_ONLY",
+    "secondary_rois": "DISPLAY_DIAGNOSTIC_ONLY",
+    "representative_anomaly_semantics": "VALIDATION_EXAMPLE_ONLY"
+  },
+  "thresholds": {
+    "normalized_mean_absdiff": 40.0,
+    "normalized_p95_absdiff": 120.0,
+    "template_correlation": 0.75
+  },
+  "production_valid": false
+}

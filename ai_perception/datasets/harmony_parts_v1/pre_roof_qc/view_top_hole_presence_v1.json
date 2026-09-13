@@ -1,0 +1,16 @@
+{
+  "schema": "harmony_pre_roof_view_top_hole_presence_v1",
+  "status": "PROTOTYPE_NOT_FINAL",
+  "purpose": "Detect silver hole/magnet presence versus black missing/covered state",
+  "policy": {
+    "golden_absolute_brightness_used": false,
+    "mean_absdiff_used": false,
+    "p95_absdiff_used": false,
+    "changed_fraction_used": false,
+    "local_background_relative": true
+  },
+  "local_margin_px": 8,
+  "bright_delta_from_local_background": 8.0,
+  "silver_fraction_min": 0.05,
+  "search_tolerance_px": 5
+}

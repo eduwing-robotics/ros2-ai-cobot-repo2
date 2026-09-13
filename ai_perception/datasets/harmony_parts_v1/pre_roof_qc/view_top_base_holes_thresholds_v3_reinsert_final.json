@@ -1,0 +1,236 @@
+{
+  "schema": "harmony_pre_roof_view_top_base_holes_thresholds_v3_reinsert_candidate",
+  "view": "TOP",
+  "production_valid": false,
+  "source_baseline": "/home/kimseongyeop/vision_project/datasets/harmony_parts_v1/pre_roof_qc/view_top_base_holes_baseline_v1/baseline_metrics.json",
+  "decision_rule": {
+    "metric_count": 3,
+    "fail_if_exceeded_count_gte": 2,
+    "depth_used_for_verdict": false,
+    "any_hole_fail": "BASE_HOLES_FAIL"
+  },
+  "holes": {
+    "HOLE_1": {
+      "mean_absdiff": {
+        "threshold": 16.449436392914656,
+        "baseline_max": 3.052066559312936,
+        "previous_threshold_v1": 6.0520665593129355,
+        "current_normal_max_30": 7.6345,
+        "reinsert_previous_threshold": 8.016225,
+        "normal_reinsert_max_15": 15.666129898013956,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "p95_absdiff": {
+        "threshold": 76.65,
+        "baseline_max": 10.0,
+        "previous_threshold_v1": 20.0,
+        "current_normal_max_30": 36.9,
+        "reinsert_previous_threshold": 38.745,
+        "normal_reinsert_max_15": 73.0,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "changed_fraction_20": {
+        "threshold": 0.22487922705314012,
+        "baseline_max": 0.001610305958132045,
+        "previous_threshold_v1": 0.08,
+        "current_normal_max_30": 0.1095,
+        "reinsert_previous_threshold": 0.11497500000000001,
+        "normal_reinsert_max_15": 0.214170692431562,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      }
+    },
+    "HOLE_2": {
+      "mean_absdiff": {
+        "threshold": 15.974919871794873,
+        "baseline_max": 2.889957264957265,
+        "previous_threshold_v1": 6.0,
+        "current_normal_max_30": 9.2585,
+        "reinsert_previous_threshold": 9.721425,
+        "normal_reinsert_max_15": 15.214209401709402,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "p95_absdiff": {
+        "threshold": 54.6,
+        "baseline_max": 8.0,
+        "previous_threshold_v1": 20.0,
+        "current_normal_max_30": 42.45,
+        "reinsert_previous_threshold": 44.572500000000005,
+        "normal_reinsert_max_15": 52.0,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "changed_fraction_20": {
+        "threshold": 0.29278846153846155,
+        "baseline_max": 0.0,
+        "previous_threshold_v1": 0.08,
+        "current_normal_max_30": 0.1522,
+        "reinsert_previous_threshold": 0.15981,
+        "normal_reinsert_max_15": 0.27884615384615385,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      }
+    },
+    "HOLE_3": {
+      "mean_absdiff": {
+        "threshold": 13.575333333333333,
+        "baseline_max": 2.1866666666666665,
+        "previous_threshold_v1": 6.0,
+        "current_normal_max_30": 8.8289,
+        "reinsert_previous_threshold": 9.270345,
+        "normal_reinsert_max_15": 12.928888888888888,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "p95_absdiff": {
+        "threshold": 84.0,
+        "baseline_max": 8.0,
+        "previous_threshold_v1": 20.0,
+        "current_normal_max_30": 52.0,
+        "reinsert_previous_threshold": 54.6,
+        "normal_reinsert_max_15": 80.0,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "changed_fraction_20": {
+        "threshold": 0.1512,
+        "baseline_max": 0.0026666666666666666,
+        "previous_threshold_v1": 0.08,
+        "current_normal_max_30": 0.1067,
+        "reinsert_previous_threshold": 0.11203500000000001,
+        "normal_reinsert_max_15": 0.144,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      }
+    },
+    "HOLE_4": {
+      "mean_absdiff": {
+        "threshold": 14.836538461538462,
+        "baseline_max": 1.8741258741258742,
+        "previous_threshold_v1": 6.0,
+        "current_normal_max_30": 7.2809,
+        "reinsert_previous_threshold": 7.644945,
+        "normal_reinsert_max_15": 12.55944055944056,
+        "reinsert_policy": "NORMAL_DEFECT_MIDPOINT",
+        "known_defect_min": 17.113636363636363
+      },
+      "p95_absdiff": {
+        "threshold": 65.0,
+        "baseline_max": 6.0,
+        "previous_threshold_v1": 20.0,
+        "current_normal_max_30": 32.0,
+        "reinsert_previous_threshold": 33.6,
+        "normal_reinsert_max_15": 57.0,
+        "reinsert_policy": "NORMAL_DEFECT_MIDPOINT",
+        "known_defect_min": 73.0
+      },
+      "changed_fraction_20": {
+        "threshold": 0.20008741258741258,
+        "baseline_max": 0.0,
+        "previous_threshold_v1": 0.08,
+        "current_normal_max_30": 0.0927,
+        "reinsert_previous_threshold": 0.097335,
+        "normal_reinsert_max_15": 0.19055944055944055,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      }
+    },
+    "HOLE_5": {
+      "mean_absdiff": {
+        "threshold": 17.432333333333336,
+        "baseline_max": 2.412777777777778,
+        "previous_threshold_v1": 6.0,
+        "current_normal_max_30": 7.615,
+        "reinsert_previous_threshold": 7.99575,
+        "normal_reinsert_max_15": 16.602222222222224,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "p95_absdiff": {
+        "threshold": 91.35000000000001,
+        "baseline_max": 9.0,
+        "previous_threshold_v1": 20.0,
+        "current_normal_max_30": 47.05,
+        "reinsert_previous_threshold": 49.402499999999996,
+        "normal_reinsert_max_15": 87.0,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "changed_fraction_20": {
+        "threshold": 0.2065,
+        "baseline_max": 0.006666666666666667,
+        "previous_threshold_v1": 0.08,
+        "current_normal_max_30": 0.0967,
+        "reinsert_previous_threshold": 0.101535,
+        "normal_reinsert_max_15": 0.19666666666666666,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      }
+    },
+    "HOLE_6": {
+      "mean_absdiff": {
+        "threshold": 16.007314814814816,
+        "baseline_max": 2.0753086419753086,
+        "previous_threshold_v1": 6.0,
+        "current_normal_max_30": 7.2216,
+        "reinsert_previous_threshold": 7.58268,
+        "normal_reinsert_max_15": 15.245061728395061,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "p95_absdiff": {
+        "threshold": 72.45,
+        "baseline_max": 7.0,
+        "previous_threshold_v1": 20.0,
+        "current_normal_max_30": 46.05,
+        "reinsert_previous_threshold": 48.3525,
+        "normal_reinsert_max_15": 69.0,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "changed_fraction_20": {
+        "threshold": 0.2275,
+        "baseline_max": 0.0,
+        "previous_threshold_v1": 0.08,
+        "current_normal_max_30": 0.1019,
+        "reinsert_previous_threshold": 0.106995,
+        "normal_reinsert_max_15": 0.21666666666666667,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      }
+    },
+    "HOLE_7": {
+      "mean_absdiff": {
+        "threshold": 20.801136363636367,
+        "baseline_max": 3.8834498834498836,
+        "previous_threshold_v1": 6.990209790209791,
+        "current_normal_max_30": 9.5962,
+        "reinsert_previous_threshold": 10.07601,
+        "normal_reinsert_max_15": 19.810606060606062,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "p95_absdiff": {
+        "threshold": 91.35000000000001,
+        "baseline_max": 15.0,
+        "previous_threshold_v1": 25.0,
+        "current_normal_max_30": 55.0,
+        "reinsert_previous_threshold": 57.75,
+        "normal_reinsert_max_15": 87.0,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      },
+      "changed_fraction_20": {
+        "threshold": 0.26433566433566436,
+        "baseline_max": 0.02097902097902098,
+        "previous_threshold_v1": 0.08,
+        "current_normal_max_30": 0.1469,
+        "reinsert_previous_threshold": 0.15424500000000002,
+        "normal_reinsert_max_15": 0.2517482517482518,
+        "reinsert_policy": "NORMAL_MAX_X_1.05"
+      }
+    }
+  },
+  "current_calibration": {
+    "status": "CANDIDATE_NOT_FINAL",
+    "golden": "view_top_golden_v4_current",
+    "normal_sample_count": 30,
+    "policy": "candidate threshold = max(previous threshold, observed normal MAX * 1.05)",
+    "decision_rule": "UNCHANGED: fail if >=2 of 3 RGB metrics exceed",
+    "created_at": "2026-09-12T16:20:22"
+  },
+  "reinsert_calibration": {
+    "status": "CANDIDATE_NOT_FINAL",
+    "golden": "view_top_golden_v4_current",
+    "normal_physical_placements": 5,
+    "normal_status_samples": 15,
+    "decision_rule": "UNCHANGED: hole FAIL if >=2 of 3 RGB metrics exceed threshold",
+    "hole_4_policy": "mean_absdiff and p95_absdiff use midpoint between normal MAX and BLACK_COVER defect MIN; changed_fraction_20 remains normal-stability oriented because separation margin is too narrow.",
+    "created_at": "2026-09-12T16:45:24"
+  }
+}

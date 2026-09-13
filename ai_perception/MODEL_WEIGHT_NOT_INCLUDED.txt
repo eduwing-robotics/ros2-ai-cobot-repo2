@@ -1,0 +1,28 @@
+Harmony Incoming Inspection Runtime Model
+
+Runtime model:
+models/harmony_unified_vision_v1/
+training_attempts/attempt06_base_ab/weights/best.pt
+
+Size:
+43 MB
+
+SHA256:
+4fc6740e7ec17719f095562f59e847b538d5cf201ddfa2bf832baf17c12a661a
+
+The trained .pt weight is intentionally not included in this source bundle.
+
+Incoming final runtime:
+harmony_incoming_inspection_final_v7_ui.py
+
+Runtime chain:
+V7 -> V6 -> V5 -> V4 -> V3 -> V2 -> V1
+
+Core:
+harmony_unified_runtime_attempt06_house_b_v2.py
+
+Final B05 runtime threshold:
+0.5
+
+0.080258 remains only as a historical candidate comment
+and is not the active final runtime threshold.

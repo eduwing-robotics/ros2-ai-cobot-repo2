@@ -1,0 +1,57 @@
+{
+  "schema": "harmony_pre_roof_view_front_roi_v2",
+  "inspection": "PRE_ROOF",
+  "view": "FRONT",
+  "robot_pose": "VIEW_FRONT_FIXED",
+  "canonical_transform": "ROTATE_180",
+  "image_width": 1280,
+  "image_height": 720,
+  "roi_policy": "GENERIC_STRUCTURAL_CHANGE_DETECTION",
+  "decision_intent": "NORMAL_REFERENCE_DEVIATION",
+  "rois": [
+    {
+      "id": 1,
+      "name": "FRONT_BODY",
+      "x": 150,
+      "y": 125,
+      "w": 980,
+      "h": 390,
+      "role": "PRIMARY_FRONT_STRUCTURE"
+    },
+    {
+      "id": 2,
+      "name": "UPPER_REGION",
+      "x": 165,
+      "y": 135,
+      "w": 950,
+      "h": 115,
+      "role": "STRUCTURAL_REGION"
+    },
+    {
+      "id": 3,
+      "name": "MIDDLE_REGION",
+      "x": 165,
+      "y": 250,
+      "w": 950,
+      "h": 175,
+      "role": "STRUCTURAL_REGION"
+    },
+    {
+      "id": 4,
+      "name": "LOWER_REGION",
+      "x": 165,
+      "y": 425,
+      "w": 950,
+      "h": 85,
+      "role": "STRUCTURAL_REGION"
+    }
+  ],
+  "notes": [
+    "ROIs are generic structural coverage regions.",
+    "No ROI defines an exclusive defect class.",
+    "Inspection compares live RGB and depth-shape against the validated normal reference.",
+    "Representative anomaly samples are validation evidence only.",
+    "Depth input is visualization/shape only and is not metric millimeter depth."
+  ],
+  "production_valid": false
+}

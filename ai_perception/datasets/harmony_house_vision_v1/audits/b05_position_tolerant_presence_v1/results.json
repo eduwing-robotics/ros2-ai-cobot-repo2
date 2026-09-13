@@ -1,0 +1,38 @@
+{
+  "project": "HARMONY_HOUSE_VISION_V1",
+  "inspection": "HOUSE_B_INCOMING_INSPECTION",
+  "slot": "B05",
+  "class_name": "wall_int_house_b",
+  "audit": "POSITION_TOLERANT_PRESENCE_V1",
+  "method": "gradient_fraction",
+  "training_used": false,
+  "physical_board_modified": false,
+  "design": {
+    "gradient_threshold": 10,
+    "pass_min": 0.16616161616161615,
+    "pass_mean": 0.16950153711023275,
+    "missing_max": 0.00417215634606939,
+    "missing_mean": 0.0038903528033962815,
+    "gap": 0.16198945981554677,
+    "presence_threshold_candidate": 0.08516688625384276
+  },
+  "validation": {
+    "pass_take02_count": 30,
+    "reinsert_pass_take03_count": 30,
+    "heldout_missing_count": 6,
+    "pass_take02_min": 0.16176987263943785,
+    "reinsert_pass_take03_min": 0.1471014492753623,
+    "missing_max": 0.003974527887571366,
+    "overall_pass_min": 0.1471014492753623,
+    "gap": 0.14312692138779096,
+    "separable": true,
+    "classification": {
+      "pass_take02_correct": 30,
+      "pass_take02_total": 30,
+      "reinsert_pass_take03_correct": 30,
+      "reinsert_pass_take03_total": 30,
+      "missing_correct": 6,
+      "missing_total": 6
+    }
+  }
+}

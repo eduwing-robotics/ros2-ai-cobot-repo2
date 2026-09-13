@@ -1,0 +1,41 @@
+{
+  "name": "harmony_factory_view_final_v1",
+  "status": "LOCKED_FINAL",
+  "date_locked": "2026-09-10",
+  "purpose": "factory_overview_for_unity",
+  "device": "/dev/v4l/by-id/usb-046d_C270_HD_WEBCAM_200901010001-video-index0",
+  "capture": {
+    "format": "mjpeg",
+    "width": 1280,
+    "height": 960,
+    "fps": 30
+  },
+  "camera_controls": {
+    "auto_exposure": 3,
+    "exposure_dynamic_framerate": 0,
+    "white_balance_automatic": 1,
+    "brightness": 150,
+    "contrast": 43,
+    "saturation": 34,
+    "sharpness": 72,
+    "backlight_compensation": 1
+  },
+  "video_filter": "perspective=x0=250:y0=0:x1=1170:y1=0:x2=135:y2=960:x3=1170:y3=960:sense=source:interpolation=cubic,crop=1170:860:100:50,scale=1280:960:flags=lanczos,eq=brightness=0.060:contrast=1.04:gamma=1.045:saturation=0.98,unsharp=7:7:0.65:5:5:0.0",
+  "output": {
+    "width": 1280,
+    "height": 960
+  },
+  "priority_objects": [
+    "materials",
+    "turtlebot",
+    "fr5_robot_arm",
+    "jig",
+    "assembly_table",
+    "material_pallet"
+  ],
+  "policy": {
+    "retuning_allowed": false,
+    "incoming_global_camera_independent": true,
+    "pre_roof_d435_independent": true
+  }
+}

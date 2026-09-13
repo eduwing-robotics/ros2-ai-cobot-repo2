@@ -1,0 +1,66 @@
+{
+  "schema": "harmony_pre_roof_view_top_base_holes_v1",
+  "production_valid": false,
+  "view": "TOP",
+  "source_golden": "/home/kimseongyeop/vision_project/datasets/harmony_parts_v1/pre_roof_qc/view_top_golden_v2/golden_rgb_median.png",
+  "parent_roi": {
+    "name": "BASE_HOLES",
+    "x": 294,
+    "y": 224,
+    "w": 604,
+    "h": 299
+  },
+  "hole_count": 7,
+  "holes": [
+    {
+      "name": "HOLE_1",
+      "x": 435,
+      "y": 235,
+      "w": 23,
+      "h": 27
+    },
+    {
+      "name": "HOLE_2",
+      "x": 393,
+      "y": 330,
+      "w": 24,
+      "h": 26
+    },
+    {
+      "name": "HOLE_3",
+      "x": 418,
+      "y": 409,
+      "w": 25,
+      "h": 30
+    },
+    {
+      "name": "HOLE_4",
+      "x": 595,
+      "y": 471,
+      "w": 22,
+      "h": 26
+    },
+    {
+      "name": "HOLE_5",
+      "x": 727,
+      "y": 469,
+      "w": 20,
+      "h": 30
+    },
+    {
+      "name": "HOLE_6",
+      "x": 837,
+      "y": 482,
+      "w": 20,
+      "h": 27
+    },
+    {
+      "name": "HOLE_7",
+      "x": 857,
+      "y": 242,
+      "w": 22,
+      "h": 26
+    }
+  ],
+  "decision_policy": "ANY_HOLE_FAIL => BASE_HOLES_FAIL"
+}

@@ -1,0 +1,41 @@
+{
+  "schema": "harmony_pre_roof_view_right_roi_v1",
+  "inspection": "PRE_ROOF",
+  "view": "RIGHT",
+  "robot_pose": "VIEW_RIGHT_FIXED",
+  "canonical_transform": "ROTATE_180",
+  "resolution": "1280x720",
+  "roi_count": 3,
+  "rois": [
+    {
+      "name": "WALL_BODY",
+      "group": "MAIN_WALL",
+      "x": 315,
+      "y": 134,
+      "w": 679,
+      "h": 409
+    },
+    {
+      "name": "CORNER_LEFT",
+      "group": "CORNER",
+      "x": 72,
+      "y": 103,
+      "w": 233,
+      "h": 127
+    },
+    {
+      "name": "CORNER_RIGHT",
+      "group": "CORNER",
+      "x": 1003,
+      "y": 74,
+      "w": 234,
+      "h": 149
+    }
+  ],
+  "scope": {
+    "WALL_BODY": "overall visible right wall body / gross assembly abnormality",
+    "CORNER_LEFT": "canonical left end/corner seating and visible height",
+    "CORNER_RIGHT": "canonical right end/corner seating and visible height"
+  },
+  "production_valid": false
+}

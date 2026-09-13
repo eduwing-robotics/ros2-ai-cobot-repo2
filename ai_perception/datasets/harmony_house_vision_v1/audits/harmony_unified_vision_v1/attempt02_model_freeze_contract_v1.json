@@ -1,0 +1,22 @@
+{
+  "project": "HARMONY_UNIFIED_VISION_V1",
+  "candidate": "ATTEMPT02",
+  "checkpoint_path": "models/harmony_unified_vision_v1/training_attempts/attempt02_quality_balanced/weights/best.pt",
+  "checkpoint_sha256": "fed5988bdfdcd2ba352bd214dce72ea3e3ae454e6cb5334db4365f0ecfa4c87e",
+  "manifest_path": "datasets/harmony_house_vision_v1/derived/harmony_unified_vision_v1_dataset_v2/manifest.jsonl",
+  "manifest_sha256": "d5aa166e39df11a39e08e662b826ebacc5f0342933771d043bebadeedf6efe87",
+  "model_contract_path": "configs/harmony_unified_model_contract_v1.json",
+  "model_contract_sha256": "73f3bfb396c8d268d82587d9667262eeffb6376a2bd7c22f25fa0ed2b3c187e0",
+  "training_report_path": "models/harmony_unified_vision_v1/training_attempts/attempt02_quality_balanced/weights/training_report.json",
+  "training_report_checkpoint_sha256": "fed5988bdfdcd2ba352bd214dce72ea3e3ae454e6cb5334db4365f0ecfa4c87e",
+  "training_attempt_status": "DEVELOPMENT_CANDIDATE_AFTER_FUSION_VALIDATION",
+  "prior_standalone_validation_status": "DEVELOPMENT_VALIDATION_FAIL_COLOR_AI_AUXILIARY",
+  "frozen": true,
+  "training_after_freeze_allowed": false,
+  "threshold_tuning_after_freeze_allowed": false,
+  "dataset_change_for_this_checkpoint_allowed": false,
+  "quality_sigmoid_threshold": 0.5,
+  "strict_heldout_allowed_only_after_this_freeze": true,
+  "production_runtime_authorized": false,
+  "created_at": "2026-09-02T15:51:26.816821+09:00"
+}
