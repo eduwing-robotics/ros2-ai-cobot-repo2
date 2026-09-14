@@ -1,0 +1,19 @@
+id,category,filename,reference_text
+001,short_command,001.wav,현재 작업 상태 알려줘
+002,short_command,002.wav,생산을 시작해줘
+003,short_command,003.wav,작업을 일시정지해줘
+004,short_command,004.wav,생산을 재개해줘
+005,short_command,005.wav,현재 공정 알려줘
+006,domain,006.wav,에이 타입 주택 생산을 시작해줘
+007,domain,007.wav,비 타입 주택으로 변경해줘
+008,domain,008.wav,현재 세 번째 공정 진행 상황 알려줘
+009,domain,009.wav,내부벽 설치 상태 확인해줘
+010,domain,010.wav,외벽 설치가 끝났는지 확인해줘
+011,domain,011.wav,구조물 품질 검사 결과 알려줘
+012,domain,012.wav,로봇 셀 상태 확인해줘
+013,long_sentence,013.wav,현재 생산 중인 주택이 어느 단계까지 진행됐는지 알려줘
+014,long_sentence,014.wav,작업이 실패했다면 어느 공정에서 문제가 발생했는지 알려줘
+015,long_sentence,015.wav,지금 진행 중인 생산 작업을 안전하게 일시정지해줘
+016,alphanumeric,016.wav,S3 공정 상태 알려줘
+017,alphanumeric,017.wav,FR5 상태 확인해줘
+018,alphanumeric,018.wav,HOUSE A 생산 상태 알려줘

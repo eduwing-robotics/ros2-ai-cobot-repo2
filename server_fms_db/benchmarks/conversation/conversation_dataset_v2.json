@@ -1,0 +1,1060 @@
+{
+  "dataset_version": "v2",
+  "scenarios": [
+    {
+      "scenario_id": "direct_001",
+      "category": "A_direct_roof_confirm",
+      "turns": [
+        {
+          "text": "A형 한 채 평지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 1,
+            "roof_option_code": "ROOF_01",
+            "clarification_needed": false
+          },
+          "expect_message": "A형 주택 한 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다.",
+          "metric": "confirmation"
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 1,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    },
+    {
+      "scenario_id": "direct_002",
+      "category": "A_direct_roof_confirm",
+      "turns": [
+        {
+          "text": "A형 두 채 2번 지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 2,
+            "roof_option_code": "ROOF_02",
+            "clarification_needed": false
+          },
+          "expect_message": "A형 주택 두 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "예",
+          "expect_state": "CONFIRMED",
+          "expect_message": "생산 요청이 확인되어 생산 작업 2건이 등록되었습니다.",
+          "metric": "confirmation"
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 2,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 2,
+        "job_step_count": 18,
+        "job_created_event_count": 2
+      }
+    },
+    {
+      "scenario_id": "direct_003",
+      "category": "A_direct_roof_confirm",
+      "turns": [
+        {
+          "text": "B형 한 채 경사지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 1,
+            "roof_option_code": "ROOF_02",
+            "clarification_needed": false
+          },
+          "expect_message": "B형 주택 한 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "응",
+          "expect_state": "CONFIRMED",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다.",
+          "metric": "confirmation"
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 1,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    },
+    {
+      "scenario_id": "direct_004",
+      "category": "A_direct_roof_confirm",
+      "turns": [
+        {
+          "text": "B형 두 채 판판한 지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 2,
+            "roof_option_code": "ROOF_01",
+            "clarification_needed": false
+          },
+          "expect_message": "B형 주택 두 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "맞습니다",
+          "expect_state": "CONFIRMED",
+          "expect_message": "생산 요청이 확인되어 생산 작업 2건이 등록되었습니다.",
+          "metric": "confirmation"
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 2,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 2,
+        "job_step_count": 18,
+        "job_created_event_count": 2
+      }
+    },
+    {
+      "scenario_id": "direct_005",
+      "category": "A_direct_roof_confirm",
+      "turns": [
+        {
+          "text": "A형 세 채 1번 지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 3,
+            "roof_option_code": "ROOF_01",
+            "clarification_needed": false
+          },
+          "expect_message": "A형 주택 3채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "yes",
+          "expect_state": "CONFIRMED",
+          "expect_message": "생산 요청이 확인되어 생산 작업 3건이 등록되었습니다.",
+          "metric": "confirmation"
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 3,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 3,
+        "job_step_count": 27,
+        "job_created_event_count": 3
+      }
+    },
+    {
+      "scenario_id": "direct_006",
+      "category": "A_direct_roof_confirm",
+      "turns": [
+        {
+          "text": "B형 세 채 지붕 2번으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 3,
+            "roof_option_code": "ROOF_02",
+            "clarification_needed": false
+          },
+          "expect_message": "B형 주택 3채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "y",
+          "expect_state": "CONFIRMED",
+          "expect_message": "생산 요청이 확인되어 생산 작업 3건이 등록되었습니다.",
+          "metric": "confirmation"
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 3,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 3,
+        "job_step_count": 27,
+        "job_created_event_count": 3
+      }
+    },
+    {
+      "scenario_id": "direct_007",
+      "category": "A_direct_roof_confirm",
+      "turns": [
+        {
+          "text": "A형 한 채 경사 지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 1,
+            "roof_option_code": "ROOF_02",
+            "clarification_needed": false
+          },
+          "expect_message": "A형 주택 한 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "맞아",
+          "expect_state": "CONFIRMED",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다.",
+          "metric": "confirmation"
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 1,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    },
+    {
+      "scenario_id": "direct_008",
+      "category": "A_direct_roof_confirm",
+      "turns": [
+        {
+          "text": "B형 한 채 평 지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 1,
+            "roof_option_code": "ROOF_01",
+            "clarification_needed": false
+          },
+          "expect_message": "B형 주택 한 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "맞아요",
+          "expect_state": "CONFIRMED",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다.",
+          "metric": "confirmation"
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 1,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    },
+    {
+      "scenario_id": "followup_001",
+      "category": "B_roof_followup_confirm",
+      "turns": [
+        {
+          "text": "A형 한 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 1,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "1번",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "A형 주택 한 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 1,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    },
+    {
+      "scenario_id": "followup_002",
+      "category": "B_roof_followup_confirm",
+      "turns": [
+        {
+          "text": "A형 두 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 2,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "2번",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "A형 주택 두 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "예",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 2건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 2,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 2,
+        "job_step_count": 18,
+        "job_created_event_count": 2
+      }
+    },
+    {
+      "scenario_id": "followup_003",
+      "category": "B_roof_followup_confirm",
+      "turns": [
+        {
+          "text": "B형 한 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 1,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "평지붕",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "B형 주택 한 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "맞습니다",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 1,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    },
+    {
+      "scenario_id": "followup_004",
+      "category": "B_roof_followup_confirm",
+      "turns": [
+        {
+          "text": "B형 두 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 2,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "경사지붕",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "B형 주택 두 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "응",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 2건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 2,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 2,
+        "job_step_count": 18,
+        "job_created_event_count": 2
+      }
+    },
+    {
+      "scenario_id": "followup_005",
+      "category": "B_roof_followup_confirm",
+      "turns": [
+        {
+          "text": "A형 한 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 1,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "1번 지붕",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "A형 주택 한 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "yes",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 1,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    },
+    {
+      "scenario_id": "followup_006",
+      "category": "B_roof_followup_confirm",
+      "turns": [
+        {
+          "text": "B형 두 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 2,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "2번 지붕",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "B형 주택 두 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "맞아",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 2건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 2,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 2,
+        "job_step_count": 18,
+        "job_created_event_count": 2
+      }
+    },
+    {
+      "scenario_id": "followup_007",
+      "category": "B_roof_followup_confirm",
+      "turns": [
+        {
+          "text": "A형 세 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 3,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "평지붕",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "A형 주택 3채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 3건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 3,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 3,
+        "job_step_count": 27,
+        "job_created_event_count": 3
+      }
+    },
+    {
+      "scenario_id": "followup_008",
+      "category": "B_roof_followup_confirm",
+      "turns": [
+        {
+          "text": "B형 세 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 3,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "2번",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "B형 주택 3채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 3건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 3,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 3,
+        "job_step_count": 27,
+        "job_created_event_count": 3
+      }
+    },
+    {
+      "scenario_id": "reject_001",
+      "category": "C_rejection",
+      "turns": [
+        {
+          "text": "A형 한 채 2번 지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 1,
+            "roof_option_code": "ROOF_02",
+            "clarification_needed": false
+          },
+          "expect_message": "A형 주택 한 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "아니",
+          "expect_state": "REJECTED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청을 진행하지 않겠습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "REJECTED",
+        "product_code": "HOUSE_A",
+        "quantity": 1,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 0,
+        "job_step_count": 0,
+        "job_created_event_count": 0
+      }
+    },
+    {
+      "scenario_id": "reject_002",
+      "category": "C_rejection",
+      "turns": [
+        {
+          "text": "B형 두 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 2,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "1번",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "B형 주택 두 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "아니요",
+          "expect_state": "REJECTED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청을 진행하지 않겠습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "REJECTED",
+        "product_code": "HOUSE_B",
+        "quantity": 2,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 0,
+        "job_step_count": 0,
+        "job_created_event_count": 0
+      }
+    },
+    {
+      "scenario_id": "reject_003",
+      "category": "C_rejection",
+      "turns": [
+        {
+          "text": "A형 두 채 평지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 2,
+            "roof_option_code": "ROOF_01",
+            "clarification_needed": false
+          },
+          "expect_message": "A형 주택 두 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "아니야",
+          "expect_state": "REJECTED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청을 진행하지 않겠습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "REJECTED",
+        "product_code": "HOUSE_A",
+        "quantity": 2,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 0,
+        "job_step_count": 0,
+        "job_created_event_count": 0
+      }
+    },
+    {
+      "scenario_id": "reject_004",
+      "category": "C_rejection",
+      "turns": [
+        {
+          "text": "B형 한 채 경사지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 1,
+            "roof_option_code": "ROOF_02",
+            "clarification_needed": false
+          },
+          "expect_message": "B형 주택 한 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "아닙니다",
+          "expect_state": "REJECTED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청을 진행하지 않겠습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "REJECTED",
+        "product_code": "HOUSE_B",
+        "quantity": 1,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 0,
+        "job_step_count": 0,
+        "job_created_event_count": 0
+      }
+    },
+    {
+      "scenario_id": "invalid_roof_001",
+      "category": "D_invalid_roof_recovery",
+      "turns": [
+        {
+          "text": "A형 한 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 1,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "3번",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "metric": "roof_followup",
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "2번",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "A형 주택 한 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 1,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    },
+    {
+      "scenario_id": "invalid_roof_002",
+      "category": "D_invalid_roof_recovery",
+      "turns": [
+        {
+          "text": "B형 두 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 2,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "3번",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "metric": "roof_followup",
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "평지붕",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "B형 주택 두 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 2건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 2,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 2,
+        "job_step_count": 18,
+        "job_created_event_count": 2
+      }
+    },
+    {
+      "scenario_id": "invalid_roof_003",
+      "category": "D_invalid_roof_recovery",
+      "turns": [
+        {
+          "text": "A형 두 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 2,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "3번",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "metric": "roof_followup",
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "1번 지붕",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "A형 주택 두 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 2건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 2,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 2,
+        "job_step_count": 18,
+        "job_created_event_count": 2
+      }
+    },
+    {
+      "scenario_id": "invalid_confirm_001",
+      "category": "E_invalid_confirmation_recovery",
+      "turns": [
+        {
+          "text": "B형 한 채 경사지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 1,
+            "roof_option_code": "ROOF_02",
+            "clarification_needed": false
+          },
+          "expect_message": "B형 주택 한 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "2번",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "confirmation",
+          "expect_message": "B형 주택 한 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 1,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    },
+    {
+      "scenario_id": "invalid_confirm_002",
+      "category": "E_invalid_confirmation_recovery",
+      "turns": [
+        {
+          "text": "A형 두 채 평지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 2,
+            "roof_option_code": "ROOF_01",
+            "clarification_needed": false
+          },
+          "expect_message": "A형 주택 두 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "글쎄",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "confirmation",
+          "expect_message": "A형 주택 두 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "예",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 2건이 등록되었습니다."
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 2,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 2,
+        "job_step_count": 18,
+        "job_created_event_count": 2
+      }
+    },
+    {
+      "scenario_id": "no_pending_001",
+      "category": "F_no_pending_safety",
+      "turns": [
+        {
+          "text": "2번",
+          "expect_state": null
+        }
+      ],
+      "expected": {
+        "final_state": null,
+        "production_job_count": 0,
+        "job_step_count": 0,
+        "job_created_event_count": 0
+      }
+    },
+    {
+      "scenario_id": "no_pending_002",
+      "category": "F_no_pending_safety",
+      "turns": [
+        {
+          "text": "네",
+          "expect_state": null
+        }
+      ],
+      "expected": {
+        "final_state": null,
+        "production_job_count": 0,
+        "job_step_count": 0,
+        "job_created_event_count": 0
+      }
+    },
+    {
+      "scenario_id": "no_pending_003",
+      "category": "F_no_pending_safety",
+      "turns": [
+        {
+          "text": "아니요",
+          "expect_state": null
+        }
+      ],
+      "expected": {
+        "final_state": null,
+        "production_job_count": 0,
+        "job_step_count": 0,
+        "job_created_event_count": 0
+      }
+    },
+    {
+      "scenario_id": "duplicate_001",
+      "category": "G_duplicate_confirmation_safety",
+      "turns": [
+        {
+          "text": "A형 두 채 1번 지붕으로 만들어줘",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_A",
+            "quantity": 2,
+            "roof_option_code": "ROOF_01",
+            "clarification_needed": false
+          },
+          "expect_message": "A형 주택 두 채를 1번 평지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 2건이 등록되었습니다."
+        },
+        {
+          "text": "네",
+          "expect_state": null
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_A",
+        "quantity": 2,
+        "roof_option_code": "ROOF_01",
+        "production_job_count": 2,
+        "job_step_count": 18,
+        "job_created_event_count": 2
+      }
+    },
+    {
+      "scenario_id": "duplicate_002",
+      "category": "G_duplicate_confirmation_safety",
+      "turns": [
+        {
+          "text": "B형 한 채 만들어줘",
+          "expect_state": "WAITING_ROOF_OPTION",
+          "initial_expected": {
+            "intent": "CREATE_PRODUCTION_REQUEST",
+            "product_code": "HOUSE_B",
+            "quantity": 1,
+            "roof_option_code": null,
+            "clarification_needed": false
+          },
+          "expect_message": "지붕을 선택해주세요. 1번 평지붕, 2번 경사지붕입니다."
+        },
+        {
+          "text": "2번",
+          "expect_state": "AWAITING_CONFIRMATION",
+          "metric": "roof_followup",
+          "expect_message": "B형 주택 한 채를 2번 경사지붕으로 제작하는 것이 맞습니까?"
+        },
+        {
+          "text": "네",
+          "expect_state": "CONFIRMED",
+          "metric": "confirmation",
+          "expect_message": "생산 요청이 확인되어 생산 작업 1건이 등록되었습니다."
+        },
+        {
+          "text": "네",
+          "expect_state": null
+        }
+      ],
+      "expected": {
+        "final_state": "CONFIRMED",
+        "product_code": "HOUSE_B",
+        "quantity": 1,
+        "roof_option_code": "ROOF_02",
+        "production_job_count": 1,
+        "job_step_count": 9,
+        "job_created_event_count": 1
+      }
+    }
+  ]
+}
