@@ -138,6 +138,11 @@ runs/
 *.sqlite3-journal
 *.db
 instance/
+# PostgreSQL / Redis runtime dumps are local operational artifacts.
+dump.rdb
+appendonly.aof
+*.dump
+*.sql.gz
 
 
 # =============================================================================
@@ -147,6 +152,9 @@ instance/
 # ── 모델 캐시 (수 GB, 자동 재다운로드된다) ──────────────────────────────────
 .cache/
 models/
+# Server/FMS domain models are source code, not downloaded AI model artifacts.
+!server_fms_db/shared/models/
+!server_fms_db/shared/models/**
 whisper_models/
 huggingface/
 *.gguf

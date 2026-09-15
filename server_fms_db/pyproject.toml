@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tiny-house-production-backend"
+version = "0.1.0"
+description = "Backend services for the Tiny House Production System"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+# This backend has no ROS launch tests yet. The interactive shell sources ROS,
+# exposing incompatible launch pytest entry points through PYTHONPATH.
+addopts = "-q -p no:launch_testing -p no:launch_ros"
+markers = [
+    "redis_integration: requires RUN_REDIS_INTEGRATION=1 and a local Redis instance",
+    "postgres_integration: requires RUN_POSTGRES_INTEGRATION=1 and the dedicated PostgreSQL test database",
+]

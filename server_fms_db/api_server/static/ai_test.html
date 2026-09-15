@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SimFirst AI Command Tester</title>
+  <link rel="stylesheet" href="/static/ai_test.css">
+</head>
+<body>
+  <main>
+    <header><p class="eyebrow">SIMFIRST · LOCAL AI LAB</p><h1>명령 해석 테스트</h1><p>자연어를 안전한 생산 의도 JSON으로 바꿉니다. 실제 로봇·FMS·DB에는 전달하지 않습니다.</p></header>
+    <section class="status" id="status">AI 서버 상태 확인 중…</section>
+    <section class="grid">
+      <article class="panel"><h2>텍스트 명령</h2><label for="command">로봇에게 시킬 일을 말해봐</label><textarea id="command" maxlength="2000" placeholder="예: A형 초소형 주택 한 채 생산해줘."></textarea><div class="examples"><button data-text="A형 초소형 주택 한 채 생산해줘.">A형 생산</button><button data-text="현재 생산이 어느 단계까지 진행됐어?">진행 상태</button><button data-text="주택 만들어줘.">모델 미지정</button></div><button class="primary" id="interpret">명령 해석하기</button></article>
+      <article class="panel"><h2>음성 테스트</h2><p class="hint">브라우저에서 녹음하거나 이미 녹음한 파일을 업로드할 수 있어.</p><div class="record"><button id="record" class="record-button">● 녹음 시작</button><span id="recording-state">대기 중</span></div><input id="audio-file" type="file" accept="audio/wav,audio/mpeg,audio/mp4,audio/flac,audio/ogg"><audio id="preview" controls hidden></audio><button class="primary" id="voice" disabled>음성 → 명령 해석</button><p class="hint">첫 요청은 Whisper small 모델 로딩 때문에 오래 걸릴 수 있어.</p></article>
+    </section>
+    <section class="panel tts-panel"><h2>TTS 미리듣기</h2><p class="hint">이 문장은 실행 결과를 가정한 미리듣기일 뿐, 생산·재고·로봇을 실제로 변경하지 않아.</p><label for="tts-text">읽을 한국어 문장</label><textarea id="tts-text" maxlength="500" placeholder="예: A형 초소형 주택 한 채 생산을 시작하겠습니다."></textarea><button class="primary" id="tts">문장 음성으로 만들기</button><p class="hint" id="tts-state">TTS 대기 중</p><audio id="tts-preview" controls hidden></audio></section>
+    <section class="result"><div class="result-head"><h2>검증된 구조화 결과</h2><span id="elapsed"></span></div><p id="message">명령을 입력하거나 녹음한 뒤 테스트해봐.</p><div class="suggested" id="suggested" hidden><span>읽을 안내 문장</span><p id="suggested-text"></p></div><pre id="json">{}</pre></section>
+  </main>
+  <script src="/static/ai_test.js?v=20260807-4"></script>
+</body>
+</html>

@@ -1,22 +1,287 @@
-# ros2-ai-cobot-repo2
+# AI 기반 조립식 주택 자동화 공장
 
-AI 기반 조립식 주택 자동화 공장 프로젝트 저장소입니다. Vision 검사, 관제, 자재 운반, 음성 인터페이스, 로봇 제어를 영역별 디렉터리로 나누어 관리합니다.
+### 2조 하모니 · 조별 프로젝트
 
-## 저장소 구성
+> **반복 조립은 로봇이 수행하고, AI가 품질을 확인하며, 모든 생산 상태는 하나의 관제 화면에서 연결합니다.**
 
-| 디렉터리 | 영역 | 설명 |
-|:---|:---|:---|
-| [ai_perception](ai_perception/README.md) | AI Perception / Vision | Global Vision · Depth Vision 기반 입고 검사와 조립 품질 검사 |
-| [controltower_gui](controltower_gui/README.md) | Control Tower GUI | 공정 · 로봇 · 검사 결과 통합 관제 화면과 수동 제어 |
-| [forklift_turtlebot3](forklift_turtlebot3/README.md) | Logistics | TurtleBot3 자재 운반 주행과 포크 리프트 제어 |
-| [llm_stt_tts](llm_stt_tts/README.md) | Voice Interface | STT · LLM 의도 해석 · TTS 음성 안내 |
-| [robot_control_fr5_zekeep](robot_control_fr5_zekeep/README.md) | Robot Operation | FR5 협동로봇 조립 동작과 ZeKeep 갠트리 제어 |
+FR5·Zekeep·TurtleBot·Vision AI·음성 비서·Unity 디지털 트윈을 연동하여 조립식 주택의 자재 검사, 운반, 구조 조립, 품질검사, 출고 완료까지의 생산 흐름을 자동화·관제하는 스마트 팩토리 프로젝트입니다.
+관리자는 음성으로 생산을 요청하고, 관제 화면에서 생산 공정·로봇·재고·검사 결과를 실시간으로 확인할 수 있습니다.
 
-각 디렉터리는 `README.md` 와 `docs/` 를 두고, 담당자가 해당 영역의 구현과 문서를 관리합니다.
+---
 
-## 작업 규칙
+## 1. 팀 구성 및 역할
 
-- 브랜치는 `main` 하나만 사용하고, 각자 담당 디렉터리에서 작업합니다.
-- 커밋 메시지는 `<type>(<scope>): <설명>` 형식을 사용합니다. 예) `feat(ai-perception): add global camera node`
-- 모델 가중치, 데이터셋, 런타임 DB, 백업 파일은 커밋하지 않습니다. 자세한 기준은 루트 `.gitignore` 를 참고합니다.
-- 티칭 자세, 캘리브레이션 결과, 맵은 재현에 필요하므로 커밋합니다.
+| 담당자 | 담당 파트 | 주요 기여 |
+| :---: | :---: | --- |
+| 김애리<br>(팀장) | Robot Cell | FR5 · Zekeep 3축 로봇 제어 |
+| 김성엽 | AI Vision · 품질검사 | Vision 학습 · 추론 기반 입고 자재 검사와 조립 결과 품질검사 |
+| 김영호 | Unity · TurtleBot | Unity 디지털 트윈 · 생산 관제 화면, TurtleBot 자재 팔레트 운반 |
+| 유예린 | Voice AI · Server | STT · LLM · TTS 음성 명령, FMS 서버 |
+
+## 2. 프로젝트 주제
+
+**AI 기반 조립식 주택 자동화 공장**
+
+조립식 주택 생산에 필요한 자재 수입검사, 팔레트 운반, 베이스 · 벽체 · 지붕 설치, 조립 결과 검사, 완성 주택 출고 과정을 하나의 생산 시스템으로 연결합니다.
+두 주택 모델(`HOUSE_A`, `HOUSE_B`)의 Recipe를 기반으로 생산 순서를 관리하고, 각 설비의 실제 상태와 생산 진행 상황을 Unity 관제 화면 및 음성 비서에 반영합니다.
+
+## 3. 주제 선정 이유
+
+조립식 주택은 공장에서 규격화된 부품을 조립해 생산 시간을 단축할 수 있지만, 실제 공정에서는 반복 작업 · 설비 간 순서 제어 · 품질 확인 · 현장 정보 분산 문제가 함께 발생합니다.
+
+- **반복 · 고강도 작업 부담**: 벽체와 지붕 설치처럼 반복적이고 정밀한 작업의 작업자 부담을 줄일 필요가 있습니다.
+- **공정 연계의 복잡성**: 자재 검사 → 운반 → 조립 → 검사 → 다음 공정의 순서가 정확히 연결되어야 합니다.
+- **품질 편차 관리**: 자재 상태와 조립 위치를 작업자의 육안 확인에만 의존하지 않고 Vision AI 기반으로 확인할 필요가 있습니다.
+- **실시간 운영 가시성**: 생산 공정, 로봇 상태, 재고, 검사 결과가 분산되면 관리자 판단이 늦어질 수 있습니다.
+- **사람 중심 제어 보완**: 음성 명령과 통합 관제를 통해 관리자가 공장 상태를 빠르게 파악하고 대응할 수 있어야 합니다.
+
+## 4. 생산 공정 흐름
+
+```mermaid
+flowchart LR
+    A[1. 작업 명령 전달] --> B[2. 수입검사]
+    B --> C[3. Zekeep 베이스 설치]
+    C --> D[4. 외벽 팔레트 운반]
+    D --> E[5. FR5 외벽 설치]
+    E --> F[6. 외벽 빈 팔레트 회수<br/>/ 내벽 팔레트 운반]
+    F --> G[7. FR5 내벽 설치]
+    G --> H[8. 내벽 빈 팔레트 회수]
+    H --> I[9. 조립 결과 품질검사]
+    I --> J[10. Zekeep 지붕 설치]
+    J --> K[11. FR5 완성 주택 운반]
+    K --> L[12. 작업 완료]
+```
+
+- **수입검사**: Vision AI가 생산 투입 전 자재의 종류·수량·상태를 확인합니다.
+- **조립 · 물류**: Zekeep은 베이스 · 지붕을 설치하고, FR5는 외벽 · 내벽을 조립하며, TurtleBot은 팔레트를 작업 위치로 운반 · 회수합니다.
+- **조립 결과 품질검사**: 품질검사 단계에서 TOP → LEFT → RIGHT → FRONT → BEHIND의 5개 View 검사를 수행합니다.
+- **통합 관제**: 실제 생산 상태를 동일하게 표시합니다.
+
+## 5. 로봇 작업공간 구성
+
+<img src="./assets/로봇_작업공간_구성도.png" alt="조립식 주택 자동화 공장 로봇 작업공간 구성도" width="100%" />
+
+- **자재 적재 및 TurtleBot 픽업 구역** : 외벽 · 내벽 등 조립 자재 대기 및 TurtleBot 픽업
+- **TurtleBot 이동 구역**: 자재 픽업 구역과 팔레트 조달 구역 간 물류 이동
+- **팔레트 조달 및 FR5 픽업 구역**: TurtleBot이 전달한 자재를 FR5가 픽업
+- **Zekeep 픽업 구역**: 베이스 · 지붕 등 Zekeep 작업 대상 자재 픽업
+- **주택 조립 작업대**: 구조물 조립 및 조립 결과 검사 수행
+- **완성 주택 적재(출하) 구역**: 조립 완료된 주택을 이동·적재하는 공간
+
+## 6. 사용자 요구사항 (User Requirements)
+
+| ID | 사용자 요구사항 |
+| --- | --- |
+| UR_01 | 로봇팔이 주택을 조립할 수 있어야 한다. |
+| UR_02 | 카메라가 조립 전 자재 수입검사를 수행할 수 있어야 한다. |
+| UR_03 | 카메라가 조립 후 품질검사를 수행할 수 있어야 한다. |
+| UR_04 | 주행 로봇이 자재를 운반할 수 있어야 한다. |
+| UR_05 | 모든 로봇은 자재를 구분할 수 있어야 한다. |
+| UR_06 | 모든 로봇은 긴급 정지를 할 수 있어야 한다. |
+| UR_07 | 관리자가 모든 로봇의 상태를 모니터링할 수 있어야 한다. |
+| UR_08 | 관리자가 작업 진행 상황을 알 수 있어야 한다. |
+| UR_09 | 관리자가 자재의 재고 현황을 파악할 수 있어야 한다. |
+| UR_10 | 로봇팔은 관리자의 접근을 감지하여 충돌을 방지할 수 있어야 한다. |
+| UR_11 | 관리자가 음성 명령으로 생산을 제어할 수 있어야 한다. |
+
+## 7. 시스템 요구사항 (System Requirements)
+
+| ID | 기능 | 요구사항 |
+| --- | --- | --- |
+| SR_01 | 생산 요청 기능 | 관리자의 요청에 따라 `HOUSE_A` 또는 `HOUSE_B` 생산을 수행한다. |
+| SR_02 | 자연어 생산 명령 기능 | 음성 인식으로 생산 요청·일시정지·재개·생산 상태 조회·재고 조회 명령을 인식하고 처리한다. |
+| SR_03 | 생산 공정 관리 기능 | 수입검사, 베이스 설치, 팔레트 운반·회수, 벽체 설치, 품질검사, 지붕 설치, 출하까지의 생산 순서를 관리한다. |
+| SR_04 | 생산 공정 상태 모니터링 기능 | 현재 생산 제품·상태·공정·공정별 시작/완료 여부·생산 시간을 실시간으로 제공한다. |
+| SR_05 | 로봇 작업 배정 기능 | 현재 공정에 필요한 작업을 판단하고 해당 로봇에 작업 명령을 전달한다. |
+| SR_06 | 자재 운반 기능 | TurtleBot이 생산 자재 팔레트를 지정 위치까지 운반하고 목표 위치 도착을 확인한다. |
+| SR_07 | 주택 구조물 조립 기능 | FR5가 주택 모델에 따라 외벽과 내벽을 설치한다. |
+| SR_08 | 밑판·지붕 설치 기능 | Zekeep 3축이 모델에 따라 밑판과 지붕을 설치한다. |
+| SR_09 | 부품 위치 인식 기능 | 카메라가 자재 종류·식별 정보, 위치·방향, 인식 신뢰도를 필요한 로봇에 제공한다. |
+| SR_10 | 자재 품질검사 기능 | 카메라가 조립 투입 전 자재 상태를 수입검사한다. |
+| SR_11 | 구조물 품질검사 기능 | 카메라가 조립된 주택의 구조물 존재 여부와 설치 위치를 품질검사한다. |
+| SR_12 | 긴급 정지 기능 | 긴급 정지 요청 시 진행 중인 로봇 동작과 컨베이어 구동을 즉시 정지시킨다. |
+| SR_13 | 로봇팔 충돌 방지 기능 | 공유 작업 영역의 동시 진입을 차단하고 점유 중인 영역에는 다른 로봇의 진입 명령을 보류한다. |
+| SR_14 | 디지털 트윈 표시 기능 | FR5 Joint, Zekeep, TurtleBot, 현재 생산 공정을 실제 상태에 맞춰 Unity에 동기화한다. |
+| SR_15 | 재고 관리 기능 | 현재 재고 조회, 부품 입고·출고, 생산 사용에 따른 재고 변동을 관리한다. |
+| SR_16 | 생산 및 시스템 이벤트 저장 기능 | 생산 업무·공정·품질검사·로봇 오류·재고·AI 명령 처리 기록을 데이터베이스에 저장한다. |
+| SR_17 | 생산 이력 조회 기능 | 생산 제품·상태·공정·시간·품질검사·오류·재고 변동 이력을 조회한다. |
+
+## 8. 시스템 아키텍처
+
+### 하드웨어 아키텍처
+
+<img src="./assets/hw_architecture.png" alt="하드웨어 아키텍처" width="100%" />
+
+### 소프트웨어 아키텍처
+
+<img src="./assets/sw_architecture.png" alt="소프트웨어 아키텍처" width="100%" />
+
+## 9. 운영 시나리오
+
+### Scenario #1 - 음성 기반 주택 생산 요청
+
+1. 관리자가 관제 시스템에서 “HOUSE_A 생산 시작해줘”와 같이 음성으로 생산을 요청합니다.
+2. STT가 음성을 텍스트로 변환하고, 명령 해석기가 생산 요청 의도와 대상 모델을 판별합니다.
+3. 서버는 요청·재고·생산 가능 여부를 확인한 뒤 `HOUSE_A` 또는 `HOUSE_B`의 생산 업무와 공정 정보를 생성합니다.
+4. 관제 화면은 생산 제품·전체 상태·현재 공정과 음성 비서 상태를 표시하고, 요청 및 처리 결과를 저장합니다.
+
+### Scenario #2 - 주택 생산 공정
+
+1. 서버가 Vision 시스템에 자재 수입검사를 요청하고, 검사 결과가 PASS일 때 공정을 진행합니다.
+2. Zekeep 3축이 밑판을 설치하고 TurtleBot이 외벽 팔레트를 작업 위치로 운반합니다.
+3. FR5 6축 로봇암이 모델에 맞는 외벽을 설치한 뒤 TurtleBot이 외벽 팔레트를 회수합니다.
+4. TurtleBot이 내벽 팔레트를 운반하고 FR5가 내벽을 설치한 뒤, TurtleBot이 내벽 팔레트를 회수합니다.
+5. 카메라가 TOP → LEFT → RIGHT → FRONT → BEHIND 순서로 조립 결과 품질검사를 수행합니다.
+6. 모든 View가 PASS하면 Zekeep 3축이 지붕을 설치하고, FR5가 완성 주택을 출하 위치로 운반한 뒤 생산 업무를 완료합니다.
+
+### Scenario #3 - 품질검사 및 불량 감지
+
+1. 서버가 Vision 시스템에 자재 수입검사를 요청하고, Vision 시스템은 ACK 및 PASS/FAIL 결과를 서버에 전달합니다.
+2. 자재가 비정상이면 누락·오류·수량 이상·불량을 기록하고, 정상 자재 교체 후 재검사합니다.
+3. 외벽·내벽 설치가 완료되면 서버가 조립 결과 품질검사를 요청합니다.
+4. 카메라는 TOP, LEFT, RIGHT, FRONT, BEHIND의 각 View에서 구조물 존재 여부와 설치 상태를 확인합니다.
+5. 모든 View가 PASS이면 지붕 설치로 진행하고, FAIL이면 다음 공정을 열지 않고 관제 화면에 품질검사 실패를 표시합니다.
+6. 수입검사와 조립 결과 품질검사 결과를 데이터베이스에 저장합니다.
+
+### Scenario #4 - 생산 일시정지 및 재개
+
+1. 관리자가 관제 시스템에서 현재 생산 상태를 확인하고 “생산 잠깐 멈춰”와 같이 일시정지를 요청합니다.
+2. 서버는 현재 실행 중인 작업에 `PAUSE`를 요청합니다.
+3. 로봇은 안전하게 정지한 뒤 정지 상태를 서버에 전달하고, 서버는 생산 상태를 일시정지로 변경합니다.
+4. 관제 시스템은 일시정지 상태를 표시합니다.
+5. 관리자가 “생산 다시 시작해”라고 요청하면 서버가 중단된 공정에 재개 명령을 전달하고, 이력을 저장합니다.
+
+### Scenario #5 - 로봇 및 설비 오류 발생
+
+1. 생산 중 FR5 파지 실패, 로봇 통신 오류, Zekeep 흡착 실패, 부품 설치 실패 또는 Vision 검사 실패가 발생할 수 있습니다.
+2. 로봇은 작업 실패 결과와 현재 작업·오류 코드·오류 내용을 서버에 전달합니다.
+3. 서버는 현재 공정을 실패 또는 정지 상태로 변경하고, 다음 공정을 수행할 수 없으면 생산을 중지합니다.
+4. 관제 시스템은 오류 발생 로봇·공정·코드·내용을 표시하고, 오류 정보를 저장합니다.
+5. 오류 원인을 조치한 뒤 운영자가 재개 또는 복구 절차를 수행합니다. 실행 여부가 불확실한 명령은 자동으로 재전송하지 않습니다.
+
+### Scenario #6 - 실시간 생산 관제 및 디지털 트윈
+
+1. 관리자는 관제 시스템에서 현재 생산 모델·전체 생산 상태·현재 공정·시작/완료 시간·작업 중인 로봇을 확인합니다.
+2. FMS와 각 로봇·설비는 연결 상태, 작업 상태, Joint 또는 위치, 오류 상태를 관제 시스템에 전달합니다.
+3. Unity는 FR5 Joint, Zekeep 상태, TurtleBot 상태, 현재 생산 공정을 디지털 트윈에 반영합니다.
+4. 실제 로봇 상태가 변경되면 디지털 트윈 화면도 함께 갱신됩니다.
+
+### Scenario #7 - 재고 조회 및 생산에 따른 재고 변경
+
+1. 관리자가 “지붕 재고 몇 개 남았어?”와 같이 음성으로 재고를 조회합니다.
+2. STT와 명령 해석기가 재고 조회 의도를 판별하고, 서버가 데이터베이스에서 현재 재고를 조회합니다.
+3. TTS가 현재 재고 수량을 안내합니다.
+4. 부품 입고·생산 사용에 따라 재고를 증감하고, 부품·입출고 여부·수량·발생 시간을 저장합니다.
+5. 관제 시스템에서 변경된 현재 재고를 조회할 수 있습니다.
+
+### Scenario #8 - 생산 상태 음성 조회
+
+1. 관리자가 “현재 생산 어디까지 됐어?” 또는 “HOUSE_A 생산 끝났어?”와 같이 현재 생산 상태를 질문합니다.
+2. STT가 음성을 텍스트로 변환하고, 명령 해석기가 생산 상태 조회 의도를 판별합니다.
+3. 서버가 현재 생산 업무·전체 상태·현재 공정·완료 공정을 데이터베이스에서 조회합니다.
+4. 관제 시스템과 TTS가 조회 결과를 관리자에게 제공합니다.
+5. 자연어 요청과 처리 결과를 AI 명령 처리 이력에 저장합니다.
+
+## 10. 시퀀스 다이어그램
+
+프로젝트의 주요 기능은 역할과 데이터 흐름을 명확히 하기 위해 시퀀스 다이어그램으로 정의했습니다.
+
+### Scenario #1 - 음성 기반 주택 생산 요청
+
+<img src="./assets/sequence_diagram1.png" alt="Scenario 1 시퀀스 다이어그램" width="100%" />
+
+### Scenario #2 - 주택 생산 공정
+
+<img src="./assets/sequence_diagram2-1.png" alt="Scenario 2 시퀀스 다이어그램 1" width="100%" />
+
+<img src="./assets/sequence_diagram2-2.png" alt="Scenario 2 시퀀스 다이어그램 2" width="100%" />
+
+<img src="./assets/sequence_diagram2-3.png" alt="Scenario 2 시퀀스 다이어그램 3" width="100%" />
+
+### Scenario #3 - 품질검사 및 불량 감지
+
+<img src="./assets/sequence_diagram3.png" alt="Scenario 3 시퀀스 다이어그램" width="100%" />
+
+### Scenario #4 - 생산 일시정지 및 재개
+
+<img src="./assets/sequence_diagram4.png" alt="Scenario 4 시퀀스 다이어그램" width="100%" />
+
+### Scenario #5 - 로봇 및 설비 오류 발생
+
+<img src="./assets/sequence_diagram5.png" alt="Scenario 5 시퀀스 다이어그램" width="100%" />
+
+### Scenario #6 - 실시간 생산 관제 및 디지털 트윈
+
+<img src="./assets/sequence_diagram6.png" alt="Scenario 6 시퀀스 다이어그램" width="100%" />
+
+### Scenario #7 - 재고 조회 및 생산에 따른 재고 변경
+
+<img src="./assets/sequence_diagram7.png" alt="Scenario 7 시퀀스 다이어그램" width="100%" />
+
+### Scenario #8 - 생산 상태 음성 조회
+
+<img src="./assets/sequence_diagram8.png" alt="Scenario 8 시퀀스 다이어그램" width="100%" />
+
+## 11. 상태 다이어그램
+
+<img src="./assets/state_diagram1.png" alt="상태 다이어그램 1" width="100%" />
+
+<img src="./assets/state_diagram2.png" alt="상태 다이어그램 2" width="100%" />
+
+<img src="./assets/state_diagram3.png" alt="상태 다이어그램 3" width="100%" />
+
+<img src="./assets/state_diagram4.png" alt="상태 다이어그램 4" width="100%" />
+
+## 12. 소스 구성
+
+| 경로 | 역할 |
+| --- | --- |
+| [ai_perception/](ai_perception/README.md) | Incoming QA 및 PRE_ROOF 품질검사, Vision AI 파이프라인 |
+| [controltower_gui/](controltower_gui/README.md) | Unity 기반 생산 관제·디지털 트윈 화면 |
+| [forklift_turtlebot3/](forklift_turtlebot3/README.md) | TurtleBot3 자재 팔레트 운반과 포크 리프트 제어 |
+| [llm_stt_tts/](llm_stt_tts/README.md) | Voice AI 기능·명령·검증 문서 진입점 |
+| [robot_control_fr5_zekeep/](robot_control_fr5_zekeep/README.md) | FR5 조립 작업과 Zekeep 3축 제어 |
+| [server_fms_db/](server_fms_db/README.md) | API Server, FMS, PostgreSQL/Redis, telemetry, Unity WebSocket, 통합 Voice Runtime |
+
+Voice Runtime의 실행 source는 production/Redis/API contract와 함께 동작하도록 `server_fms_db/`에 통합되어 있으며, `llm_stt_tts/`는 Voice AI 기능 문서의 진입점입니다.
+
+## 13. 프로젝트 타임라인
+
+**프로젝트 기간: 2026년 8월 3일 ~ 2026년 9월 17일**
+
+요구사항 정의, 공정·인터페이스 설계, 파트별 구현, 통합 테스트와 최종 시연 준비 일정을 Jira로 관리했습니다.
+
+<img src="./assets/timeline.png" alt="프로젝트 타임라인" width="100%" />
+
+## 14. 프로젝트 기술 스택
+
+| 구분 | 실제 사용 기술 |
+| --- | --- |
+| Backend / FMS | Python, FastAPI, PostgreSQL, SQLAlchemy, Alembic, Redis, WebSocket |
+| Robot Middleware | ROS 2 (Topic, Action), CycloneDDS |
+| Robot / Hardware | FR5, Zekeep 3축, TurtleBot3 |
+| Voice AI | sherpa-onnx, faster-whisper, Ollama, EXAONE, Edge TTS |
+| Vision AI | Python, YOLO, PyTorch, OpenCV, NumPy |
+| Digital Twin / GUI | Unity, C# |
+| Collaboration / Project Management | Git, GitHub, Jira |
+
+## 15. 보안 및 제외 항목
+
+저장소의 `.gitignore` 기준으로 다음 로컬·실행 산출물과 민감 정보는 커밋하지 않습니다.
+
+- **시크릿·환경 설정**: `.env`, `.env.*`, `.envrc`, 개인 키(`*.pem`, `*.key`), PyPI 인증 설정
+- **백업·압축 산출물**: `*.BEFORE_*`, `*.PREV*`, `*.BAK*`, `*_backup_/`, `*.tar.gz`, `*.zip` 등
+- **ROS 2 실행 산출물**: `build/`, `install/`, `log/`, `run_logs/`, `.ros/`, rosbag(`*.db3`, `*.mcap`)
+- **로봇 런타임 산출물**: `state/`, `runtime/`, `*.pid`
+- **Vision 대용량 자산**: 모델 가중치(`*.pt`, `*.onnx`, `*.engine` 등), 데이터셋·캡처·증적·추론 결과, 로컬 DB 파일
+- **Voice AI 산출물**: 모델 캐시, Whisper/Hugging Face 모델, 녹음·합성 음성 파일
+- **관제·Unity·웹 빌드 산출물**: `node_modules/`, Unity `Library/`·`Temp/`·`Build/`·`Logs/` 등 자동 생성 파일
+- **개발 환경 산출물**: Python 가상환경·캐시·테스트/커버리지 결과, IDE·OS 임시 파일
+- **개인 문서·로컬 도구 설정**: 개인 회의록·검증 노트, Office 원본 문서, 로컬 AI 도구 설정
+
+다만 **로봇 티칭 자세·캘리브레이션 결과·TurtleBot 지도·운반 경로·Unity `.meta` 파일은 재현에 필수이므로 제외하지 않고 커밋합니다.**
+
+
+---
+
+**2조 하모니**

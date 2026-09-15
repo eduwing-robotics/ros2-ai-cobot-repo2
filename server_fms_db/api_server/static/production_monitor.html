@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FMS Production Monitor</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f6fa; margin: 0; padding: 20px; color: #333; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        h1 { margin: 0; font-size: 24px; color: #2c3e50; }
+        .controls { display: flex; gap: 15px; align-items: center; }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+        .column { flex: 1; min-width: 300px; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .card { border: 1px solid #eee; border-radius: 4px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s; }
+        .card:hover { border-color: #3498db; }
+        .card.active { border-color: #3498db; background-color: #ebf5fb; }
+        .card-title { font-weight: bold; margin-bottom: 5px; font-size: 16px; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; color: #fff; }
+        .badge.PENDING { background-color: #95a5a6; }
+        .badge.READY { background-color: #3498db; }
+        .badge.RUNNING { background-color: #f39c12; }
+        .badge.COMPLETED { background-color: #2ecc71; }
+        .badge.FAILED { background-color: #e74c3c; }
+        .badge.CANCELED { background-color: #34495e; }
+        .badge.PAUSED { background-color: #8e44ad; }
+        .badge.REQUESTED { background-color: #7f8c8d; }
+        .badge.SENT { background-color: #5dade2; }
+        .badge.ACKED { background-color: #2e86c1; }
+        .badge.REJECTED, .badge.ERROR { background-color: #c0392b; }
+        .badge.DEFAULT { background-color: #bdc3c7; }
+
+        .step-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .step-row:last-child { border-bottom: none; }
+
+        .event-row { font-family: monospace; font-size: 12px; padding: 6px 0; border-bottom: 1px dashed #eee; display: flex; flex-wrap: wrap; gap: 10px; }
+        .event-time { color: #7f8c8d; min-width: 60px; }
+        .event-type { font-weight: bold; min-width: 130px; }
+        .event-msg { color: #555; flex: 1; }
+
+        .error-message { color: #e74c3c; padding: 10px; background: #fadbd8; border-radius: 4px; margin-bottom: 10px; display: none; }
+        .empty-message { color: #7f8c8d; font-style: italic; }
+
+        .btn { padding: 6px 12px; border: 1px solid #ccc; background: #fff; cursor: pointer; border-radius: 4px; }
+        .btn:hover { background: #f0f0f0; }
+        .badge.PRE_ROOF_READY { background-color: #8e44ad; }
+        .badge.ROOF_READY { background-color: #2980b9; }
+        .execution-snapshot { margin-top: 20px; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .snapshot-header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 12px; }
+        .snapshot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+        .snapshot-card { border: 1px solid #eee; border-radius: 6px; padding: 12px; min-width: 0; }
+        .snapshot-card h3 { margin: 0 0 8px; font-size: 14px; color: #2c3e50; }
+        .snapshot-code { font-family: monospace; font-weight: bold; word-break: break-word; }
+        .snapshot-row { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; font-size: 13px; }
+        .snapshot-label { color: #7f8c8d; }
+        .snapshot-value { text-align: right; overflow-wrap: anywhere; }
+        #snapshot-status { margin: 0 0 10px; color: #7f8c8d; font-size: 13px; }
+        .material-monitoring { margin-top: 20px; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .material-delivery-card { border: 1px solid #eee; border-radius: 6px; padding: 14px; margin-bottom: 12px; }
+        .material-delivery-card:last-child { margin-bottom: 0; }
+        .material-delivery-header { display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap; }
+        .material-delivery-title { font-size: 15px; font-weight: bold; color: #2c3e50; }
+        .material-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 14px; margin: 12px 0; font-size: 13px; }
+        .material-summary-label { color: #7f8c8d; }
+        .material-items { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+        .material-items th, .material-items td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
+        .material-items th { color: #7f8c8d; font-weight: 600; }
+        .material-items tr:last-child td { border-bottom: none; }
+        .qa-state { font-weight: 600; }
+        .qa-detail { margin-top: 5px; color: #555; font-size: 12px; }
+        .qa-warning { color: #b9770e; }
+        .qa-failure { color: #c0392b; }
+        .qa-success { color: #1e8449; }
+        .material-debug { margin-top: 8px; font-size: 12px; color: #7f8c8d; }
+        .physical-ready-btn { border-color: #2980b9; color: #21618c; font-weight: 600; }
+        .physical-ready-btn:disabled { cursor: wait; opacity: 0.65; }
+        .execution-ready-btn { border-color: #8e44ad; color: #6c3483; font-weight: 600; }
+        .execution-ready-btn:disabled { cursor: wait; opacity: 0.65; }
+        .command-feedback { display: none; margin: 0 0 12px; padding: 9px 10px; border-radius: 4px; font-size: 13px; }
+        .command-feedback.neutral { display: block; color: #1f618d; background: #d6eaf8; }
+        .command-feedback.success { display: block; color: #1e8449; background: #d5f5e3; }
+        .command-feedback.error { display: block; color: #c0392b; background: #fadbd8; }
+        .production-request-panel { margin-top: 20px; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .production-request-input { width: 100%; min-height: 70px; box-sizing: border-box; resize: vertical; padding: 9px; font: inherit; border: 1px solid #ccc; border-radius: 4px; }
+        .production-request-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .production-request-status { margin-top: 10px; padding: 10px; border: 1px solid #eee; border-radius: 4px; font-size: 13px; white-space: pre-wrap; }
+        .production-request-status:empty { display: none; }
+        .production-request-hint { color: #7f8c8d; font-size: 12px; margin-top: 6px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>FMS Production Monitor</h1>
+    <div class="controls">
+        <span id="last-updated">Last Updated: -</span>
+        <label>
+            <input type="checkbox" id="auto-refresh" checked> Auto Refresh
+        </label>
+        <button class="btn" id="refresh-btn">Refresh Now</button>
+    </div>
+</header>
+
+<div id="global-error" class="error-message"></div>
+
+<div class="container">
+    <div class="column" id="col-jobs">
+        <h2>Production Jobs</h2>
+        <div id="jobs-container"></div>
+    </div>
+
+    <div class="column" id="col-steps">
+        <h2>Job Details</h2>
+        <div id="job-detail-container">
+            <div class="empty-message">Select a job to view details</div>
+        </div>
+    </div>
+
+    <div class="column" id="col-events">
+        <h2>Events</h2>
+        <div id="job-events-container">
+            <div class="empty-message">Select a job to view events</div>
+        </div>
+    </div>
+</div>
+
+<section class="execution-snapshot" aria-live="polite">
+    <div class="snapshot-header">
+        <h2 style="margin: 0;">Execution Snapshot</h2>
+        <span id="snapshot-status"></span>
+    </div>
+    <div id="execution-snapshot-container">
+        <div class="empty-message">Select a job to view execution diagnostics</div>
+    </div>
+</section>
+
+<section id="test-override-panel" class="execution-snapshot" hidden aria-live="polite">
+    <div class="snapshot-header">
+        <h2 style="margin: 0;">TEST MODE ONLY · 현재 차단 원인</h2>
+    </div>
+    <div id="test-override-status"></div>
+    <button class="btn" id="test-override-start" disabled>작업 시작 시뮬레이션</button>
+    <button class="btn" id="test-override-advance" disabled>공정 완료 시뮬레이션</button>
+    <button class="btn" id="test-override-house-outbound" hidden>완성 주택 운반 완료 시뮬레이션</button>
+</section>
+
+<section class="production-request-panel" aria-live="polite">
+    <div class="snapshot-header">
+        <h2 style="margin: 0;">수동 생산 요청</h2>
+        <span id="production-request-state"></span>
+    </div>
+    <textarea id="production-request-input" class="production-request-input" placeholder="예: HOUSE_B 한 채 만들어줘" aria-label="생산 요청 텍스트"></textarea>
+    <div class="production-request-actions">
+        <button class="btn" id="production-request-submit">생산 요청 보내기</button>
+    </div>
+    <div id="production-request-status" class="production-request-status"></div>
+    <div id="production-request-followup" class="production-request-actions"></div>
+    <div class="production-request-hint">음성 입력 대신 같은 생산 대화 절차를 사용합니다. 요청 확정 전에는 Job이 생성되지 않습니다.</div>
+</section>
+
+<section class="material-monitoring" aria-live="polite">
+    <div class="snapshot-header">
+        <h2 style="margin: 0;">Material / Incoming QA</h2>
+        <span id="material-delivery-status"></span>
+    </div>
+    <div id="material-command-feedback" class="command-feedback" role="status"></div>
+    <div id="material-deliveries-container">
+        <div class="empty-message">Select a job to view material delivery and Incoming QA status</div>
+    </div>
+</section>
+
+<section class="material-monitoring" aria-live="polite">
+    <div class="snapshot-header">
+        <h2 style="margin: 0;">Incoming QA v0.2</h2>
+        <span id="incoming-qa-v02-status"></span>
+    </div>
+    <div id="incoming-qa-v02-action"></div>
+    <div id="incoming-qa-v02-feedback" class="command-feedback" role="status"></div>
+    <div id="incoming-qa-v02-container">
+        <div class="empty-message">Select a job to view Incoming QA v0.2 transaction diagnostics</div>
+    </div>
+</section>
+
+<section class="execution-snapshot" aria-live="polite">
+    <div class="snapshot-header">
+        <h2 style="margin: 0;">Voice Command</h2>
+        <span id="voice-runtime-status"></span>
+    </div>
+    <div id="voice-runtime-container">
+        <div class="empty-message">Loading Voice Runtime diagnostics…</div>
+    </div>
+</section>
+
+<script>
+    let currentJobId = null;
+    let currentJobDetail = null;
+    let refreshInterval = null;
+    let isFetching = false;
+    const physicalReadyCommandsInFlight = new Set();
+    const manualPrestageCommandsInFlight = new Set();
+    const emptyReturnCommandsInFlight = new Set();
+    const outerWallBatchCommandsInFlight = new Set();
+    const incomingQAReinspectionCommandsInFlight = new Set();
+    const incomingQAModeReinspectionCommandsInFlight = new Set();
+    let incomingQATestHoldCommandInFlight = false;
+    let incomingQAHouseBAdvanceInFlight = false;
+    let currentIncomingQAV02Monitor = null;
+    let incomingQAV02StartInFlight = false;
+    let preRoofCommandInFlight = false;
+    let operatorExecutionReadyInFlight = false;
+    let productionConversationSessionId = null;
+    let productionConversationPendingRequestId = null;
+    let productionConversationInFlight = false;
+    const terminalJobStatuses = new Set(["COMPLETED", "FAILED", "CANCELED"]);
+
+    function isTerminalJob(job) {
+        return Boolean(job && terminalJobStatuses.has(job.status));
+    }
+
+    function isCurrentJobTerminal() {
+        return isTerminalJob(currentJobDetail);
+    }
+
+    const elements = {
+        jobsContainer: document.getElementById('jobs-container'),
+        jobDetailContainer: document.getElementById('job-detail-container'),
+        jobEventsContainer: document.getElementById('job-events-container'),
+        executionSnapshotContainer: document.getElementById('execution-snapshot-container'),
+        snapshotStatus: document.getElementById('snapshot-status'),
+        testOverridePanel: document.getElementById('test-override-panel'),
+        testOverrideStatus: document.getElementById('test-override-status'),
+        testOverrideStart: document.getElementById('test-override-start'),
+        testOverrideAdvance: document.getElementById('test-override-advance'),
+        testOverrideHouseOutbound: document.getElementById('test-override-house-outbound'),
+        materialDeliveriesContainer: document.getElementById('material-deliveries-container'),
+        materialDeliveryStatus: document.getElementById('material-delivery-status'),
+        materialCommandFeedback: document.getElementById('material-command-feedback'),
+        incomingQAV02Container: document.getElementById('incoming-qa-v02-container'),
+        incomingQAV02Status: document.getElementById('incoming-qa-v02-status'),
+        incomingQAV02Action: document.getElementById('incoming-qa-v02-action'),
+        incomingQAV02Feedback: document.getElementById('incoming-qa-v02-feedback'),
+        voiceRuntimeContainer: document.getElementById('voice-runtime-container'),
+        voiceRuntimeStatus: document.getElementById('voice-runtime-status'),
+        productionRequestInput: document.getElementById('production-request-input'),
+        productionRequestSubmit: document.getElementById('production-request-submit'),
+        productionRequestState: document.getElementById('production-request-state'),
+        productionRequestStatus: document.getElementById('production-request-status'),
+        productionRequestFollowup: document.getElementById('production-request-followup'),
+        globalError: document.getElementById('global-error'),
+        lastUpdated: document.getElementById('last-updated'),
+        autoRefresh: document.getElementById('auto-refresh'),
+        refreshBtn: document.getElementById('refresh-btn')
+    };
+
+    function showError(msg) {
+        elements.globalError.textContent = msg;
+        elements.globalError.style.display = 'block';
+    }
+
+    function hideError() {
+        elements.globalError.style.display = 'none';
+    }
+
+    function getBadgeClass(status) {
+        const known = ['PENDING', 'READY', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELED', 'PAUSED', 'REQUESTED', 'SENT', 'ACKED', 'REJECTED', 'ERROR'];
+        return known.includes(status) ? status : 'DEFAULT';
+    }
+
+    async function fetchJobs() {
+        try {
+            const res = await fetch('/production/jobs');
+            if (!res.ok) throw new Error('API request failed');
+            const jobs = await res.json();
+            renderJobs(jobs);
+            hideError();
+        } catch (e) {
+            showError('데이터를 불러오지 못했습니다. (Jobs API Error)');
+        }
+    }
+
+    function renderJobs(jobs) {
+        if (!jobs || jobs.length === 0) {
+            elements.jobsContainer.innerHTML = '<div class="empty-message">등록된 Production Job이 없습니다.</div>';
+            return;
+        }
+
+        let html = '';
+        let foundCurrent = false;
+
+        for (const job of jobs) {
+            if (job.job_id === currentJobId) foundCurrent = true;
+            const activeCls = (currentJobId === job.job_id) ? 'active' : '';
+            html += `
+                <div class="card ${activeCls}" onclick="selectJob(${job.job_id})">
+                    <div class="card-title">${job.job_code}</div>
+                    <div style="margin-bottom: 5px;">Product Code: ${job.product_code}</div>
+                    <div><span class="badge ${getBadgeClass(job.status)}">${job.status}</span></div>
+                </div>
+            `;
+        }
+        elements.jobsContainer.innerHTML = html;
+
+        if (currentJobId && !foundCurrent) {
+            currentJobId = null;
+            currentJobDetail = null;
+            elements.jobDetailContainer.innerHTML = '<div class="empty-message">선택한 Job이 삭제되었거나 존재하지 않습니다.</div>';
+            elements.jobEventsContainer.innerHTML = '<div class="empty-message">Select a job to view events</div>';
+            clearExecutionSnapshot('선택한 Job이 삭제되었거나 존재하지 않습니다.');
+            clearMaterialDeliveries('선택한 Job이 삭제되었거나 존재하지 않습니다.');
+            clearIncomingQAV02('선택한 Job이 삭제되었거나 존재하지 않습니다.');
+        }
+
+        updateTimestamp();
+    }
+
+    async function selectJob(jobId) {
+        currentJobId = jobId;
+        await refreshData();
+    }
+
+    async function fetchJobDetail() {
+        if (!currentJobId) return;
+        try {
+            const res = await fetch(`/production/jobs/${currentJobId}`);
+            if (res.status === 404) {
+                elements.jobDetailContainer.innerHTML = '<div class="empty-message">선택한 Job이 삭제되었거나 존재하지 않습니다.</div>';
+                return;
+            }
+            if (!res.ok) throw new Error('API request failed');
+            const detail = await res.json();
+            currentJobDetail = detail;
+            renderJobDetail(detail);
+        } catch (e) {
+            elements.jobDetailContainer.innerHTML = '<div class="error-message" style="display:block">데이터를 불러오지 못했습니다. (Job Detail Error)</div>';
+        }
+    }
+
+    function renderJobDetail(job) {
+        const terminal = isTerminalJob(job);
+        const cancelControl = terminal
+            ? '<div class="material-debug">종료된 Job은 읽기 전용입니다.</div>'
+            : '<button class="btn physical-ready-btn" id="selected-job-cancel-button" onclick="confirmSelectedJobCancel(' + job.job_id + ')">작업 취소</button>';
+        let totalSteps = job.steps ? job.steps.length : 0;
+        let completedSteps = job.steps ? job.steps.filter(s => s.status === 'COMPLETED').length : 0;
+
+        let currentStepText = '-';
+        let summaryText = 'Waiting to Start';
+
+        if (job.steps && job.steps.length > 0) {
+            let failedIdx = job.steps.findIndex(s => s.status === 'FAILED');
+            let runningIdx = job.steps.findIndex(s => s.status === 'RUNNING');
+
+            if (job.status === 'COMPLETED') {
+                summaryText = 'Production Completed';
+            } else if (job.status === 'FAILED') {
+                if (failedIdx !== -1) {
+                    summaryText = `Failed at S${failedIdx + 1} · ${job.steps[failedIdx].step_code}`;
+                } else {
+                    summaryText = 'Job Failed';
+                }
+            } else if (['RUNNING', 'ROOF_READY'].includes(job.status)) {
+                if (runningIdx !== -1) {
+                    currentStepText = `S${runningIdx + 1} · ${job.steps[runningIdx].step_code}`;
+                    summaryText = `S${runningIdx + 1} · ${job.steps[runningIdx].step_code} 진행 중`;
+                } else {
+                    summaryText = 'Running';
+                }
+            }
+        }
+
+        let timelineHtml = '<div style="display:flex; align-items:center; margin: 15px 0; overflow-x: auto; gap: 5px;">';
+        if (job.steps && job.steps.length > 0) {
+            for (let i = 0; i < job.steps.length; i++) {
+                const step = job.steps[i];
+                let color = '#bdc3c7';
+                let icon = '○';
+                if (step.status === 'COMPLETED') { color = '#2ecc71'; icon = '●'; }
+                else if (step.status === 'RUNNING') { color = '#f39c12'; icon = '◉'; }
+                else if (step.status === 'FAILED') { color = '#e74c3c'; icon = '◉'; }
+
+                timelineHtml += `
+                    <div style="display:flex; flex-direction:column; align-items:center; min-width:32px;">
+                        <div style="color:${color}; font-size:18px; line-height:1;">${icon}</div>
+                        <div style="font-size:11px; color:#7f8c8d; margin-top:4px;">S${i+1}</div>
+                    </div>
+                `;
+                if (i < job.steps.length - 1) {
+                    timelineHtml += `<div style="height:2px; flex:1; min-width:12px; background-color:#eee; margin-top:-14px;"></div>`;
+                }
+            }
+        }
+        timelineHtml += '</div>';
+
+        let html = `
+            <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee;">
+                <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">${job.job_code}</div>
+                <div style="margin-bottom: 5px;">Product Code: ${job.product_code}</div>
+                <div style="margin-bottom: 10px;">Status: <span class="badge ${getBadgeClass(job.status)}">${job.status}</span></div>
+
+                <div style="background:#fdfdfd; border:1px solid #eee; padding:12px; border-radius:6px; margin-top:15px; margin-bottom:15px;">
+                    <div style="font-weight:bold; color:#2c3e50; font-size:15px;">${summaryText}</div>
+                    <div style="color:#7f8c8d; font-size:13px; margin-top:4px;">Progress: ${completedSteps} / ${totalSteps} Completed</div>
+                    ${timelineHtml}
+                </div>
+
+                <div>Current Step: <strong>${currentStepText}</strong></div>
+                <div style="margin-top:12px;">${cancelControl}</div>
+            </div>
+            <h4 style="margin-top: 0;">Steps</h4>
+        `;
+
+        if (!job.steps || job.steps.length === 0) {
+            html += '<div class="empty-message">등록된 Step이 없습니다.</div>';
+        } else {
+            for (let i = 0; i < job.steps.length; i++) {
+                const step = job.steps[i];
+                html += `
+                    <div class="step-row">
+                        <span><strong>S${i+1} · ${step.step_code}</strong> - ${step.step_name}</span>
+                        <span class="badge ${getBadgeClass(step.status)}">${step.status}</span>
+                    </div>
+                `;
+                if (step.failure_reason) {
+                    html += `<div style="font-size:12px; color:#e74c3c; margin-top:-5px; margin-bottom:5px;">Failure: ${step.failure_reason}</div>`;
+                }
+            }
+        }
+        elements.jobDetailContainer.innerHTML = html;
+    }
+
+    async function confirmSelectedJobCancel(jobId) {
+        if (currentJobId !== jobId || isCurrentJobTerminal()) return;
+        const job = currentJobDetail;
+        const stage = job.current_step ? (job.current_step.operation_code || job.current_step.step_code) : job.status;
+        const confirmed = window.confirm(
+            "생산 작업을 취소하시겠습니까?\n\nJob: " + job.job_code
+            + "\n제품: " + job.product_code
+            + "\n현재 단계: " + stage
+            + "\n\n취소 후에는 되돌릴 수 없습니다."
+        );
+        if (!confirmed) return;
+        elements.snapshotStatus.textContent = "선택한 Job 취소를 요청하는 중입니다.";
+        try {
+            const response = await postJsonWithTimeout("/production/jobs/" + jobId + "/cancel", {});
+            if (!response.ok) {
+                const payload = await response.json().catch(() => ({}));
+                throw new Error(payload.detail || "CANCEL_" + response.status);
+            }
+            const result = await response.json();
+            if (result.job_id !== jobId || result.status !== "CANCELED") {
+                throw new Error("INVALID_CANCEL_RESPONSE");
+            }
+            await refreshData();
+            elements.snapshotStatus.textContent = "선택한 Job이 취소되었습니다.";
+        } catch (error) {
+            await refreshData();
+            elements.snapshotStatus.textContent = "Job 취소가 적용되지 않았습니다: " + (error.message || "현재 상태를 다시 확인하세요.");
+        }
+    }
+
+    function displayValue(value) {
+        if (value === null || value === undefined || value === '') return '-';
+        return String(value);
+    }
+
+    function escapeHtml(value) {
+        return displayValue(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function statusBadge(status) {
+        const value = displayValue(status);
+        return `<span class="badge ${getBadgeClass(value)}">${escapeHtml(value)}</span>`;
+    }
+
+    function snapshotStepCard(title, step) {
+        if (!step) {
+            return `<div class="snapshot-card"><h3>${escapeHtml(title)}</h3><div class="empty-message">현재 실행 중인 공정 없음</div></div>`;
+        }
+        return `
+            <div class="snapshot-card">
+                <h3>${escapeHtml(title)}</h3>
+                <div class="snapshot-code">${escapeHtml(step.operation_code || step.step_code)}</div>
+                <div class="snapshot-row"><span class="snapshot-label">Order</span><span class="snapshot-value">${escapeHtml(step.step_order)}</span></div>
+                <div class="snapshot-row"><span class="snapshot-label">Display</span><span class="snapshot-value">${escapeHtml(step.step_name)}</span></div>
+                <div class="snapshot-row"><span class="snapshot-label">Status</span><span class="snapshot-value">${statusBadge(step.status)}</span></div>
+            </div>
+        `;
+    }
+
+    function snapshotEventCard(title, event) {
+        if (!event) {
+            return `<div class="snapshot-card"><h3>${escapeHtml(title)}</h3><div class="empty-message">-</div></div>`;
+        }
+        return `
+            <div class="snapshot-card">
+                <h3>${escapeHtml(title)}</h3>
+                <div class="snapshot-code">${escapeHtml(event.event_type)}</div>
+                <div class="snapshot-row"><span class="snapshot-label">Error Code</span><span class="snapshot-value">${escapeHtml(event.error_code)}</span></div>
+                <div class="snapshot-row"><span class="snapshot-label">Message</span><span class="snapshot-value">${escapeHtml(event.message)}</span></div>
+                <div class="snapshot-row"><span class="snapshot-label">At</span><span class="snapshot-value">${escapeHtml(event.created_at)}</span></div>
+            </div>
+        `;
+    }
+
+    function preRoofViewsHtml(inspection) {
+        if (!inspection || !Array.isArray(inspection.views) || inspection.views.length === 0) return '';
+        const rows = inspection.views.map((view) => `
+            <div class="snapshot-row"><span class="snapshot-label">${escapeHtml(view.view_name)}</span><span class="snapshot-value">${statusBadge(view.status)}${view.result ? ` · ${escapeHtml(view.result)}` : ''}</span></div>
+        `).join('');
+        return `
+            <div class="snapshot-row"><span class="snapshot-label">Current View</span><span class="snapshot-value">${escapeHtml(inspection.current_view || '-')}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Gate</span><span class="snapshot-value">${escapeHtml(inspection.gate_state || 'NOT_RELEASED')}</span></div>
+            <div class="qa-detail">${rows}</div>
+        `;
+    }
+
+    function preRoofControlsHtml(snapshot) {
+        if (terminalJobStatuses.has(snapshot.job_status)) return "";
+        const inspection = snapshot.inspection;
+        if (!inspection) return '';
+        if (snapshot.job_status === 'PRE_ROOF_READY' && inspection.status === 'PENDING') {
+            return `<button class="btn physical-ready-btn" onclick="runPreRoofCommand(${escapeHtml(snapshot.job_id)}, 'start')" ${preRoofCommandInFlight ? 'disabled' : ''}>품질검사 시작</button>`;
+        }
+        if (snapshot.job_status === 'PRE_ROOF_READY' && inspection.status === 'RUNNING') {
+            return '<div class="qa-detail">Vision View 검사 진행 중입니다.</div>';
+        }
+        if (snapshot.job_status === 'PRE_ROOF_READY' && inspection.status === 'COMPLETED' && inspection.result !== 'PASS') {
+            return `
+                <div class="qa-detail qa-failure">현장 조치 후 재검사가 필요합니다.</div>
+                <button class="btn physical-ready-btn" onclick="runPreRoofCommand(${escapeHtml(snapshot.job_id)}, 'start')" ${preRoofCommandInFlight ? 'disabled' : ''}>재검사 시작</button>
+            `;
+        }
+        if (inspection.status === 'COMPLETED' && inspection.result === 'PASS') return '<div class="qa-detail qa-success">PRE_ROOF 품질검사 완료</div>';
+        return '';
+    }
+
+    async function runPreRoofCommand(jobId, action) {
+        if (currentJobId !== jobId || preRoofCommandInFlight) return;
+        let body = {};
+        if (action === 'fail') {
+            const reason = window.prompt('PRE_ROOF FAIL 사유를 입력하세요. (선택)', 'manual temporary inspection failure');
+            if (reason === null) return;
+            body = { failure_reason: reason.trim() || null };
+        }
+        preRoofCommandInFlight = true;
+        elements.snapshotStatus.textContent = 'PRE_ROOF 상태를 저장하는 중입니다.';
+        try {
+            const response = await postJsonWithTimeout(`/production/jobs/${jobId}/pre-roof/${action}`, body);
+            if (!response.ok) throw new Error(`PRE_ROOF_${response.status}`);
+            await refreshData();
+            elements.snapshotStatus.textContent = 'PRE_ROOF 상태가 저장되었습니다.';
+        } catch (error) {
+            await refreshData();
+            elements.snapshotStatus.textContent = 'PRE_ROOF 상태 전이를 적용하지 못했습니다. 현재 상태를 다시 확인하세요.';
+        } finally {
+            preRoofCommandInFlight = false;
+        }
+    }
+
+    function shouldShowOperatorExecutionReady(next) {
+        return !isCurrentJobTerminal()
+            && next
+            && next.status === 'PENDING'
+            && next.supply_mode === 'TRANSPORTED'
+            && next.operator_execution_ready_at == null
+            && next.readiness_reason === 'OPERATOR_EXECUTION_READY_REQUIRED';
+    }
+
+    function operatorExecutionReadyHtml(next) {
+        if (!shouldShowOperatorExecutionReady(next)) return '';
+        const disabled = operatorExecutionReadyInFlight ? 'disabled' : '';
+        return `
+            <button class="btn execution-ready-btn" onclick="confirmOperatorExecutionReady(${escapeHtml(currentJobId)}, ${escapeHtml(next.job_step_id)})" ${disabled}>
+                ${operatorExecutionReadyInFlight ? '처리 중...' : '조립 시작'}
+            </button>
+            <div class="material-debug">배송 완료 후 TurtleBot 작업영역 이탈과 자재 상태를 확인한 뒤 승인하세요. 이 버튼은 Robot Cell을 직접 실행하지 않습니다.</div>
+        `;
+    }
+
+    async function confirmOperatorExecutionReady(jobId, stepId) {
+        if (currentJobId !== jobId || operatorExecutionReadyInFlight) return;
+        const confirmed = window.confirm(
+            'TurtleBot이 작업영역에서 이탈했고 자재 위치가 안전한지 확인했습니까?\n\n'
+            + '확인하면 이 조립 Step의 FMS Robot Cell 실행을 허용합니다. 이 버튼은 Robot Cell을 직접 실행하지 않습니다.'
+        );
+        if (!confirmed) return;
+        operatorExecutionReadyInFlight = true;
+        elements.snapshotStatus.textContent = '조립 시작 승인을 저장하는 중입니다.';
+        try {
+            const response = await postJsonWithTimeout(
+                `/production/jobs/${jobId}/steps/${stepId}/execution-ready`, {}
+            );
+            if (!response.ok) throw new Error(`EXECUTION_READY_${response.status}`);
+            await refreshData();
+            elements.snapshotStatus.textContent = '조립 시작 승인이 저장되었습니다. FMS가 별도로 dispatch합니다.';
+        } catch (error) {
+            await refreshData();
+            elements.snapshotStatus.textContent = '조립 시작 승인을 저장하지 못했습니다. 배송 및 현재 Step 상태를 다시 확인하세요.';
+        } finally {
+            operatorExecutionReadyInFlight = false;
+        }
+    }
+
+    function renderExecutionSnapshot(snapshot) {
+        const next = snapshot.next_step;
+        const readinessHtml = next ? `
+            <div class="snapshot-row"><span class="snapshot-label">Production Ready</span><span class="snapshot-value">${next.ready ? 'READY' : 'WAITING'}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Readiness Reason</span><span class="snapshot-value">${escapeHtml(next.readiness_reason)}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Robot Cell Dispatch</span><span class="snapshot-value">${next.dispatchable ? 'DISPATCHABLE' : 'BLOCKED'}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Dispatch Reason</span><span class="snapshot-value">${escapeHtml(next.dispatch_block_reason)}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Operator Execution Release</span><span class="snapshot-value">${escapeHtml(next.operator_execution_ready_at)}</span></div>
+            ${operatorExecutionReadyHtml(next)}
+        ` : '<div class="empty-message">다음 실행 대상 공정 없음</div>';
+        const inspection = snapshot.inspection;
+        const roof = snapshot.roof || {};
+        const roofStep = roof.step;
+
+        elements.executionSnapshotContainer.innerHTML = `
+            <div class="snapshot-header">
+                <div><strong>Production Job #${escapeHtml(snapshot.job_id)}</strong> · <span class="snapshot-code">${escapeHtml(snapshot.product_code)}</span></div>
+                <div>${statusBadge(snapshot.control_state === 'PAUSED' ? 'PAUSED' : snapshot.job_status)}</div>
+            </div>
+            <div class="snapshot-grid">
+                <div class="snapshot-row"><span class="snapshot-label">Control State</span><span class="snapshot-value">${escapeHtml(snapshot.control_state || 'ACTIVE')}</span></div>
+                ${snapshotStepCard('Current Step', snapshot.current_step)}
+                ${snapshotStepCard('Next Step', next)}
+                <div class="snapshot-card">
+                    <h3>Execution Conditions</h3>
+                    ${readinessHtml}
+                </div>
+                <div class="snapshot-card">
+                    <h3>PRE_ROOF Inspection</h3>
+                    ${inspection ? `
+                        <div class="snapshot-code">${escapeHtml(inspection.inspection_type)}</div>
+                        <div class="snapshot-row"><span class="snapshot-label">Status</span><span class="snapshot-value">${statusBadge(inspection.status)} · ${escapeHtml(inspection.result)}</span></div>
+                        ${preRoofViewsHtml(inspection)}
+                        <div class="snapshot-row"><span class="snapshot-label">Failure</span><span class="snapshot-value">${escapeHtml(inspection.failure_reason)}</span></div>
+                        ${preRoofControlsHtml(snapshot)}
+                    ` : '<div class="empty-message">-</div>'}
+                </div>
+                <div class="snapshot-card">
+                    <h3>Roof</h3>
+                    <div class="snapshot-row"><span class="snapshot-label">Option</span><span class="snapshot-value">${escapeHtml(roof.roof_option_code)}</span></div>
+                    <div class="snapshot-row"><span class="snapshot-label">Runtime Step</span><span class="snapshot-value">${escapeHtml(roofStep ? roofStep.operation_code : null)}</span></div>
+                    <div class="snapshot-row"><span class="snapshot-label">Step Status</span><span class="snapshot-value">${roofStep ? statusBadge(roofStep.status) : '-'}</span></div>
+                </div>
+                ${snapshotEventCard('Last Job Event', snapshot.last_event)}
+                ${snapshotEventCard('Last Step Execution Event', snapshot.last_step_execution_event)}
+            </div>
+        `;
+    }
+
+    function clearExecutionSnapshot(message) {
+        elements.snapshotStatus.textContent = '';
+        elements.executionSnapshotContainer.innerHTML = `<div class="empty-message">${escapeHtml(message)}</div>`;
+    }
+
+    function renderMaterialIncomingQAGate(gate) {
+        if (!gate) {
+            elements.materialDeliveryStatus.textContent = '';
+            return;
+        }
+        elements.materialDeliveryStatus.innerHTML = `Incoming QA Gate: ${statusBadge(gate.status)} · Released: ${escapeHtml(gate.released_items)} / ${escapeHtml(gate.total_expected_items)}`;
+    }
+
+    function clearMaterialDeliveries(message) {
+        currentIncomingQAV02Monitor = null;
+        elements.materialDeliveryStatus.textContent = '';
+        clearMaterialCommandFeedback();
+        elements.materialDeliveriesContainer.innerHTML = `<div class="empty-message">${escapeHtml(message)}</div>`;
+    }
+
+    function setMaterialCommandFeedback(message, kind = 'neutral') {
+        elements.materialCommandFeedback.textContent = message;
+        elements.materialCommandFeedback.className = `command-feedback ${kind}`;
+    }
+
+    function clearMaterialCommandFeedback() {
+        elements.materialCommandFeedback.textContent = '';
+        elements.materialCommandFeedback.className = 'command-feedback';
+    }
+
+    function createProductionConversationSessionId() {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return `monitor-production-${crypto.randomUUID()}`;
+        }
+        return `monitor-production-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    }
+
+    function getProductionConversationSessionId() {
+        if (!productionConversationSessionId) {
+            productionConversationSessionId = createProductionConversationSessionId();
+        }
+        return productionConversationSessionId;
+    }
+
+    function productionConversationStateLabel(state) {
+        const labels = {
+            WAITING_ROOF_OPTION: '지붕 선택 대기',
+            AWAITING_CONFIRMATION: '생산 확정 대기',
+            CONFIRMED: '생산 요청 확정',
+            REJECTED: '생산 요청 취소',
+            EXPIRED: '요청 만료'
+        };
+        return labels[state] || displayValue(state);
+    }
+
+    function setProductionConversationInFlight(inFlight) {
+        productionConversationInFlight = inFlight;
+        elements.productionRequestSubmit.disabled = inFlight;
+        elements.productionRequestSubmit.textContent = inFlight ? '처리 중...' : '생산 요청 보내기';
+        for (const button of elements.productionRequestFollowup.querySelectorAll('button')) {
+            button.disabled = inFlight;
+        }
+    }
+
+    function renderProductionConversation(response) {
+        productionConversationPendingRequestId = response.pending_request_id || null;
+        const state = response.conversation_state;
+        elements.productionRequestState.textContent = state ? productionConversationStateLabel(state) : '';
+        elements.productionRequestStatus.textContent = response.message || '서버 응답 메시지가 없습니다.';
+
+        if (state === 'AWAITING_CONFIRMATION') {
+            elements.productionRequestFollowup.innerHTML = `
+                <button class="btn physical-ready-btn" onclick="submitProductionConversation('네')" ${productionConversationInFlight ? 'disabled' : ''}>생산 확정</button>
+                <button class="btn" onclick="submitProductionConversation('아니')" ${productionConversationInFlight ? 'disabled' : ''}>취소</button>
+            `;
+        } else if (state === 'WAITING_ROOF_OPTION') {
+            elements.productionRequestFollowup.innerHTML = '<span class="production-request-hint">지붕 선택을 입력하세요. 예: 1번 또는 2번</span>';
+        } else {
+            elements.productionRequestFollowup.innerHTML = '';
+        }
+    }
+
+    async function submitProductionConversation(text) {
+        const normalizedText = String(text || '').trim();
+        if (!normalizedText || productionConversationInFlight) return;
+
+        setProductionConversationInFlight(true);
+        elements.productionRequestStatus.textContent = '생산 요청 대화를 서버에 전달하는 중입니다.';
+        try {
+            const response = await postJsonWithTimeout('/ai/conversation', {
+                session_id: getProductionConversationSessionId(),
+                text: normalizedText,
+            });
+            if (response.status === 422) throw new Error('INVALID_REQUEST');
+            if (response.status === 404) throw new Error('NOT_FOUND');
+            if (response.status === 409) throw new Error('CONVERSATION_CONFLICT');
+            if (response.status === 503 || response.status === 504) throw new Error('INTERPRETER_UNAVAILABLE');
+            if (!response.ok) throw new Error('CONVERSATION_FAILED');
+
+            const result = await response.json();
+            if (result.session_id !== getProductionConversationSessionId()) {
+                throw new Error('INVALID_CONVERSATION_RESPONSE');
+            }
+            renderProductionConversation(result);
+            elements.productionRequestInput.value = '';
+
+            if (result.production_job_ids && result.production_job_ids.length > 0) {
+                currentJobId = result.production_job_ids[0];
+                await refreshData();
+            }
+        } catch (error) {
+            elements.productionRequestFollowup.innerHTML = '';
+            if (error.message === 'INVALID_REQUEST') {
+                elements.productionRequestStatus.textContent = '생산 요청 형식이 올바르지 않습니다. 내용을 확인해 다시 입력하세요.';
+            } else if (error.message === 'NOT_FOUND') {
+                elements.productionRequestStatus.textContent = '요청에 필요한 제품 또는 대화 상태를 찾을 수 없습니다.';
+            } else if (error.message === 'CONVERSATION_CONFLICT') {
+                elements.productionRequestStatus.textContent = '현재 대화 상태에서는 이 요청을 처리할 수 없습니다. 서버 메시지를 확인하세요.';
+            } else if (error.message === 'INTERPRETER_UNAVAILABLE') {
+                elements.productionRequestStatus.textContent = '명령 해석 서버를 사용할 수 없습니다. 잠시 후 다시 시도하세요.';
+            } else {
+                elements.productionRequestStatus.textContent = '응답을 확인하지 못했습니다. 서버가 요청을 처리했을 수도 있으므로 같은 문장을 자동 재전송하지 마세요.';
+            }
+        } finally {
+            setProductionConversationInFlight(false);
+        }
+    }
+
+    function physicalReadyCommandKey(jobId, deliveryId) {
+        return `${jobId}:${deliveryId}`;
+    }
+
+    function deliveryItemsAreReleased(delivery) {
+        const items = delivery.items || [];
+        return delivery.qa_applicable === true
+            && items.length > 0
+            && items.every((item) => item.qa_released === true);
+    }
+
+    function shouldShowPhysicalReadyCommand(delivery) {
+        return !isCurrentJobTerminal()
+            && delivery.supply_mode === 'TRANSPORTED'
+            && delivery.status === 'PENDING'
+            && delivery.physical_ready === false;
+    }
+
+    function physicalReadyButtonHtml(delivery) {
+        if (!shouldShowPhysicalReadyCommand(delivery) || !currentJobId) return '';
+        const commandKey = physicalReadyCommandKey(currentJobId, delivery.job_delivery_id);
+        const inFlight = physicalReadyCommandsInFlight.has(commandKey);
+        const qaReleased = deliveryItemsAreReleased(delivery);
+        const disabled = inFlight || !qaReleased;
+        return `
+            <button
+                class="btn physical-ready-btn"
+                id="physical-ready-button-${escapeHtml(delivery.job_delivery_id)}"
+                onclick="confirmPhysicalReady(${escapeHtml(currentJobId)}, ${escapeHtml(delivery.job_delivery_id)})"
+                title="${qaReleased ? 'QA release confirmed.' : '입고검사 통과 후 사용할 수 있습니다.'}"
+                ${disabled ? 'disabled' : ''}
+            >${inFlight ? '처리 중...' : '팔레트 준비 완료'}</button>
+            ${qaReleased ? '' : '<div class="material-debug">입고검사 통과 후 사용할 수 있습니다.</div>'}
+        `;
+    }
+
+    function createPhysicalReadyRequestId() {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return `monitor-physical-ready-${crypto.randomUUID()}`;
+        }
+        return `monitor-physical-ready-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    }
+
+    function emptyReturnCommandKey(jobId, deliveryId) {
+        return `${jobId}:${deliveryId}`;
+    }
+
+    function outerWallBatchButtonHtml(delivery) {
+        if (!currentJobId || delivery.can_start_outer_wall_batch !== true) return "";
+        const inFlight = outerWallBatchCommandsInFlight.has(currentJobId);
+        const label = inFlight ? "처리 중..." : "외벽 연속 조립 시작";
+        return `<button class="btn physical-ready-btn" onclick="confirmOuterWallBatch(${escapeHtml(currentJobId)})" ${inFlight ? "disabled" : ""}>${label}</button>`;
+    }
+
+    async function confirmOuterWallBatch(jobId) {
+        if (currentJobId !== jobId || outerWallBatchCommandsInFlight.has(jobId)) return;
+        if (!window.confirm("외벽 4개 조립을 연속 진행하도록 승인하시겠습니까?\n\n각 외벽은 기존 공정 순서대로 하나씩 실행됩니다.")) return;
+        outerWallBatchCommandsInFlight.add(jobId);
+        try {
+            const response = await postJsonWithTimeout("/production/jobs/" + jobId + "/outer-walls/operator-ready", {});
+            if (!response.ok) throw new Error("COMMAND_FAILED");
+            await refreshData();
+            setMaterialCommandFeedback("외벽 연속 조립 승인이 완료되었습니다. 각 외벽은 공정 순서대로 실행됩니다.", "success");
+        } catch (error) {
+            await refreshData();
+            setMaterialCommandFeedback("현재 상태에서는 외벽 연속 조립을 시작할 수 없습니다. 팔레트 배송 및 현재 공정 상태를 확인하세요.", "error");
+        } finally {
+            outerWallBatchCommandsInFlight.delete(jobId);
+        }
+    }
+
+    function shouldShowEmptyReturnCommand(delivery) {
+        return !isCurrentJobTerminal() && delivery.can_empty_pallet_return === true;
+    }
+
+    function emptyReturnButtonHtml(delivery) {
+        if (!shouldShowEmptyReturnCommand(delivery) || !currentJobId) return '';
+        const commandKey = emptyReturnCommandKey(currentJobId, delivery.job_delivery_id);
+        const inFlight = emptyReturnCommandsInFlight.has(commandKey);
+        return `
+            <button
+                class="btn physical-ready-btn"
+                id="empty-return-button-${escapeHtml(delivery.job_delivery_id)}"
+                onclick="confirmEmptyPalletReturn(${escapeHtml(currentJobId)}, ${escapeHtml(delivery.job_delivery_id)})"
+                ${inFlight ? 'disabled' : ''}
+            >${inFlight ? '처리 중...' : '빈 팔레트 확인 및 반환'}</button>
+        `;
+    }
+
+    function terminalDropCleanupButtonHtml(delivery) {
+        if (!currentJobId || delivery.can_terminal_drop_cleanup !== true) return '';
+        const commandKey = `terminal-drop-cleanup:${currentJobId}:${delivery.job_delivery_id}`;
+        const inFlight = emptyReturnCommandsInFlight.has(commandKey);
+        return `
+            <div class="material-debug">DROP is occupied by this terminal Job. Physical pallet removal is still required outside TEST MODE.</div>
+            <button class="btn physical-ready-btn" onclick="confirmTerminalDropCleanup(${escapeHtml(currentJobId)}, ${escapeHtml(delivery.job_delivery_id)})" ${inFlight ? 'disabled' : ''}>
+                ${inFlight ? '처리 중...' : 'TEST MODE · 빈 팔레트 반환 시뮬레이션'}
+            </button>
+        `;
+    }
+
+    function manualPrestageCommandKey(jobId, deliveryId) {
+        return `${jobId}:${deliveryId}`;
+    }
+
+    function shouldShowManualPrestageCommand(delivery) {
+        return !isCurrentJobTerminal()
+            && delivery.supply_mode === 'MANUAL'
+            && delivery.status === 'PENDING'
+            && delivery.manual_prestage_ready === false;
+    }
+
+    function manualPrestageButtonHtml(delivery) {
+        if (!shouldShowManualPrestageCommand(delivery) || !currentJobId) return '';
+        const commandKey = manualPrestageCommandKey(currentJobId, delivery.job_delivery_id);
+        const inFlight = manualPrestageCommandsInFlight.has(commandKey);
+        const qaReleased = deliveryItemsAreReleased(delivery);
+        const disabled = inFlight || !qaReleased;
+        return `
+            <button
+                class="btn physical-ready-btn"
+                id="manual-prestage-button-${escapeHtml(delivery.job_delivery_id)}"
+                onclick="confirmManualPrestage(${escapeHtml(currentJobId)}, ${escapeHtml(delivery.job_delivery_id)})"
+                title="${qaReleased ? 'QA release confirmed.' : '입고검사 통과 후 사용할 수 있습니다.'}"
+                ${disabled ? 'disabled' : ''}
+            >${inFlight ? '처리 중...' : '수동 셋업 완료'}</button>
+            ${qaReleased ? '' : '<div class="material-debug">입고검사 통과 후 사용할 수 있습니다.</div>'}
+        `;
+    }
+
+    function createManualPrestageRequestId() {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return `monitor-manual-prestage-${crypto.randomUUID()}`;
+        }
+        return `monitor-manual-prestage-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    }
+
+    function setManualPrestageButtonInFlight(deliveryId, inFlight) {
+        const button = document.getElementById(`manual-prestage-button-${deliveryId}`);
+        if (!button) return;
+        button.disabled = inFlight;
+        button.textContent = inFlight ? '처리 중...' : '수동 셋업 완료';
+    }
+
+    function setPhysicalReadyButtonInFlight(deliveryId, inFlight) {
+        const button = document.getElementById(`physical-ready-button-${deliveryId}`);
+        if (!button) return;
+        button.disabled = inFlight;
+        button.textContent = inFlight ? '처리 중...' : '팔레트 준비 완료';
+    }
+
+    function setEmptyReturnButtonInFlight(deliveryId, inFlight) {
+        const button = document.getElementById(`empty-return-button-${deliveryId}`);
+        if (!button) return;
+        button.disabled = inFlight;
+        button.textContent = inFlight ? '처리 중...' : '빈 팔레트 확인 및 반환';
+    }
+
+    function incomingQAReinspectionCommandKey(jobId, deliveryItemId) {
+        return `${jobId}:${deliveryItemId}`;
+    }
+
+    function shouldShowIncomingQAReinspectionCommand(delivery, item) {
+        return !isCurrentJobTerminal()
+            && delivery.qa_applicable === true
+            && (
+                item.qa_state === 'FAILED'
+                || item.qa_state === 'NOT_EVALUATED'
+                || item.qa_state === 'ERROR'
+            );
+    }
+
+    function incomingQAReinspectionButtonHtml(delivery, item) {
+        if (!shouldShowIncomingQAReinspectionCommand(delivery, item) || !currentJobId) return '';
+        const commandKey = incomingQAReinspectionCommandKey(currentJobId, item.delivery_item_id);
+        const inFlight = incomingQAReinspectionCommandsInFlight.has(commandKey);
+        return `
+            <button
+                class="btn physical-ready-btn"
+                id="incoming-qa-reinspect-button-${escapeHtml(item.delivery_item_id)}"
+                onclick="reinspectIncomingQAV02(${escapeHtml(currentJobId)}, ${escapeHtml(item.delivery_item_id)})"
+                ${inFlight ? 'disabled' : ''}
+            >${inFlight ? '처리 중...' : '재검사 요청'}</button>
+        `;
+    }
+
+    function setIncomingQAReinspectionButtonInFlight(deliveryItemId, inFlight) {
+        const button = document.getElementById(`incoming-qa-reinspect-button-${deliveryItemId}`);
+        if (!button) return;
+        button.disabled = inFlight;
+        button.textContent = inFlight ? '처리 중...' : '재검사 요청';
+    }
+
+    function qaStateLabel(qaState) {
+        const labels = {
+            NOT_REQUESTED: 'Not requested',
+            REQUESTED: 'Requested',
+            RUNNING: 'Running',
+            RELEASED: 'Released',
+            FAILED: 'Failed',
+            ERROR: 'Error',
+            NOT_EVALUATED: 'Not evaluated',
+            NOT_RELEASED: 'Not released for production'
+        };
+        return labels[qaState] || displayValue(qaState);
+    }
+
+    function transportStatusLabel(status) {
+        const labels = {
+            PENDING: 'Transport pending',
+            IN_PROGRESS: 'Transport in progress',
+            COMPLETED: 'Transport completed',
+            FAILED: 'Transport failed'
+        };
+        return labels[status] || displayValue(status);
+    }
+
+    function qaStateClass(qaState) {
+        if (qaState === 'RELEASED') return 'qa-success';
+        if (qaState === 'FAILED' || qaState === 'ERROR' || qaState === 'NOT_RELEASED') return 'qa-failure';
+        if (qaState === 'REQUESTED' || qaState === 'RUNNING') return 'qa-warning';
+        return '';
+    }
+
+    function formatDateTime(isoString) {
+        if (!isoString) return '-';
+        const date = new Date(isoString);
+        return Number.isNaN(date.getTime()) ? displayValue(isoString) : date.toLocaleString();
+    }
+
+    function renderInspectionDetail(item) {
+        const inspection = item.latest_inspection;
+        if (!inspection) return '<div class="qa-detail">No inspection has been recorded.</div>';
+
+        const failureReason = inspection.failure_reason
+            ? `<div class="qa-detail ${item.qa_state === 'REQUESTED' ? 'qa-warning' : 'qa-failure'}">${item.qa_state === 'REQUESTED' ? 'Request/send issue: ' : 'Failure: '}${escapeHtml(inspection.failure_reason)}</div>`
+            : '';
+        const failureType = inspection.failure_type
+            ? `<div class="qa-detail">Failure type: ${escapeHtml(inspection.failure_type)}</div>`
+            : '';
+        return `
+            ${failureReason}
+            ${failureType}
+            <details class="material-debug">
+                <summary>Inspection detail</summary>
+                <div>Cycle: ${escapeHtml(inspection.inspection_cycle)} · Request: ${escapeHtml(inspection.inspection_request_id)}</div>
+                <div>Status: ${escapeHtml(inspection.status)} · Result: ${escapeHtml(inspection.result)}</div>
+                <div>Production valid: ${escapeHtml(inspection.production_valid)} · Detected quantity: ${escapeHtml(inspection.detected_quantity)}</div>
+                <div>Camera: ${escapeHtml(inspection.camera_source)} · Requested: ${escapeHtml(formatDateTime(inspection.requested_at))}</div>
+                <div>Started: ${escapeHtml(formatDateTime(inspection.started_at))} · Completed: ${escapeHtml(formatDateTime(inspection.completed_at))}</div>
+            </details>
+        `;
+    }
+
+    function renderMaterialDeliveries(deliveries) {
+        if (!deliveries || deliveries.length === 0) {
+            elements.materialDeliveriesContainer.innerHTML = '<div class="empty-message">No material deliveries have been created for this Job.</div>';
+            return;
+        }
+
+        elements.materialDeliveriesContainer.innerHTML = deliveries.map((delivery) => {
+            const groupName = delivery.supply_group_code || delivery.display_name || delivery.delivery_code;
+            const inspectionCompleteItems = (delivery.items || []).filter(
+                (item) => item.latest_inspection && item.latest_inspection.status === 'COMPLETED',
+            ).length;
+            const qaSummary = delivery.qa_applicable === true
+                ? `Inspection complete: ${escapeHtml(inspectionCompleteItems)} / ${escapeHtml(delivery.qa_total_items)} · Released: ${escapeHtml(delivery.qa_released_items)} / ${escapeHtml(delivery.qa_total_items)}`
+                : 'QA policy undecided';
+            const physicalReady = delivery.physical_ready ? 'Prepared' : 'Waiting for preparation';
+            const manualPrestage = delivery.manual_prestage_ready ? 'Prepared at Robot Cell' : 'Waiting for manual prestage';
+            const items = delivery.items || [];
+            const itemHtml = items.length === 0
+                ? '<div class="empty-message">No delivery items are linked to this group.</div>'
+                : `
+                    <table class="material-items">
+                        <thead><tr><th>Part</th><th>Vision class</th><th>Expected qty</th><th>Incoming QA</th></tr></thead>
+                        <tbody>
+                            ${items.map((item) => `
+                                <tr>
+                                    <td>${escapeHtml(item.part_code)}</td>
+                                    <td>${escapeHtml(item.vision_class)}</td>
+                                    <td>${escapeHtml(item.expected_quantity)}</td>
+                                    <td>
+                                        <div class="qa-state ${qaStateClass(item.qa_state)}">${escapeHtml(qaStateLabel(item.qa_state))}</div>
+                                        ${renderInspectionDetail(item)}
+                                        ${incomingQAReinspectionButtonHtml(delivery, item)}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            return `
+                <article class="material-delivery-card">
+                    <div class="material-delivery-header">
+                        <div>
+                            <div class="material-delivery-title">${escapeHtml(groupName)}</div>
+                            <div class="material-debug">${escapeHtml(delivery.delivery_code)}</div>
+                        </div>
+                        <div>${statusBadge(delivery.status)} <span class="material-debug">${escapeHtml(transportStatusLabel(delivery.status))}</span></div>
+                    </div>
+                    <div class="material-summary">
+                        <div><span class="material-summary-label">Supply mode:</span> ${escapeHtml(delivery.supply_mode)}</div>
+                        <div><span class="material-summary-label">Destination:</span> ${escapeHtml(delivery.supply_destination_code)}</div>
+                        <div><span class="material-summary-label">Physical ready:</span> ${escapeHtml(physicalReady)}${delivery.physical_ready_at ? ` (${escapeHtml(formatDateTime(delivery.physical_ready_at))})` : ''}</div>
+                        <div><span class="material-summary-label">Manual prestage:</span> ${escapeHtml(manualPrestage)}${delivery.manual_prestage_ready_at ? ` (${escapeHtml(formatDateTime(delivery.manual_prestage_ready_at))})` : ''}</div>
+                        <div><span class="material-summary-label">Incoming QA:</span> ${qaSummary}</div>
+                        ${delivery.terminal_drop_cleanup_required ? '<div><span class="material-summary-label">Terminal DROP cleanup:</span> Empty pallet return required</div>' : ''}
+                    </div>
+                    ${physicalReadyButtonHtml(delivery)}
+                    ${manualPrestageButtonHtml(delivery)}
+                    ${outerWallBatchButtonHtml(delivery)}
+                    ${emptyReturnButtonHtml(delivery)}
+                    ${terminalDropCleanupButtonHtml(delivery)}
+                    ${itemHtml}
+                    <details class="material-debug"><summary>Debug identity</summary>Delivery ID: ${escapeHtml(delivery.job_delivery_id)}</details>
+                </article>
+            `;
+        }).join('');
+    }
+
+    async function postNoBodyWithTimeout(url, timeoutMs = 8000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            return await fetch(url, { method: 'POST', signal: controller.signal });
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
+
+    async function refreshMaterialDeliveriesAfterIncomingQACommand(jobId) {
+        if (currentJobId !== jobId) return null;
+        return fetchMaterialDeliveries();
+    }
+
+    async function reinspectIncomingQAV02(jobId, deliveryItemId) {
+        if (currentJobId !== jobId) {
+            setMaterialCommandFeedback('선택한 Job이 변경되었습니다. 현재 상태를 다시 확인하세요.', 'error');
+            return;
+        }
+        const commandKey = incomingQAReinspectionCommandKey(jobId, deliveryItemId);
+        if (incomingQAReinspectionCommandsInFlight.has(commandKey)) return;
+
+        const confirmed = window.confirm(
+            '해당 자재가 Vision 재검사 위치에 다시 준비되어 있습니까?\n\n'
+            + '확인하면 새 입고검사 cycle 요청이 생성됩니다.\n'
+            + '이전 검사 이력은 보존되며, TurtleBot이나 Robot Cell을 즉시 실행하지 않습니다.'
+        );
+        if (!confirmed) return;
+
+        incomingQAReinspectionCommandsInFlight.add(commandKey);
+        setIncomingQAReinspectionButtonInFlight(deliveryItemId, true);
+        setMaterialCommandFeedback('재검사 요청을 생성하는 중입니다.', 'neutral');
+        try {
+            const response = await postJsonWithTimeout(
+                `/production/jobs/${jobId}/incoming-qa/v02/reinspect`,
+                { delivery_item_ids: [deliveryItemId] },
+            );
+            if (response.status === 404) throw new Error('NOT_FOUND');
+            if (response.status === 409) throw new Error('STATE_CONFLICT');
+            if (!response.ok) throw new Error('COMMAND_FAILED');
+            const result = await response.json();
+            if (!result || !Array.isArray(result.created_transaction_ids) || result.created_transaction_ids.length === 0) {
+                throw new Error('INVALID_COMMAND_RESPONSE');
+            }
+            await refreshMaterialDeliveriesAfterIncomingQACommand(jobId);
+            await fetchIncomingQAV02();
+            setMaterialCommandFeedback('재검사 요청이 생성되었습니다. Transaction 상태를 확인하세요.', 'success');
+        } catch (error) {
+            await refreshMaterialDeliveriesAfterIncomingQACommand(jobId);
+            await fetchIncomingQAV02();
+            if (error.message === 'NOT_FOUND') {
+                setMaterialCommandFeedback('Job 또는 검사 대상 자재를 찾을 수 없습니다. 현재 상태를 다시 조회했습니다.', 'error');
+            } else if (error.message === 'STATE_CONFLICT') {
+                setMaterialCommandFeedback('현재 상태에서는 재검사를 요청할 수 없습니다. 진행 중인 검사와 최신 결과를 확인하세요.', 'error');
+            } else {
+                setMaterialCommandFeedback('재검사 요청 상태를 확인하지 못했습니다. 현재 상태를 다시 조회했습니다. 필요하면 다시 시도하세요.', 'error');
+            }
+        } finally {
+            incomingQAReinspectionCommandsInFlight.delete(commandKey);
+            setIncomingQAReinspectionButtonInFlight(deliveryItemId, false);
+        }
+    }
+
+    async function postJsonWithTimeout(url, body, timeoutMs = 8000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            return await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+                signal: controller.signal,
+            });
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
+
+    async function refreshMaterialDeliveriesAfterCommand(jobId) {
+        if (currentJobId !== jobId) return null;
+        return fetchMaterialDeliveries();
+    }
+
+    async function confirmManualPrestage(jobId, deliveryId) {
+        if (currentJobId !== jobId) {
+            setMaterialCommandFeedback('선택한 Job이 변경되었습니다. 현재 상태를 다시 확인하세요.', 'error');
+            return;
+        }
+        const commandKey = manualPrestageCommandKey(jobId, deliveryId);
+        if (manualPrestageCommandsInFlight.has(commandKey)) return;
+
+        const confirmed = window.confirm(
+            '해당 자재가 Robot Cell 작업 위치에 실제 배치되었습니까?\n\n'
+            + '확인 후에는 수동 셋업 완료를 되돌릴 수 없습니다.\n'
+            + '이 명령은 Robot Cell이나 TurtleBot을 즉시 실행하지 않으며, 서버에 배치 사실만 기록합니다.'
+        );
+        if (!confirmed) return;
+
+        manualPrestageCommandsInFlight.add(commandKey);
+        setManualPrestageButtonInFlight(deliveryId, true);
+        setMaterialCommandFeedback('수동 셋업 완료를 저장하는 중입니다.', 'neutral');
+        try {
+            const response = await postJsonWithTimeout(
+                `/production/jobs/${jobId}/material-deliveries/${deliveryId}/manual-prestage-ready`,
+                { request_id: createManualPrestageRequestId() },
+            );
+            if (response.status === 404) throw new Error('NOT_FOUND');
+            if (response.status === 409) throw new Error('STATE_CONFLICT');
+            if (response.status === 422) throw new Error('INVALID_COMMAND');
+            if (!response.ok) throw new Error('COMMAND_FAILED');
+            const result = await response.json();
+            if (result.job_id !== jobId || result.job_delivery_id !== deliveryId || !result.manual_prestage_ready_at) {
+                throw new Error('INVALID_COMMAND_RESPONSE');
+            }
+            const deliveries = await refreshMaterialDeliveriesAfterCommand(jobId);
+            const refreshed = deliveries && deliveries.find((delivery) => delivery.job_delivery_id === deliveryId);
+            setMaterialCommandFeedback(
+                refreshed && refreshed.manual_prestage_ready
+                    ? '수동 셋업 완료가 저장되었습니다.'
+                    : '수동 셋업은 저장되었지만 현재 상태를 표시하지 못했습니다. 다시 조회하세요.',
+                refreshed && refreshed.manual_prestage_ready ? 'success' : 'neutral',
+            );
+        } catch (error) {
+            const deliveries = await refreshMaterialDeliveriesAfterCommand(jobId);
+            const refreshed = deliveries && deliveries.find((delivery) => delivery.job_delivery_id === deliveryId);
+            if (refreshed && refreshed.manual_prestage_ready) {
+                setMaterialCommandFeedback('응답은 확인하지 못했지만, 서버에는 수동 셋업 완료가 기록되어 있습니다.', 'success');
+            } else {
+                setMaterialCommandFeedback('수동 셋업 완료 상태를 확인하지 못했습니다. 현재 상태를 다시 조회했습니다. 필요하면 다시 시도하세요.', 'error');
+            }
+        } finally {
+            manualPrestageCommandsInFlight.delete(commandKey);
+            setManualPrestageButtonInFlight(deliveryId, false);
+        }
+    }
+
+    async function confirmEmptyPalletReturn(jobId, deliveryId) {
+        if (currentJobId !== jobId) {
+            setMaterialCommandFeedback('선택한 Job이 변경되었습니다. 현재 상태를 다시 확인하세요.', 'error');
+            return;
+        }
+        const commandKey = emptyReturnCommandKey(jobId, deliveryId);
+        if (emptyReturnCommandsInFlight.has(commandKey)) return;
+        const confirmed = window.confirm(
+            '실제 팔레트가 비어 있는 것을 확인했습니까?\n\n'
+            + '확인한 경우에만 DROP에서 원래 Rack으로 반환합니다. 서버는 소비 Step 완료와 DROP 소유권을 다시 검증합니다.'
+        );
+        if (!confirmed) return;
+        emptyReturnCommandsInFlight.add(commandKey);
+        setEmptyReturnButtonInFlight(deliveryId, true);
+        setMaterialCommandFeedback('빈 팔레트 반환을 요청하는 중입니다.', 'neutral');
+        try {
+            const response = await postJsonWithTimeout(
+                `/production/jobs/${jobId}/material-deliveries/${deliveryId}/empty-pallet-return`,
+                { confirmed_empty: true },
+            );
+            if (!response.ok) {
+                const body = await response.json().catch(() => null);
+                throw new Error(body && body.detail ? body.detail : 'COMMAND_FAILED');
+            }
+            const result = await response.json();
+            if (result.job_id !== jobId || result.job_delivery_id !== deliveryId || result.status !== 'SUCCEEDED') {
+                throw new Error('INVALID_COMMAND_RESPONSE');
+            }
+            await refreshMaterialDeliveriesAfterCommand(jobId);
+            setMaterialCommandFeedback('빈 팔레트 반환 요청이 완료되었습니다.', 'success');
+        } catch (error) {
+            await refreshMaterialDeliveriesAfterCommand(jobId);
+            setMaterialCommandFeedback(`빈 팔레트 반환이 실행되지 않았습니다: ${error.message || '서버 응답을 확인하세요.'}`, 'error');
+        } finally {
+            emptyReturnCommandsInFlight.delete(commandKey);
+            setEmptyReturnButtonInFlight(deliveryId, false);
+        }
+    }
+
+    async function confirmTerminalDropCleanup(jobId, deliveryId) {
+        if (currentJobId !== jobId) return;
+        const commandKey = `terminal-drop-cleanup:${jobId}:${deliveryId}`;
+        if (emptyReturnCommandsInFlight.has(commandKey)) return;
+        if (!window.confirm('TEST MODE ONLY: 실제 TurtleBot 명령 없이 성공한 빈 팔레트 반환 이력을 기록하고 DROP을 해제합니다. 실제 팔레트가 이미 제거되었거나 시연용 상태임을 확인했습니까?')) return;
+        emptyReturnCommandsInFlight.add(commandKey);
+        setMaterialCommandFeedback('TEST MODE 빈 팔레트 반환을 처리하는 중입니다.', 'neutral');
+        try {
+            const response = await postNoBodyWithTimeout(`/test/jobs/${jobId}/material-deliveries/${deliveryId}/terminal-drop-cleanup`);
+            if (!response.ok) {
+                const body = await response.json().catch(() => null);
+                throw new Error(body && body.detail ? body.detail : 'COMMAND_FAILED');
+            }
+            await refreshMaterialDeliveriesAfterCommand(jobId);
+            setMaterialCommandFeedback('TEST MODE 빈 팔레트 반환 이력이 기록되어 DROP이 해제되었습니다.', 'success');
+        } catch (error) {
+            await refreshMaterialDeliveriesAfterCommand(jobId);
+            setMaterialCommandFeedback(`TEST MODE DROP cleanup이 수행되지 않았습니다: ${error.message || '서버 응답을 확인하세요.'}`, 'error');
+        } finally {
+            emptyReturnCommandsInFlight.delete(commandKey);
+        }
+    }
+
+    async function confirmPhysicalReady(jobId, deliveryId) {
+        if (currentJobId !== jobId) {
+            setMaterialCommandFeedback('선택한 Job이 변경되었습니다. 현재 상태를 다시 확인하세요.', 'error');
+            return;
+        }
+        const commandKey = physicalReadyCommandKey(jobId, deliveryId);
+        if (physicalReadyCommandsInFlight.has(commandKey)) return;
+
+        const confirmed = window.confirm(
+            '해당 팔레트/자재 그룹의 실제 준비가 완료되었습니까?\n\n'
+            + '확인 후에는 준비 완료를 되돌릴 수 없습니다.\n'
+            + '이 명령은 TurtleBot을 즉시 출발시키지 않으며, 서버에 준비 완료 사실만 기록합니다.'
+        );
+        if (!confirmed) return;
+
+        const requestId = createPhysicalReadyRequestId();
+        physicalReadyCommandsInFlight.add(commandKey);
+        setPhysicalReadyButtonInFlight(deliveryId, true);
+        setMaterialCommandFeedback('팔레트 준비 완료를 저장하는 중입니다.', 'neutral');
+
+        try {
+            const response = await postJsonWithTimeout(
+                `/production/jobs/${jobId}/material-deliveries/${deliveryId}/physical-ready`,
+                { request_id: requestId },
+            );
+            if (response.status === 404) {
+                throw new Error('NOT_FOUND');
+            }
+            if (response.status === 409) {
+                throw new Error('STATE_CONFLICT');
+            }
+            if (response.status === 422) {
+                throw new Error('INVALID_COMMAND');
+            }
+            if (!response.ok) {
+                throw new Error('COMMAND_FAILED');
+            }
+            const result = await response.json();
+            if (result.job_id !== jobId || result.job_delivery_id !== deliveryId || !result.physical_ready_at) {
+                throw new Error('INVALID_COMMAND_RESPONSE');
+            }
+            const deliveries = await refreshMaterialDeliveriesAfterCommand(jobId);
+            const refreshed = deliveries && deliveries.find((delivery) => delivery.job_delivery_id === deliveryId);
+            setMaterialCommandFeedback(
+                refreshed && refreshed.physical_ready
+                    ? '팔레트 준비 완료가 저장되었습니다.'
+                    : '준비 완료는 저장되었지만 현재 상태를 표시하지 못했습니다. 다시 조회하세요.',
+                refreshed && refreshed.physical_ready ? 'success' : 'neutral',
+            );
+        } catch (error) {
+            const deliveries = await refreshMaterialDeliveriesAfterCommand(jobId);
+            const refreshed = deliveries && deliveries.find((delivery) => delivery.job_delivery_id === deliveryId);
+            if (refreshed && refreshed.physical_ready) {
+                setMaterialCommandFeedback('응답은 확인하지 못했지만, 서버에는 준비 완료가 기록되어 있습니다.', 'success');
+            } else if (error.message === 'NOT_FOUND') {
+                setMaterialCommandFeedback('Job 또는 Delivery를 찾을 수 없습니다. 현재 상태를 다시 조회했습니다.', 'error');
+            } else if (error.message === 'STATE_CONFLICT') {
+                setMaterialCommandFeedback('현재 상태에서는 준비 완료를 처음 기록할 수 없습니다. 현재 상태를 다시 조회했습니다.', 'error');
+            } else if (error.message === 'INVALID_COMMAND') {
+                setMaterialCommandFeedback('준비 완료 요청 형식이 올바르지 않습니다. 현재 상태를 다시 조회했습니다.', 'error');
+            } else {
+                setMaterialCommandFeedback('준비 완료 상태를 확인하지 못했습니다. 현재 상태를 다시 조회했습니다. 필요하면 다시 시도하세요.', 'error');
+            }
+        } finally {
+            physicalReadyCommandsInFlight.delete(commandKey);
+            setPhysicalReadyButtonInFlight(deliveryId, false);
+        }
+    }
+
+    async function fetchReadOnlyWithTimeout(url, timeoutMs = 8000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            return await fetch(url, { method: 'GET', signal: controller.signal });
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
+
+    async function fetchMaterialDeliveries() {
+        if (!currentJobId) return;
+        const selectedJobId = currentJobId;
+        elements.materialDeliveryStatus.textContent = 'Loading material / Incoming QA...';
+        try {
+            const res = await fetchReadOnlyWithTimeout(`/production/jobs/${selectedJobId}/material-deliveries`);
+            if (selectedJobId !== currentJobId) return;
+            if (res.status === 404) {
+                clearMaterialDeliveries('Job을 찾을 수 없습니다.');
+                return null;
+            }
+            if (!res.ok) throw new Error(`Material deliveries API HTTP ${res.status}`);
+            const deliveries = await res.json();
+            renderMaterialDeliveries(deliveries);
+            renderMaterialIncomingQAGate(
+                currentIncomingQAV02Monitor ? currentIncomingQAV02Monitor.gate : null,
+            );
+            return deliveries;
+        } catch (e) {
+            if (selectedJobId !== currentJobId) return;
+            elements.materialDeliveryStatus.textContent = '';
+            elements.materialDeliveriesContainer.innerHTML = '<div class="error-message" style="display:block">Unable to load material delivery / Incoming QA data.</div>';
+            return null;
+        }
+    }
+
+    function clearIncomingQAV02(message) {
+        currentIncomingQAV02Monitor = null;
+        renderMaterialIncomingQAGate(null);
+        elements.incomingQAV02Container.innerHTML = `<div class="empty-message">${escapeHtml(message)}</div>`;
+        elements.incomingQAV02Action.innerHTML = '';
+        elements.incomingQAV02Status.textContent = '';
+    }
+
+    function setIncomingQAV02Feedback(message, kind = 'neutral') {
+        elements.incomingQAV02Feedback.textContent = message;
+        elements.incomingQAV02Feedback.className = `command-feedback ${kind}`;
+    }
+
+    function incomingQAV02InitialStartControl(transactions) {
+        if (!currentJobId || !currentJobDetail) {
+            return '<div class="empty-message">Job 상태를 확인한 뒤 입고검사를 시작할 수 있습니다.</div>';
+        }
+        const terminalStatuses = new Set(['COMPLETED', 'FAILED', 'CANCELED']);
+        if (terminalStatuses.has(currentJobDetail.status)) {
+            return '<div class="empty-message">종료된 Job에서는 입고검사를 시작할 수 없습니다.</div>';
+        }
+        if (transactions.length > 0) {
+            return '<div class="material-debug">입고검사 시작됨 — 기존 Transaction 상태를 확인하세요.</div>';
+        }
+        const disabled = incomingQAV02StartInFlight ? 'disabled' : '';
+        const label = incomingQAV02StartInFlight ? '요청 생성 중...' : '입고검사 자재 준비 완료';
+        return `<div class="material-delivery-card" style="margin-bottom:12px">
+            <div class="material-summary-label">Vision 검사 위치에 이 Job의 검사 대상 자재를 모두 배치한 뒤 눌러주세요.</div>
+            <button class="btn physical-ready-btn" id="incoming-qa-v02-initial-start-button" onclick="confirmIncomingQAV02InitialStart(${escapeHtml(currentJobId)})" ${disabled}>${label}</button>
+        </div>`;
+    }
+
+    async function safeIncomingQAV02StartError(response) {
+        try {
+            const payload = await response.json();
+            if (payload && typeof payload.detail === 'string' && payload.detail.length <= 240) return payload.detail;
+        } catch (_) {
+            // Keep only a generic operator-safe error if the response is not JSON.
+        }
+        return '입고검사 요청을 시작할 수 없습니다. 현재 상태를 다시 확인하세요.';
+    }
+
+    async function confirmIncomingQAV02InitialStart(jobId) {
+        if (incomingQAV02StartInFlight || currentJobId !== jobId) return;
+        const confirmed = window.confirm(
+            'Vision 입고검사 위치에 이 Job의 자재 배치가 모두 완료되었습니까?\n\n확인하면 Incoming QA 요청이 생성됩니다.'
+        );
+        if (!confirmed) return;
+        incomingQAV02StartInFlight = true;
+        setIncomingQAV02Feedback('입고검사 요청을 생성하는 중입니다.', 'neutral');
+        try {
+            const response = await postNoBodyWithTimeout(`/production/jobs/${jobId}/incoming-qa/v02/start`);
+            if (!response.ok) throw new Error(await safeIncomingQAV02StartError(response));
+            const result = await response.json();
+            if (!result || !Array.isArray(result.created_transaction_ids)) throw new Error('입고검사 요청 응답을 확인할 수 없습니다.');
+            if (result.created_transaction_ids.length === 0) {
+                throw new Error('입고검사 요청이 생성되지 않았습니다. 현재 Incoming QA 상태를 다시 확인하세요.');
+            }
+            setIncomingQAV02Feedback('입고검사 요청이 생성되었습니다. Transaction 상태를 확인하세요.', 'success');
+        } catch (error) {
+            const message = error && error.message
+                ? error.message
+                : '입고검사 요청을 시작할 수 없습니다. 현재 상태를 다시 확인하세요.';
+            setIncomingQAV02Feedback(message, 'error');
+        } finally {
+            incomingQAV02StartInFlight = false;
+            if (currentJobId === jobId) {
+                await fetchIncomingQAV02();
+                await fetchMaterialDeliveries();
+            }
+        }
+    }
+
+    function incomingQATestHoldControls(monitor) {
+        if (!monitor || !currentJobId || isCurrentJobTerminal()) return '';
+        const controls = [];
+        const holdOn = monitor.incoming_qa_test_hold === true;
+        controls.push(`<div class="material-debug" style="margin:8px 0">Vision QA 테스트 Hold: <strong>${holdOn ? 'ON' : 'OFF'}</strong>${holdOn ? ' — 검사 PASS 후에도 다음 검사/생산으로 자동 진행하지 않습니다.' : ' — 자동 진행'}</div>`);
+        if (monitor.can_enable_incoming_qa_test_hold) {
+            controls.push(`<button class="btn physical-ready-btn" onclick="confirmIncomingQATestHold(${escapeHtml(currentJobId)}, true)" ${incomingQATestHoldCommandInFlight ? 'disabled' : ''}>Vision QA 테스트 Hold 켜기</button>`);
+        }
+        if (monitor.can_disable_incoming_qa_test_hold) {
+            controls.push(`<button class="btn" onclick="confirmIncomingQATestHold(${escapeHtml(currentJobId)}, false)" ${incomingQATestHoldCommandInFlight ? 'disabled' : ''}>Vision QA 테스트 Hold 해제</button>`);
+        }
+        if (monitor.can_advance_house_b) {
+            controls.push(`<button class="btn physical-ready-btn" onclick="confirmIncomingQAHouseBAdvance(${escapeHtml(currentJobId)})" ${incomingQAHouseBAdvanceInFlight ? 'disabled' : ''}>HOUSE_B 검사 진행</button>`);
+        }
+        if (monitor.can_release_incoming_qa_test_hold) {
+            controls.push(`<button class="btn physical-ready-btn" onclick="confirmIncomingQAProductionRelease(${escapeHtml(currentJobId)})" ${incomingQATestHoldCommandInFlight ? 'disabled' : ''}>생산 진행</button>`);
+        }
+        return `<div class="material-delivery-card" style="margin-bottom:12px">${controls.join(' ')}</div>`;
+    }
+
+    async function confirmIncomingQATestHold(jobId, enabled, release = false) {
+        if (incomingQATestHoldCommandInFlight || currentJobId !== jobId || isCurrentJobTerminal()) return;
+        const message = release
+            ? 'Vision QA 테스트를 종료하고 실제 생산 진행을 허용하시겠습니까?'
+            : enabled
+                ? 'Vision QA 테스트 Hold를 켜시겠습니까?\n\n검사 PASS 후 다음 검사/생산으로 자동 진행하지 않습니다.'
+                : 'Vision QA 테스트 Hold를 해제하시겠습니까?';
+        if (!window.confirm(message)) return;
+        incomingQATestHoldCommandInFlight = true;
+        setIncomingQAV02Feedback(enabled ? 'Vision QA 테스트 Hold를 설정하는 중입니다.' : 'Vision QA 테스트 Hold를 해제하는 중입니다.', 'neutral');
+        try {
+            const response = await postJsonWithTimeout(`/production/jobs/${jobId}/incoming-qa/v02/test-hold`, {enabled});
+            if (!response.ok) throw new Error(await safeIncomingQAV02StartError(response));
+            setIncomingQAV02Feedback(enabled ? 'Vision QA 테스트 Hold가 설정되었습니다.' : 'Vision QA 테스트 Hold가 해제되었습니다.', 'success');
+        } catch (error) {
+            setIncomingQAV02Feedback(error && error.message ? error.message : 'Vision QA 테스트 Hold를 변경하지 못했습니다.', 'error');
+        } finally {
+            incomingQATestHoldCommandInFlight = false;
+            if (currentJobId === jobId) {
+                await fetchIncomingQAV02();
+                await fetchMaterialDeliveries();
+            }
+        }
+    }
+
+    async function confirmIncomingQAProductionRelease(jobId) {
+        return confirmIncomingQATestHold(jobId, false, true);
+    }
+
+    async function confirmIncomingQAHouseBAdvance(jobId) {
+        if (incomingQAHouseBAdvanceInFlight || currentJobId !== jobId || isCurrentJobTerminal()) return;
+        if (!window.confirm('BASE_AB 검사를 종료하고 HOUSE_B 검사를 진행하시겠습니까?\n\n테스트 Hold는 계속 유지됩니다.')) return;
+        incomingQAHouseBAdvanceInFlight = true;
+        setIncomingQAV02Feedback('HOUSE_B 검사 cycle을 생성하는 중입니다.', 'neutral');
+        try {
+            const response = await postNoBodyWithTimeout(`/production/jobs/${jobId}/incoming-qa/v02/advance-house-b`);
+            if (!response.ok) throw new Error(await safeIncomingQAV02StartError(response));
+            const result = await response.json();
+            if (!result || !Array.isArray(result.created_transaction_ids) || result.created_transaction_ids.length !== 1) throw new Error('HOUSE_B 검사 cycle 요청 응답을 확인할 수 없습니다.');
+            setIncomingQAV02Feedback('HOUSE_B 검사 cycle이 생성되었습니다. Vision 전송은 FMS가 처리합니다.', 'success');
+        } catch (error) {
+            setIncomingQAV02Feedback(error && error.message ? error.message : 'HOUSE_B 검사를 진행하지 못했습니다.', 'error');
+        } finally {
+            incomingQAHouseBAdvanceInFlight = false;
+            if (currentJobId === jobId) await fetchIncomingQAV02();
+        }
+    }
+
+    function incomingQAV02ItemRows(items) {
+        if (!items || items.length === 0) {
+            return '<div class="empty-message">Immutable request item snapshot is unavailable.</div>';
+        }
+        const rows = items.map(item => {
+            const evidence = [];
+            if (item.predicted_class_name) evidence.push(`predicted: ${escapeHtml(item.predicted_class_name)}`);
+            if (item.material_confidence !== null && item.material_confidence !== undefined) evidence.push(`confidence: ${escapeHtml(item.material_confidence)}`);
+            if (item.failure_type) evidence.push(`failure: ${escapeHtml(item.failure_type)}`);
+            if (item.defects && item.defects.length) evidence.push(`defects: ${escapeHtml(item.defects.join(', '))}`);
+            if (item.quality_scores) evidence.push(`scores: ${escapeHtml(JSON.stringify(item.quality_scores))}`);
+            return `<tr>
+                <td>${escapeHtml(item.slot_id)}</td>
+                <td>${escapeHtml(item.expected_part_code)}<div class="material-debug">#${escapeHtml(item.delivery_item_id)} · ${escapeHtml(item.expected_class_name)}</div></td>
+                <td>${statusBadge(item.status || 'WAITING')}</td>
+                <td>${escapeHtml(item.result || 'waiting')}</td>
+                <td>${escapeHtml(item.production_valid)}</td>
+                <td>${evidence.join('<br>') || '-'}</td>
+            </tr>`;
+        }).join('');
+        return `<table class="material-items">
+            <thead><tr><th>Slot</th><th>Expected</th><th>Item Status</th><th>Result</th><th>Inspection PASS</th><th>Vision Evidence</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    function incomingQAModeReinspectionButtonHtml(transaction) {
+        if (!transaction.can_reinspect_mode || isCurrentJobTerminal() || !currentJobId) return '';
+        const key = `${currentJobId}:${transaction.inspection_mode}`;
+        const inFlight = incomingQAModeReinspectionCommandsInFlight.has(key);
+        const label = transaction.inspection_mode === 'BASE_AB' ? 'BASE_AB 재검사' : 'HOUSE_B 재검사';
+        return `<button class="btn physical-ready-btn" onclick="confirmIncomingQAModeReinspection(${escapeHtml(currentJobId)}, '${escapeHtml(transaction.inspection_mode)}')" ${inFlight ? 'disabled' : ''}>${inFlight ? '요청 생성 중...' : label}</button>`;
+    }
+
+    async function confirmIncomingQAModeReinspection(jobId, inspectionMode) {
+        if (currentJobId !== jobId || isCurrentJobTerminal()) return;
+        const key = `${jobId}:${inspectionMode}`;
+        if (incomingQAModeReinspectionCommandsInFlight.has(key)) return;
+        const confirmed = window.confirm(
+            `${inspectionMode} 검사를 새 cycle로 다시 요청하시겠습니까?\n\n기존 검사 결과는 이력으로 유지됩니다. Vision 전송은 FMS가 처리합니다.`
+        );
+        if (!confirmed) return;
+        incomingQAModeReinspectionCommandsInFlight.add(key);
+        setIncomingQAV02Feedback(`${inspectionMode} 재검사 요청을 생성하는 중입니다.`, 'neutral');
+        try {
+            const response = await postNoBodyWithTimeout(
+                `/production/jobs/${jobId}/incoming-qa/v02/${inspectionMode}/reinspect`
+            );
+            if (!response.ok) throw new Error(await safeIncomingQAV02StartError(response));
+            const result = await response.json();
+            if (!result || !Array.isArray(result.created_transaction_ids) || result.created_transaction_ids.length !== 1) {
+                throw new Error('재검사 cycle 요청 응답을 확인할 수 없습니다.');
+            }
+            setIncomingQAV02Feedback(`${inspectionMode} 재검사 cycle이 생성되었습니다.`, 'success');
+        } catch (error) {
+            setIncomingQAV02Feedback(error && error.message ? error.message : '재검사 요청을 생성하지 못했습니다.', 'error');
+        } finally {
+            incomingQAModeReinspectionCommandsInFlight.delete(key);
+            if (currentJobId === jobId) await fetchIncomingQAV02();
+        }
+    }
+
+    function renderIncomingQAV02(monitor) {
+        currentIncomingQAV02Monitor = monitor || null;
+        const transactions = monitor && monitor.transactions ? monitor.transactions : [];
+        const gate = monitor && monitor.gate ? monitor.gate : null;
+        renderMaterialIncomingQAGate(gate);
+        elements.incomingQAV02Status.innerHTML = gate
+            ? `Incoming QA Gate: ${statusBadge(gate.status)} (${escapeHtml(gate.released_items)} / ${escapeHtml(gate.total_expected_items)})`
+            : '';
+        elements.incomingQAV02Action.innerHTML = incomingQAV02InitialStartControl(transactions) + incomingQATestHoldControls(monitor);
+        if (transactions.length === 0) {
+            elements.incomingQAV02Container.innerHTML = '<div class="empty-message">No Incoming QA v0.2 transactions for this Job.</div>';
+            return;
+        }
+        elements.incomingQAV02Container.innerHTML = transactions.map(transaction => {
+            const rejectionOrError = transaction.error_reason || transaction.ack_reason_code;
+            const ackState = transaction.ack_accepted === null || transaction.ack_accepted === undefined
+                ? 'waiting' : transaction.ack_accepted ? (transaction.ack_duplicate ? 'accepted (duplicate)' : 'accepted') : 'rejected';
+            return `<article class="material-delivery-card">
+                <div class="material-delivery-header">
+                    <div>
+                        <div class="material-delivery-title">${escapeHtml(transaction.inspection_mode)} · Cycle ${escapeHtml(transaction.inspection_cycle)}</div>
+                        <div class="material-debug">Request: ${escapeHtml(transaction.inspection_request_id)}</div>
+                    </div>
+                    ${statusBadge(transaction.status)}
+                </div>
+                <div class="material-summary">
+                    <div><span class="material-summary-label">Overall result</span><br>${escapeHtml(transaction.overall_result || 'waiting')}</div>
+                    <div><span class="material-summary-label">Vision Runtime Authorization</span><br>${escapeHtml(transaction.production_valid)}</div>
+                    <div><span class="material-summary-label">ACK</span><br>${escapeHtml(ackState)}</div>
+                    <div><span class="material-summary-label">Retry count</span><br>${escapeHtml(transaction.retry_count)}</div>
+                    <div><span class="material-summary-label">Created / Sent</span><br>${escapeHtml(transaction.created_at)}<br>${escapeHtml(transaction.sent_at)}</div>
+                    <div><span class="material-summary-label">ACKed / Completed</span><br>${escapeHtml(transaction.acked_at)}<br>${escapeHtml(transaction.completed_at)}</div>
+                </div>
+                ${rejectionOrError ? `<div class="qa-detail qa-failure">Transport/ACK reason: ${escapeHtml(rejectionOrError)}</div>` : ''}
+                ${incomingQAModeReinspectionButtonHtml(transaction)}
+                ${incomingQAV02ItemRows(transaction.items)}
+            </article>`;
+        }).join('');
+    }
+
+    async function fetchIncomingQAV02() {
+        if (!currentJobId) return;
+        const selectedJobId = currentJobId;
+        elements.incomingQAV02Status.textContent = 'Loading Incoming QA v0.2...';
+        try {
+            const res = await fetchReadOnlyWithTimeout(`/production/jobs/${selectedJobId}/incoming-qa/v02`);
+            if (selectedJobId !== currentJobId) return;
+            if (res.status === 404) {
+                clearIncomingQAV02('Job을 찾을 수 없습니다.');
+                return;
+            }
+            if (!res.ok) throw new Error(`Incoming QA v0.2 API HTTP ${res.status}`);
+            renderIncomingQAV02(await res.json());
+            elements.incomingQAV02Status.textContent = '';
+        } catch (e) {
+            if (selectedJobId !== currentJobId) return;
+            elements.incomingQAV02Status.textContent = 'Incoming QA v0.2 API/network error';
+        }
+    }
+
+    function voiceTurnCard(title, turn) {
+        if (!turn) {
+            return `<div class="snapshot-card"><h3>${escapeHtml(title)}</h3><div class="empty-message">No active voice turn</div></div>`;
+        }
+        const latency = turn.latencies_ms && Object.keys(turn.latencies_ms).length
+            ? Object.entries(turn.latencies_ms).map(([key, value]) => `${escapeHtml(key)} ${escapeHtml(Math.round(value))}ms`).join(' · ')
+            : '-';
+        return `<div class="snapshot-card">
+            <h3>${escapeHtml(title)} · ${statusBadge(turn.state)}</h3>
+            <div class="snapshot-row"><span class="snapshot-label">Turn / Session</span><span class="snapshot-value">${escapeHtml(turn.turn_id)}<br>${escapeHtml(turn.session_id)}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Wake / Speech</span><span class="snapshot-value">${turn.wake_detected ? 'detected' : '-'} / ${turn.speech_detected ? 'detected' : '-'}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Transcript</span><span class="snapshot-value">${escapeHtml(turn.transcript)}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Intent</span><span class="snapshot-value">${escapeHtml(turn.intent)}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Parsed</span><span class="snapshot-value">${escapeHtml(turn.parsed_command_summary)}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Confirmation</span><span class="snapshot-value">${escapeHtml(turn.confirmation_state)}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Response</span><span class="snapshot-value">${escapeHtml(turn.response_text)}</span></div>
+            <div class="snapshot-row"><span class="snapshot-label">Latency</span><span class="snapshot-value">${latency}</span></div>
+            ${turn.error ? `<div class="qa-detail qa-failure">Error: ${escapeHtml(turn.error)}</div>` : ''}
+        </div>`;
+    }
+
+    function renderVoiceRuntime(snapshot) {
+        elements.voiceRuntimeStatus.innerHTML = `Runtime: ${statusBadge(snapshot.runtime_status)} · Mic: ${snapshot.mic_active ? 'ACTIVE' : 'IDLE'}`;
+        const recent = snapshot.recent_turns || [];
+        const recentHtml = recent.length
+            ? recent.map(turn => `<div class="step-row"><span><strong>${escapeHtml(turn.turn_id)}</strong> · ${escapeHtml(turn.intent || '-')}</span><span>${statusBadge(turn.state)}</span></div>`).join('')
+            : '<div class="empty-message">No recent voice turns</div>';
+        elements.voiceRuntimeContainer.innerHTML = `
+            <div class="snapshot-grid">${voiceTurnCard('Current Turn', snapshot.current_turn)}</div>
+            <div class="snapshot-card" style="margin-top:12px"><h3>Recent Turns</h3>${recentHtml}</div>`;
+    }
+
+    async function fetchVoiceRuntime() {
+        try {
+            const res = await fetchReadOnlyWithTimeout('/ai/debug/voice-runtime');
+            if (!res.ok) throw new Error(`Voice runtime API HTTP ${res.status}`);
+            renderVoiceRuntime(await res.json());
+        } catch (e) {
+            elements.voiceRuntimeStatus.textContent = 'Voice Runtime diagnostics unavailable';
+        }
+    }
+
+    async function fetchExecutionSnapshot() {
+        if (!currentJobId) return;
+        const selectedJobId = currentJobId;
+        elements.snapshotStatus.textContent = 'Loading execution snapshot...';
+        try {
+            const res = await fetch(`/production/jobs/${selectedJobId}/execution-snapshot`);
+            if (selectedJobId !== currentJobId) return;
+            if (res.status === 404) {
+                clearExecutionSnapshot('Job을 찾을 수 없습니다.');
+                return;
+            }
+            if (res.status === 409) {
+                const detail = await res.json();
+                elements.snapshotStatus.textContent = 'Execution state inconsistency';
+                elements.executionSnapshotContainer.innerHTML = `<div class="error-message" style="display:block">${escapeHtml(detail.detail)}</div>`;
+                return;
+            }
+            if (!res.ok) throw new Error(`Snapshot API HTTP ${res.status}`);
+            renderExecutionSnapshot(await res.json());
+            fetchTestOverrideBlocker();
+            elements.snapshotStatus.textContent = '';
+        } catch (e) {
+
+            if (selectedJobId !== currentJobId) return;
+            // Preserve the last successful diagnostic snapshot for transient failures.
+            elements.snapshotStatus.textContent = 'Execution snapshot API/network error';
+        }
+    }
+    let testOverrideBlocker = null;
+
+    function isHouseOutboundCheckpoint() {
+        // Job detail exposes the same additive PROCESS projection as Unity
+        // production_status.  Do not infer the outbound checkpoint from a
+        // legacy Job status or a completed roof Step: ROOF_READY is expected.
+        const job = currentJobDetail;
+        return Boolean(job && !isTerminalJob(job)
+            && job.process_stage_code === 'HOUSE_OUTBOUND');
+    }
+
+    async function fetchTestOverrideBlocker() {
+        if (!currentJobId) {
+            elements.testOverrideHouseOutbound.hidden = true;
+            elements.testOverridePanel.hidden = true;
+            return;
+        }
+        if (isCurrentJobTerminal()) {
+            elements.testOverrideHouseOutbound.hidden = true;
+            testOverrideBlocker = null;
+            elements.testOverridePanel.hidden = true;
+            return;
+        }
+        const selectedJobId = currentJobId;
+        try {
+            const res = await fetch(`/test/jobs/${selectedJobId}/current-blocker`);
+            if (selectedJobId !== currentJobId) return;
+            if (res.status === 403 || !res.ok) {
+                testOverrideBlocker = null;
+                elements.testOverridePanel.hidden = true;
+                return;
+            }
+            testOverrideBlocker = await res.json();
+            elements.testOverrideHouseOutbound.hidden = !isHouseOutboundCheckpoint();
+            elements.testOverridePanel.hidden = false;
+            if (!testOverrideBlocker) {
+                elements.testOverrideStatus.textContent = "안전하게 식별 가능한 현재 차단 원인이 없습니다.";
+                elements.testOverrideStart.disabled = true;
+                elements.testOverrideAdvance.disabled = true;
+                return;
+            }
+            const synthetic = new Set(["ROBOT_CELL_STEP_EXECUTION", "MATERIAL_DELIVERY", "PRE_ROOF_INSPECTION", "INCOMING_QA_INSPECTION"]);
+            elements.testOverrideStatus.textContent = `현재 차단 원인: ${testOverrideBlocker.blocker_type} (#${testOverrideBlocker.entity_id})`;
+            if (testOverrideBlocker.detail) elements.testOverrideStatus.textContent += ` · ${testOverrideBlocker.detail}`;
+            if (testOverrideBlocker.blocker_type === "OPERATOR_EXECUTION_READY") elements.testOverrideStatus.textContent += " · 기존 [조립 시작] 명령을 사용하세요.";
+            if (testOverrideBlocker.blocker_type === "MANUAL_PHYSICAL_READY") elements.testOverrideStatus.textContent += " · 기존 [준비 완료] 명령을 사용하세요.";
+            const isSyntheticRunning = testOverrideBlocker.detail === "Synthetic RUNNING step awaiting operator completion.";
+            elements.testOverrideStart.disabled = !(testOverrideBlocker.blocker_type === "ROBOT_CELL_STEP_EXECUTION" && !isSyntheticRunning);
+            elements.testOverrideAdvance.disabled = !synthetic.has(testOverrideBlocker.blocker_type);
+        } catch (_) {
+            testOverrideBlocker = null;
+            elements.testOverridePanel.hidden = true;
+        }
+    }
+
+    elements.testOverrideHouseOutbound.addEventListener("click", async () => {
+        if (!currentJobId || elements.testOverrideHouseOutbound.hidden) return;
+        if (!window.confirm("TEST MODE ONLY: 완성 주택 운반이 완료되었음을 확인하고 작업을 완료 처리할까요?\\n물리 로봇 명령은 전송되지 않습니다.")) return;
+        elements.testOverrideHouseOutbound.disabled = true;
+        try {
+            const response = await fetch(`/test/jobs/${currentJobId}/house-outbound/complete`, { method: "POST" });
+            if (!response.ok) {
+                const body = await response.json().catch(() => ({}));
+                throw new Error(body.detail || `Test Override HTTP ${response.status}`);
+            }
+            await refreshData();
+            elements.snapshotStatus.textContent = "완성 주택 운반 완료가 기록되었습니다.";
+        } catch (error) {
+            alert(`완성 주택 운반 완료 시뮬레이션이 수행되지 않았습니다: ${error.message}`);
+            await fetchTestOverrideBlocker();
+        }
+    });
+
+    elements.testOverrideStart.addEventListener("click", async () => {
+        const blocker = testOverrideBlocker;
+        if (!currentJobId || !blocker || elements.testOverrideStart.disabled) return;
+        if (!window.confirm("TEST MODE ONLY: 현재 작업을 RUNNING으로 시작 처리할까요?\n물리 로봇 명령은 전송되지 않습니다.")) return;
+        elements.testOverrideStart.disabled = true;
+        try {
+            const res = await fetch("/test/jobs/" + currentJobId + "/start-current-blocker", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ expected_blocker_type: blocker.blocker_type, expected_entity_id: blocker.entity_id }),
+            });
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                throw new Error(body.detail || "Test Override HTTP " + res.status);
+            }
+            await fetchJobDetail();
+            await fetchExecutionSnapshot();
+            await fetchJobEvents();
+        } catch (error) {
+            alert("작업 시작 시뮬레이션이 수행되지 않았습니다: " + error.message);
+            await fetchTestOverrideBlocker();
+        }
+    });
+
+    elements.testOverrideAdvance.addEventListener("click", async () => {
+        const blocker = testOverrideBlocker;
+        if (!currentJobId || !blocker || elements.testOverrideAdvance.disabled) return;
+        if (!window.confirm("TEST MODE ONLY: 현재 차단 원인 하나만 완료 처리할까요?")) return;
+        elements.testOverrideAdvance.disabled = true;
+        try {
+            const res = await fetch(`/test/jobs/${currentJobId}/advance-current-blocker`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ expected_blocker_type: blocker.blocker_type, expected_entity_id: blocker.entity_id }),
+            });
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                throw new Error(body.detail || `Test Override HTTP ${res.status}`);
+            }
+            await fetchJobDetail();
+            await fetchExecutionSnapshot();
+            await fetchJobEvents();
+        } catch (error) {
+            alert(`공정 완료 시뮬레이션이 수행되지 않았습니다: ${error.message}`);
+            await fetchTestOverrideBlocker();
+        }
+    });
+
+
+    async function fetchJobEvents() {
+        if (!currentJobId) return;
+        try {
+            const res = await fetch(`/production/jobs/${currentJobId}/events`);
+            if (res.status === 404) {
+                elements.jobEventsContainer.innerHTML = '<div class="empty-message">선택한 Job이 존재하지 않습니다.</div>';
+                return;
+            }
+            if (!res.ok) throw new Error('API request failed');
+            const events = await res.json();
+            renderJobEvents(events);
+        } catch (e) {
+            elements.jobEventsContainer.innerHTML = '<div class="error-message" style="display:block">데이터를 불러오지 못했습니다. (Events Error)</div>';
+        }
+    }
+
+    function formatTime(isoStr) {
+        if (!isoStr) return '';
+        const d = new Date(isoStr);
+        return d.toTimeString().split(' ')[0];
+    }
+
+    function renderJobEvents(events) {
+        if (!events || events.length === 0) {
+            elements.jobEventsContainer.innerHTML = '<div class="empty-message">events가 비어 있습니다.</div>';
+            return;
+        }
+
+        let html = '';
+        for (const ev of events) {
+            let extra = '';
+            if (ev.error_code) extra += ` [${ev.error_code}]`;
+            html += `
+                <div class="event-row">
+                    <span class="event-time">${formatTime(ev.created_at)}</span>
+                    <span class="event-type">${ev.event_type}</span>
+                    <span class="event-msg">${ev.message}${extra}</span>
+                </div>
+            `;
+        }
+        elements.jobEventsContainer.innerHTML = html;
+    }
+
+    function updateTimestamp() {
+        const d = new Date();
+        elements.lastUpdated.textContent = `Last Updated: ${d.toLocaleTimeString()}`;
+    }
+
+    async function refreshData() {
+        if (isFetching) return;
+        isFetching = true;
+        try {
+            await fetchJobs();
+            await fetchVoiceRuntime();
+            if (currentJobId) {
+                await fetchJobDetail();
+                await fetchJobEvents();
+                await fetchExecutionSnapshot();
+                await fetchMaterialDeliveries();
+                await fetchIncomingQAV02();
+            }
+        } finally {
+            isFetching = false;
+        }
+    }
+
+    function setupAutoRefresh() {
+        if (refreshInterval) clearInterval(refreshInterval);
+        if (elements.autoRefresh.checked) {
+            refreshInterval = setInterval(refreshData, 3000);
+        }
+    }
+
+    elements.autoRefresh.addEventListener('change', setupAutoRefresh);
+    elements.refreshBtn.addEventListener('click', refreshData);
+    elements.productionRequestSubmit.addEventListener('click', () => submitProductionConversation(elements.productionRequestInput.value));
+
+    // Initial load
+    refreshData();
+    setupAutoRefresh();
+
+</script>
+
+</body>
+</html>
