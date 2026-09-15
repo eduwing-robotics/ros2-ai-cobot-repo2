@@ -46,15 +46,9 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
       <img src="./assets/house_B.jpg" alt="HOUSE_B 완성 주택 모델" width="95%" />
     </td>
   </tr>
-  <tr>
-    <td align="center">
-      HOUSE_A
-    </td>
-    <td align="center">
-      HOUSE_B
-    </td>
-  </tr>
 </table>
+두 주택 모델은 생산 요청 시 지붕 옵션을 선택할 수 있으며,
+선택된 모델과 지붕 정보는 생산 Recipe 및 공정 제어에 반영됩니다.
 
 ## 3. 주제 선정 이유
 
