@@ -13,7 +13,7 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
 
 | 담당자 | 담당 파트 | 주요 기여 |
 | :---: | :---: | --- |
-| 김애리<br>(팀장) | Robot Cell | FR5 · Zekeep 3축 로봇 제어 |
+| 김애리<br>(팀장) | Robot Cell · Vision Alignment | FR5 6축 · Zekeep 3축 로봇 제어, 카메라 4대 기반 비전 보정(밑판 측정 · 정렬 · 하강 감시), 서버 인터페이스 계약 |
 | 김성엽 | AI Vision · 품질검사 | Vision 학습 · 추론 기반 입고 자재 검사와 조립 결과 품질검사 |
 | 김영호 | Unity · TurtleBot | Unity 디지털 트윈 · 생산 관제 화면, TurtleBot 자재 팔레트 운반 |
 | 유예린 | Voice AI · Server | STT · LLM · TTS 음성 명령, FMS 서버 |

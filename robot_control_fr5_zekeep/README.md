@@ -1,10 +1,10 @@
-# Robot Control — FR5 · ZeKeep 로봇셀 파트
+# Robot Control & Vision Alignment — FR5 · ZeKeep 로봇셀 파트
 
 FR5 6축 협동로봇이 벽을 집어 밑판 슬롯에 끼우고, ZeKeep 3축 로봇이 밑판·지붕을 반송하는 로봇셀 스택입니다.
 서버(FMS)의 작업 지시 한 줄을 실물 로봇의 0.1 mm 동작으로 바꾸는 계층 전부 — 서버 인터페이스, 셀 오케스트레이션,
-벽 삽입 파이프라인, 자체 비전 보정, 운영 콘솔, PLC 로봇 제어 — 를 담당합니다.
+벽 삽입 파이프라인, **카메라 4대 기반 비전 보정(밑판 측정 · 랙 파지 · 정렬 · 하강 감시)**, 운영 콘솔, PLC 로봇 제어 — 를 담당합니다.
 
-담당: 김애리 (팀장)
+담당: 김애리 (팀장) — 로봇 제어 · 비전 보정 · 서버 인터페이스
 
 <p align="center">
   <img src="docs/images/console_overview.png" width="900" alt="통합 운영 콘솔">
