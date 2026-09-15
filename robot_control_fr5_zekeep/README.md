@@ -6,10 +6,15 @@ FR5 6축 협동로봇이 벽을 집어 밑판 슬롯에 끼우고, ZeKeep 3축 �
 
 담당: 김애리 (팀장)
 
+<p align="center">
+  <img src="docs/images/console_overview.png" width="900" alt="통합 운영 콘솔">
+  <br><em>통합 운영 콘솔 — ZK1·FR5 조그, 카메라 4대, 관절 트윈, 시퀀스 기록/재생을 한 화면에서. 모든 실기 시험이 이 콘솔 위에서 이루어졌다</em>
+</p>
+
 ## 최종 성과
 
-| 항목 | 결과 | 비고 |
-|---|---|---|
+| 항목 | 결과 | 측정 방법 |
+|:---|:---:|:---|
 | 벽 전량 삽입 | **5 / 5** · 하강 중 막힘 0건 | 한 회차 다섯 장 전부 삽입, 로그 `── DONE` 기준 |
 | 파지 재현 오차 | 1.7 mm → **0.13 mm** | 같은 벽 반복 파지 후 TCP 편차 |
 | 정렬 수렴 잔차 | **0.41 mm** | 로봇 최소 실행 이동량(0.5 mm) 아래 = 한계 수렴 |
@@ -21,6 +26,13 @@ FR5 6축 협동로봇이 벽을 집어 밑판 슬롯에 끼우고, ZeKeep 3축 �
 
 > "5/5" 는 한 회차에서 다섯 장이 모두 들어갔다는 뜻이지 성공률이 아닙니다. 개발 기간 전체의 정지 기록은
 > [docs/05_verification.md](docs/05_verification.md) 에 그대로 적었습니다.
+
+<p align="center">
+  <img src="docs/images/wall_insert_align.gif" width="300" alt="벽 정렬·삽입">
+  &nbsp;&nbsp;
+  <img src="docs/images/base_pillar_4points.png" width="300" alt="밑판 기둥 색점 4점 검출">
+  <br><em>왼쪽: 든 벽을 밑판 기둥과 상대 정렬해 삽입 · 오른쪽: 매 사이클 밑판 기둥 색점 4점 + ArUco 로 밑판 위치·회전 측정</em>
+</p>
 
 ## 시스템 구성
 
@@ -54,10 +66,15 @@ FR5 6축 협동로봇이 벽을 집어 밑판 슬롯에 끼우고, ZeKeep 3축 �
 
 외벽 4장 → 내벽 순서는 물리적 강제입니다. 내벽을 먼저 넣으면 밑판 뎁스 검출이 갈려 기둥을 못 찾습니다.
 
+<p align="center">
+  <img src="docs/images/descend_jam_monitor.gif" width="300" alt="하강 밀림 감시">
+  <br><em>⑤ DESCEND — 3 mm 단계 하강 중 든 벽 색점의 픽셀 이동을 감시. 벽이 기둥에 걸리면 그리퍼 안에서 밀리는 것이 화면에 보이므로 그 자리에서 정지한다</em>
+</p>
+
 ## 로봇 2종 역할
 
 | 로봇 | 역할 | 제어 경로 |
-|---|---|---|
+|:---|:---:|:---|
 | FR5 6축 | 벽 파지 · 운반 · 삽입 · 완성품 출하 | `bridge_server` → Fairino SDK (Ethernet) |
 | ZeKeep 3축 ×2 | 밑판 · 지붕 흡착 반송 | `zk_*.py` → MODBUS-RTU → FX3U PLC (USB 시리얼) |
 
@@ -101,19 +118,20 @@ python3 src/orchestrator/cell_orchestrator.py --ros-args -p exec_mode:=real
 #    http://<PC>:8776/                          벽 삽입 사이클 (하강 버튼은 사람이 누른다)
 ```
 
-| 포트 | 서비스 |
-|---:|---|
-| 8765 | FR5 브리지 |
-| 8766 / 8768 / 8771 / 8779 | 손목 D435 / 보조 / 측면 / 글로벌 카메라 |
-| 8776 | 벽 삽입 사이클 |
-| 8773 / 8777 | 단계별 기준점 오버레이 뷰 |
+| 포트 | 서비스 | 파일 |
+|:---|:---:|:---|
+| 8765 | FR5 브리지 | `src/bridge/bridge_server.py` |
+| 8766 / 8768 / 8771 / 8779 | 손목 D435 / 보조 / 측면 / 글로벌 카메라 | `src/cameras/` |
+| 8776 | 벽 삽입 사이클 | `src/fr5_cycle/house_cycle.py` |
+| 8773 / 8777 | 단계별 기준점 오버레이 뷰 | `src/fr5_cycle/pillar_view.py` · `ref_view.py` |
+| 8000 | 통합 운영 콘솔 | `src/console/bf2_robot_console.html` |
 
 컨트롤러가 동결되면 `scripts/fr5_rescue.sh` (전원 재투입 → 펜던트 알람 Clear 는 사람 → 링크 복구 → 브리지 rescue).
 
 ## 핵심 파라미터
 
 | 파라미터 | 값 | 설명 |
-|---|---|---|
+|:---|:---:|:---|
 | `HOVER_DZ` | 85 (외벽) / 100 (blue_in · yellow_in) / 102 (red_in) | 안착 높이 위 정렬 높이 (mm) |
 | `COMBINE_TOL_MM` | 1.5 | 두 카메라 XY 불일치 허용 |
 | `ALIGN_MAX_MOVE_TWOCAM_MM` | 15 | 정렬 결과가 슬롯 기준에서 벗어나도 되는 상한 |
