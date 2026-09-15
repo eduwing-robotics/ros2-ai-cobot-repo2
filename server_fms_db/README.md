@@ -48,6 +48,63 @@ Unity 관제, Voice 생산 상태 조회, 자동 TTS 공정 안내는 모두 서
 
 `COMPLETED` / `SUCCEEDED` 이력은 재시작 후에도 보존합니다. `PENDING` 작업은 durable state를 다시 평가할 수 있지만, `RUNNING` / `IN_PROGRESS`처럼 실제 물리 실행 결과가 불확실한 작업은 자동 재전송하지 않습니다. 불확실 상태는 수동 복구 대상으로 남겨 동일 Robot/Transport 명령의 중복 실행을 막습니다.
 
+## 데이터베이스 설계
+
+생산 공정의 현재 상태와 실행 이력을 추적할 수 있도록 PostgreSQL 기반의 관계형 데이터 모델을 구성했습니다.
+
+ERD는 크게 **Master · Inventory · Recipe · Production/Execution · Quality · Logistics** 영역으로 나누어 관리합니다.
+
+<img src="./docs/erd_0914.drawio.png" alt="Server/FMS Core ERD" width="100%" />
+
+> 가독성을 위해 핵심 테이블과 주요 필드만 표시했습니다.
+
+### 주요 데이터 영역
+
+| 영역 | 주요 테이블 | 역할 |
+| --- | --- | --- |
+| Master | `products`, `parts` | 생산 모델과 부품 기준정보 |
+| Inventory | `inventory` | 부품별 현재 수량과 예약 수량 관리 |
+| Recipe | `assembly_recipes`, `assembly_recipe_stages` | 제품별 조립 순서와 작업 정의 |
+| Production / Execution | `production_jobs`, `job_steps`, `execution_attempts` | 생산 Job, 실제 실행 Step, 로봇/운반 명령 실행 이력 |
+| Quality | `incoming_qa_transactions`, `production_inspections` | 자재 수입검사와 조립 결과 품질검사 |
+| Logistics | `job_material_deliveries`, `job_material_delivery_items` | 생산 Job별 자재 운반과 팔레트 Delivery 상태 |
+
+### Recipe와 Job 실행 상태 분리
+
+`assembly_recipes`와 `assembly_recipe_stages`는 제품별 생산 순서를 정의하는 기준 정보입니다.
+
+생산 요청이 생성되면 해당 Recipe를 기준으로 Job의 실행 대상이 `job_steps`에 materialize되며, 이후 FMS는 원본 Recipe를 직접 따라가는 것이 아니라 **Job에 저장된 durable state를 기준으로 실행 가능 여부를 판단**합니다.
+
+따라서 Recipe가 이후 수정되더라도 이미 생성된 Job의 실행 이력과 상태는 유지됩니다.
+
+### 실행 이력 추적
+
+`execution_attempts`는 Robot Cell, TurtleBot 등 외부 장비에 전달한 실제 실행 단위를 기록합니다.
+
+하나의 `job_step`에 대해 실행 요청, 결과, `req_id`, executor type 등을 별도로 보존하여 다음을 추적할 수 있습니다.
+
+- 어떤 생산 Job에서 실행됐는지
+- 어떤 Step에 대한 명령인지
+- 어떤 장비가 수행했는지
+- 성공 / 실패 여부
+- 동일 작업의 재시도 여부
+
+### 물류와 생산 Step 연결
+
+`job_material_deliveries`는 생산에 필요한 자재 운반 lifecycle을 관리하고,
+`job_material_delivery_items`를 통해 실제 부품과 대상 `job_step`을 연결합니다.
+
+이를 통해 단순히 TurtleBot이 이동했는지가 아니라 **어떤 생산 Job의 어떤 자재가 어느 공정을 위해 운반되었는지**를 추적할 수 있습니다.
+
+### 검사 결과의 durable evidence
+
+수입검사는 `incoming_qa_transactions`,
+조립 결과 검사는 `production_inspections`에 별도로 저장합니다.
+
+FMS는 검사 결과를 단순 이벤트로 처리하지 않고 PostgreSQL에 저장된 검사 상태를 다음 공정의 Gate로 사용합니다.
+
+예를 들어 조립 결과 품질검사가 PASS되지 않으면 지붕 설치 Step은 실행 가능 상태가 되지 않습니다.
+
 ## 시스템 데이터 흐름
 
 ```mermaid
