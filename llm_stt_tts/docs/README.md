@@ -1,29 +1,15 @@
 # 문서 목록
 
-LLM / STT / TTS 영역의 상세 기술 문서입니다. 아래 구성으로 작성합니다.
+Voice AI 영역의 상세 기술 문서입니다. 전체 기능과 발화 예시는 [상위 README](../README.md)를 참고하세요.
 
-| 번호 | 문서 | 내용 | 상태 |
-|:---:|:---|:---|:---:|
-| 01 | 프로젝트 개요 | 배경, 문제 정의, 개발 목적, 담당 영역의 역할 | 작성 예정 |
-| 02 | 시스템 아키텍처 | 내부 구조와 타 영역 연동 구조 | 작성 예정 |
-| 03 | 주요 기능 | 핵심 구현 항목 | 작성 예정 |
-| 04 | 데이터 흐름 | 입력부터 처리, 상태 관리, 결과 전달까지 Runtime 흐름 | 작성 예정 |
-| 05 | 검증 | 검증 단계별 결과 | 작성 예정 |
-| 06 | 프로젝트 범위 | 팀 전체 시스템과 담당 영역의 경계 | 작성 예정 |
-| 07 | 프로젝트 구조 | 공개 코드 구조, 포함 파일, 제외한 산출물 | 작성 예정 |
-
-파일명은 `01_overview.md` ~ `07_project_structure.md` 를 사용하고, 작성한 문서부터 이 표에 링크를 겁니다.
-
----
+| 문서 | 내용 |
+| --- | --- |
+| [01_architecture.md](01_architecture.md) | Voice Runtime, API Server, FMS 연동 구조와 데이터 흐름 |
+| [02_troubleshooting_validation.md](02_troubleshooting_validation.md) | Wake Word · STT · 명령 해석 · TTS의 문제 해결 및 검증 |
+| [03_project_structure.md](03_project_structure.md) | 실제 source 배치, 모듈 경계, 공개·제외 범위 |
 
 ## 문서 구성 원칙
 
-- 팀 전체 프로젝트를 설명하되, 담당 영역을 중심으로 작성합니다.
-- 타 담당 영역의 내부 구현은 분리하고, 연동 Interface와 범위만 설명합니다.
-- Dummy, Local, Actual 검증을 서로 다른 단계로 기록합니다.
-- 실제로 검증되지 않은 항목은 PASS로 표현하지 않습니다.
-- 대용량 Dataset, Model Weight, Runtime DB, 백업 파일은 저장소에 포함하지 않습니다.
-
----
-
-[LLM / STT / TTS README로 돌아가기](../README.md)
+- 실제 코드와 테스트로 확인되지 않은 항목을 PASS 또는 성능 수치로 표현하지 않습니다.
+- 대용량 원본 Dataset·Model Weight·Runtime DB·백업 산출물은 저장소에 포함하지 않습니다.
+- 타 담당 영역의 내부 구현을 반복하기보다 Voice AI가 사용하는 interface와 책임 경계를 중심으로 설명합니다.
