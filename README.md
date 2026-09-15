@@ -84,7 +84,7 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
 | SR_16 | 생산 및 시스템 이벤트 저장 기능 | 생산 업무 · 공정 · 품질검사 · 로봇 오류 · 재고 · AI 명령 처리 기록을 데이터베이스에 저장한다. |
 | SR_17 | 생산 이력 조회 기능 | 생산 제품 · 상태 · 공정 · 시간 · 품질검사 · 오류 · 재고 변동 이력을 조회한다. |
 
-## 6. 시스템 아키텍처
+## 7. 시스템 아키텍처
 
 ### 하드웨어 아키텍처
 
@@ -94,7 +94,7 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
 
 <img src="./assets/sw_architecture.png" alt="소프트웨어 아키텍처" width="100%" />
 
-## 7. 운영 시나리오
+## 8. 운영 시나리오
 
 ### Scenario #1 - 음성 기반 주택 생산 요청
 
@@ -156,11 +156,11 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
 
 1. 관리자가 “현재 생산 어디까지 됐어?” 또는 “HOUSE_A 생산 끝났어?”와 같이 현재 생산 상태를 질문합니다.
 2. STT가 음성을 텍스트로 변환하고, 명령 해석기가 생산 상태 조회 의도를 판별합니다.
-3. 서버가 현재 생산 업무 · 전체 상태 · 현재 공정·완료 공정을 데이터베이스에서 조회합니다.
+3. 서버가 현재 생산 업무 · 전체 상태 · 현재 공정 · 완료 공정을 데이터베이스에서 조회합니다.
 4. 관제 시스템과 TTS가 조회 결과를 관리자에게 제공합니다.
 5. 자연어 요청과 처리 결과를 AI 명령 처리 이력에 저장합니다.
 
-## 8. 시퀀스 다이어그램
+## 9. 시퀀스 다이어그램
 
 프로젝트의 주요 기능은 역할과 데이터 흐름을 명확히 하기 위해 시퀀스 다이어그램으로 정의했습니다.
 
@@ -200,7 +200,7 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
 
 <img src="./assets/sequence_diagram8.png" alt="Scenario 8 시퀀스 다이어그램" width="100%" />
 
-## 9. 상태 다이어그램
+## 10. 상태 다이어그램
 
 <img src="./assets/state_diagram1.png" alt="상태 다이어그램 1" width="100%" />
 
@@ -210,40 +210,40 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
 
 <img src="./assets/state_diagram4.png" alt="상태 다이어그램 4" width="100%" />
 
-## 10. 소스 구성
+## 11. 소스 구성
 
 | 경로 | 역할 |
 | --- | --- |
-| [ai_perception/](ai_perception/README.md) | Incoming QA 및 PRE_ROOF 품질검사, Vision AI 파이프라인 |
+| [ai_perception/](ai_perception/README.md) | 수입검사 QC 및 구조물 품질검사, Vision AI 파이프라인 |
 | [controltower_gui/](controltower_gui/README.md) | Unity 기반 생산 관제 · 디지털 트윈 화면 |
 | [forklift_turtlebot3/](forklift_turtlebot3/README.md) | TurtleBot3 자재 팔레트 운반과 포크 리프트 제어 |
 | [llm_stt_tts/](llm_stt_tts/README.md) | Voice AI 기능 · 명령 · 검증 문서 진입점 |
-| [robot_control_fr5_zekeep/](robot_control_fr5_zekeep/README.md) | FR5 조립 작업과 Zekeep 3축 제어 |
-| [server_fms_db/](server_fms_db/README.md) | API Server, FMS, PostgreSQL/Redis, telemetry, Unity WebSocket, 통합 Voice Runtime |
+| [robot_control_fr5_zekeep/](robot_control_fr5_zekeep/README.md) | FR5 6축 제어 및 조립 작업과 Zekeep 3축 제어 |
+| [server_fms_db/](server_fms_db/README.md) | API Server, FMS, PostgreSQL / Redis, telemetry, Unity WebSocket, 통합 Voice Runtime |
 
-Voice Runtime의 실행 source는 production/Redis/API contract와 함께 동작하도록 `server_fms_db/`에 통합되어 있으며, `llm_stt_tts/`는 Voice AI 기능 문서의 진입점입니다.
+Voice Runtime의 실행 source는 production / Redis / API contract와 함께 동작하도록 `server_fms_db/`에 통합되어 있으며, `llm_stt_tts/`는 Voice AI 기능 문서의 진입점입니다.
 
-## 11. 프로젝트 타임라인
+## 12. 프로젝트 타임라인
 
 **프로젝트 기간: 2026년 8월 3일 ~ 2026년 9월 17일**
 
-요구사항 정의, 공정 · 인터페이스 설계, 파트별 구현, 통합 테스트와 최종 시연 준비 일정을 Jira로 관리했습니다.
+요구사항 정의, 공정 · 인터페이스 설계, 파트별 구현, 통합 테스트와 최종 시연 준비 일정 등을 Jira / Confluence / Slack / Github로 관리했습니다.
 
 <img src="./assets/timeline.png" alt="프로젝트 타임라인" width="100%" />
 
-## 12. 프로젝트 기술 스택
+## 13. 프로젝트 기술 스택
 
 | 구분 | 실제 사용 기술 |
 | --- | --- |
 | Backend / FMS | Python, FastAPI, PostgreSQL, SQLAlchemy, Alembic, Redis, WebSocket |
-| Robot Middleware | ROS 2 (Topic, Action), CycloneDDS |
-| Robot / Hardware | FR5, Zekeep 3축, TurtleBot3 |
+| Robot Middleware | ROS 2 (Topic, Action), CycloneDDS, MoveIt2 |
+| Robot / Hardware | FR5 6축, Zekeep 3축, TurtleBot3 |
 | Voice AI | sherpa-onnx, faster-whisper, Ollama, EXAONE, Edge TTS |
 | Vision AI | Python, YOLO, PyTorch, OpenCV, NumPy |
-| Digital Twin / GUI | Unity, C# |
-| Collaboration / Project Management | Git, GitHub, Jira |
+| Digital Twin / GUI | Unity, C#, HTML |
+| Collaboration / Project Management | Git, GitHub, Jira, Confluence, Slack |
 
-## 13. 보안 및 제외 항목
+## 14. 보안 및 제외 항목
 
 저장소의 `.gitignore` 기준으로 다음 로컬 · 실행 산출물과 민감 정보는 커밋하지 않습니다.
 
@@ -252,7 +252,7 @@ Voice Runtime의 실행 source는 production/Redis/API contract와 함께 동작
 - **ROS 2 실행 산출물** : `build/`, `install/`, `log/`, `run_logs/`, `.ros/`, rosbag(`*.db3`, `*.mcap`)
 - **로봇 런타임 산출물** : `state/`, `runtime/`, `*.pid`
 - **Vision 대용량 자산** : 모델 가중치(`*.pt`, `*.onnx`, `*.engine` 등), 데이터셋 · 캡처 · 증적 · 추론 결과, 로컬 DB 파일
-- **Voice AI 산출물** : 모델 캐시, Whisper/Hugging Face 모델, 녹음 · 합성 음성 파일
+- **Voice AI 산출물** : 모델 캐시, Whisper / Hugging Face 모델, 녹음 · 합성 음성 파일
 - **관제 · Unity · 웹 빌드 산출물** : `node_modules/`, Unity `Library/`·`Temp/`·`Build/`·`Logs/` 등 자동 생성 파일
 - **개발 환경 산출물** : Python 가상환경 · 캐시 · 테스트 / 커버리지 결과, IDE · OS 임시 파일
 - **개인 문서 · 로컬 도구 설정** : 개인 회의록 · 검증 노트, Office 원본 문서, 로컬 AI 도구 설정
