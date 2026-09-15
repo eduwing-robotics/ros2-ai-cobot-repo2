@@ -11,12 +11,12 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
 
 ## 1. 팀 구성 및 역할
 
-| 담당자 | 담당 파트 | 주요 기여 |
+| 담⁠당⁠자 | 담⁠당 파⁠트 | 주⁠요 기⁠여 |
 | :---: | :---: | --- |
-| 김애리<br>(팀장) | 로봇셀 · 비전 보정 | FR5 6축 · Zekeep 3축 로봇 제어, RGB-D · RGB 카메라 기반 정렬 보정(밑판 측정 · 정렬 · 하강 감시), 서버 인터페이스 계약 · 셀 오케스트레이션 |
-| 김성엽 | AI Vision · 품질검사 | Vision 학습 · 추론 기반 입고 자재 검사와 조립 결과 품질검사 |
-| 김영호 | Unity · TurtleBot | Unity 디지털 트윈 · 생산 관제 화면, TurtleBot 자재 팔레트 운반 |
-| 유예린 | Voice AI · Server | STT · LLM · TTS 음성 명령, FMS 서버 |
+| 김⁠애⁠리<br>(⁠팀⁠장⁠) | 로⁠봇⁠셀 · 비⁠전 보⁠정 | FR5 6축 · Zekeep 3축 로봇 제어, RGB-D · RGB 카메라 기반 정렬 보정(밑판 측정 · 정렬 · 하강 감시), 서버 인터페이스 계약 · 셀 오케스트레이션 |
+| 김⁠성⁠엽 | AI Vision · 품⁠질⁠검⁠사 | Vision 학습 · 추론 기반 입고 자재 검사와 조립 결과 품질검사 |
+| 김⁠영⁠호 | Unity · TurtleBot | Unity 디지털 트윈 · 생산 관제 화면, TurtleBot 자재 팔레트 운반 |
+| 유⁠예⁠린 | Voice AI · Server | STT · LLM · TTS 음성 명령, FMS 서버 |
 
 ## 2. 프로젝트 주제
 
