@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HARMONY Robot Console — ZK1 · ZK2 · FR5</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+/* 산업 관제탑 테마 — 다크 + 안전 해저드(노랑/검정). smart-factory-soarm101 관제탑 톤 참고 */
+:root{
+  --paper:#121418; --grid:#1B1E24; --ink:#E8E6DF; --muted:#8A9099; --line:#2E333B;
+  --fr5:#7E8AA0; --zk:#27B9CB; --ok:#3DDC84; --warn:#E5382B; --amber:#F5B301; --card:#1B1E23;
+  --hz:#FFC400; --hzdark:#0A0A0C; --well:#0E1013;
+  --mono:"JetBrains Mono","SF Mono",Consolas,monospace; --sans:"Pretendard","Inter",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+/* 해저드 스트라이프 유틸 */
+.hazard{background:repeating-linear-gradient(90deg,var(--hz) 0 28px,var(--hzdark) 28px 56px)}
+/* 기둥보호대 프레임 — 캡처(안전무늬 사각기둥보호대) 스타일: 굵은 가로줄 세로기둥 */
+body::before,body::after{content:"";position:fixed;top:0;bottom:0;width:16px;z-index:50;
+  background:repeating-linear-gradient(180deg,var(--hz) 0 26px,var(--hzdark) 26px 52px)}
+body::before{left:0}body::after{right:0}
+header{display:flex;align-items:center;gap:16px;padding:17px 22px;background:#16181D;position:relative}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:10px;
+  background:repeating-linear-gradient(90deg,var(--hz) 0 32px,var(--hzdark) 32px 64px)}
+header h1{font:800 22px var(--mono);margin:0;letter-spacing:.06em;color:var(--hz);display:flex;align-items:center;gap:8px}
+header h1::before{content:"HARMONY";background:var(--hz);color:#111;padding:2px 7px;border-radius:3px;font:800 18px var(--mono)}
+.tabs{display:flex;gap:8px;margin-left:10px;flex-wrap:wrap}
+.tab{padding:10px 16px;border:1px solid var(--line);background:#22262C;color:var(--muted);cursor:pointer;font:600 18px var(--mono);border-radius:4px}
+.tab.active{background:var(--hz);color:#111;border-color:var(--hz);font-weight:800}
+.tab[data-r=zk1].active,.tab[data-r=zk2].active{background:var(--zk);border-color:var(--zk);color:#08282c}
+.tab[data-r=fr5].active{background:var(--fr5);border-color:var(--fr5);color:#12151c}
+.spacer{flex:1}
+.conn{display:flex;align-items:center;gap:8px;font:600 16px var(--mono);color:var(--ink);
+  background:#22262C;border:1px solid #3A404A;border-radius:6px;padding:8px 14px;cursor:pointer}
+.conn:hover{background:#2F343C;border-color:var(--hz)}
+#rchips{display:flex;gap:6px}
+.rchip{font:700 13px var(--mono);padding:4px 8px;border-radius:4px;background:#22262C;color:var(--muted);border:1px solid #3A404A}
+.rchip.on{background:#12351F;color:#3DDC84;border-color:#2E8B57}
+.rchip.off{background:#341715;color:#FF8A80;border-color:#6b2a24}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--muted);box-shadow:0 0 6px transparent}
+.dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)} .dot.sim{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+/* 산업 비상정지: 노랑 베젤 + 빨강 버튼 */
+#estop{background:var(--warn);color:#fff;border:3px solid var(--hz);padding:9px 18px;font:800 22px var(--mono);border-radius:6px;cursor:pointer;letter-spacing:.1em;box-shadow:0 0 0 2px #111 inset}
+#estop:hover{background:#FF4A3C}
+#estop:active{transform:scale(.97)}
+main{--c1:620px;--c3:490px;display:grid;grid-template-columns:var(--c1) 8px 1fr 8px var(--c3);gap:10px;padding:20px 28px 12px;height:calc(100vh - 76px)}
+.vsplit{cursor:col-resize;background:#262A31;border-radius:4px;align-self:stretch}
+.vsplit:hover,.vsplit.on{background:var(--hz)}
+#modal-back{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90}
+#modal-back.open{display:block}
+#modal{display:none;position:fixed;top:6vh;left:50%;transform:translateX(-50%);width:min(1000px,92vw);max-height:86vh;z-index:95;background:var(--card);border:1px solid #4A515C;border-radius:8px;box-shadow:0 18px 60px rgba(0,0,0,.65);flex-direction:column;overflow:hidden}
+#modal.open{display:flex}
+#modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#16181D;border-bottom:3px solid var(--hz)}
+#modal-head span{font:800 22px var(--mono);color:var(--hz)}
+#modal-body{padding:18px;overflow:auto}
+@media(max-width:1500px){main{grid-template-columns:1fr 1fr;height:auto}.vsplit{display:none}#twinwrap{min-height:420px}}
+@media(max-width:900px){main{grid-template-columns:1fr}#twinwrap{height:320px}}
+/* 컨트롤 컬럼: ZK(탭) 위 + FR5 아래 세로 스택 */
+#ctrlcol{display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+#ctrlcol .panel{flex:none}
+#dock-report{display:flex;flex-direction:column;min-height:0}
+#rec-steps{flex:1 1 240px;overflow:auto;resize:vertical;min-height:200px;border:1px solid var(--line);background:var(--well);padding:4px}
+.step.sel{outline:1px solid var(--hz);background:#26251A}
+.step{cursor:pointer}
+.panel{background:var(--card);border:1px solid var(--line);border-top:2px solid #3A404A;border-radius:6px;padding:16px;overflow:auto}
+.view{display:none}.view.active{display:block}
+h2{font:700 22px var(--mono);color:var(--amber);margin:18px 0 12px;letter-spacing:.08em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px}
+h2::before{content:"";width:12px;height:20px;flex:none;border-radius:2px;
+  background:repeating-linear-gradient(180deg,var(--hz) 0 5px,var(--hzdark) 5px 10px)}
+h2:first-child{margin-top:0}
+.row{display:grid;grid-template-columns:56px 52px 52px 1fr 1fr 76px;gap:10px;align-items:center;margin-bottom:10px}
+.row .ax{font:700 22px var(--mono);color:var(--hz)}
+button{font-family:var(--mono);cursor:pointer;border-radius:5px;border:1px solid #3A404A;background:#262A31;color:var(--ink);padding:10px 16px;font-size:18px}
+button:hover{background:#2F343C;border-color:#4A515C} button:focus-visible{outline:2px solid var(--hz)}
+button.pm{font-weight:800;font-size:22px;padding:8px 0}
+button.primary{background:var(--hz);color:#111;border-color:var(--hz);font-weight:800}
+button.primary:hover{background:#FFC61A}
+button.zk{background:var(--zk);color:#08282c;border-color:var(--zk);font-weight:700}
+button.fr5{background:var(--fr5);color:#12151c;border-color:var(--fr5);font-weight:700}
+button.danger{background:var(--warn);color:#fff;border-color:#8a1f16}
+button:disabled{opacity:.4;cursor:not-allowed}
+input,select{font-family:var(--mono);font-size:18px;padding:9px 10px;border:1px solid #3A404A;border-radius:4px;width:100%;background:var(--well);color:var(--ink)}
+input[readonly]{background:#15181D;color:var(--amber)}
+.cur{text-align:right}
+.inline{display:flex;gap:12px;row-gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.inline label{font:18px var(--mono);color:var(--muted);white-space:nowrap}
+.inline input,.inline select{width:auto}
+.seg{display:inline-flex;border:1px solid #3A404A;border-radius:4px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid #3A404A} .seg button:last-child{border-right:0}
+.seg button.on{background:var(--hz);color:#111;font-weight:800}
+#mode-seg button[data-m=real].on{background:var(--warn);color:#fff}
+#mode-seg.pulse{outline:3px solid var(--warn);outline-offset:2px;animation:segpulse .5s 4}
+@keyframes segpulse{50%{outline-color:transparent}}
+#drytoast{position:fixed;top:84px;left:50%;transform:translateX(-50%);z-index:200;background:var(--warn);color:#fff;
+  font:800 18px var(--mono);padding:12px 22px;border-radius:8px;border:2px solid var(--hz);opacity:0;pointer-events:none;transition:opacity .3s}
+#drytoast.show{opacity:1}
+#errtoast{position:fixed;top:140px;left:50%;transform:translateX(-50%);z-index:200;background:#3a1512;color:#FFB4AC;
+  font:800 18px var(--mono);padding:12px 22px;border-radius:8px;border:2px solid var(--warn);opacity:0;pointer-events:none;transition:opacity .3s;max-width:70vw}
+#errtoast.show{opacity:1}
+#rec-edit{display:none;position:fixed;top:18vh;right:470px;z-index:96;background:var(--card);border:1px solid #4A515C;border-top:3px solid var(--hz);border-radius:8px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.6);min-width:360px}
+#rec-edit.open{display:block}
+#rec-edit .re-head{font:800 20px var(--mono);color:var(--hz);margin-bottom:12px}
+#rec-edit .re-grid{display:grid;grid-template-columns:52px 1fr 52px 1fr;gap:8px;align-items:center;margin-bottom:10px}
+.note{font:18px var(--mono);color:#C9CDD3;background:#22261F;padding:6px 8px 6px 12px;margin:8px 0;position:relative;border:1px solid #3A3D33}
+.note::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+  background:repeating-linear-gradient(180deg,var(--hz) 0 7px,var(--hzdark) 7px 14px)}
+.note.red{background:#2A1B19;border-color:#4A2622}
+.note.red::before{background:repeating-linear-gradient(180deg,var(--warn) 0 7px,var(--hzdark) 7px 14px)}
+#twinwrap{position:relative;background:#101216;border:1px solid var(--line);border-radius:6px;overflow:hidden;min-height:320px}
+#twin{width:100%;height:100%;display:block}
+#twinlabel{position:absolute;top:8px;left:10px;font:18px var(--mono);color:var(--muted)}
+#twinstate{position:absolute;bottom:8px;left:10px;font:18px var(--mono);color:var(--ink);background:rgba(16,18,22,.85);border:1px solid var(--line);padding:4px 8px;border-radius:4px;white-space:pre}
+table{width:100%;border-collapse:collapse;font:18px var(--mono)}
+td,th{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+th{color:var(--amber);font-weight:600}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font:700 16px var(--mono);color:#fff}
+.tag.zk1,.tag.zk2{background:var(--zk);color:#08282c}.tag.fr5{background:var(--fr5);color:#12151c}.tag.sys{background:#4A515C}
+/* 8/26 카메라 플로팅 패널 공통: 헤더 드래그=이동 · 우하단 모서리=크기 · ✕=빼기(트윈 헤더 ＋버튼으로 다시 넣기) · ⧉=별창 */
+.campanel{position:absolute;z-index:6;background:rgba(12,14,18,.88);border:1px solid #3A404A;border-radius:4px;padding:4px;user-select:none}
+.campanel .chdr{display:flex;justify-content:space-between;align-items:center;font:700 14px var(--mono);color:var(--muted);padding:0 2px 3px;cursor:move}
+.campanel .chdr button{padding:0 6px;font-size:14px;margin-left:4px;cursor:pointer}
+.campanel img{width:100%;background:#000;border:1px solid #262A31;display:block}
+.campanel .cgrip{position:absolute;right:0;bottom:0;width:26px;height:26px;cursor:nwse-resize;border-right:3px solid var(--amber);border-bottom:3px solid var(--amber);border-radius:0 0 4px 0;opacity:.7}
+.campanel .cgrip:hover{opacity:1}
+#camwrap img{aspect-ratio:16/9;cursor:crosshair}#scamwrap img{aspect-ratio:16/9}
+#cam{width:100%;aspect-ratio:16/9;background:#000;border:1px solid #262A31;cursor:crosshair;display:block}
+#log{height:180px;resize:vertical;overflow:auto;font:18px var(--mono);background:var(--well);color:#B9E3A8;border:1px solid #262A31;padding:6px;white-space:pre-wrap}
+textarea{width:100%;min-height:220px;font:18px var(--mono);border:1px solid #3A404A;border-radius:4px;padding:6px;background:var(--well);color:var(--ink)}
+.step{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:9px 4px;border-bottom:1px dashed var(--line);font:18px var(--mono)}
+.step.running{background:#2A2410;color:var(--amber)}.step.done{color:var(--ok)}.step.fail{color:var(--warn)}
+.right{display:grid;grid-template-rows:1fr auto;gap:12px;min-height:0}
+</style>
+</head>
+<body>
+<header>
+  <h1>ROBOT CONSOLE</h1>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-v="zk1" data-r="zk1">ZK1</button>
+    <button class="tab" data-v="zk2" data-r="zk2">ZK2</button>
+    <button class="tab" data-v="poses">Saved Poses</button>
+    <button class="tab" data-v="settings">Settings</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="seg" id="mode-seg" title="SIM=시뮬레이션만 · REAL=브리지로 실기 구동">
+    <button data-m="sim" class="on">SIM</button><button data-m="real">REAL</button></div>
+  <button class="conn" id="srv-btn" title="클릭 = 브리지(콘솔↔로봇 중계) 연결/재연결. 팀 서버(FMS)는 버튼 없이 자동 발견 — 옆 '서버' 칩으로 확인">
+    <span class="dot sim" id="cdot"></span><span id="ctext">브리지 연결</span></button>
+  <select id="cell-mode" title="셀 실행기 모드 — sim: 로봇 안 건드림(FMS 연동 개발용) / real: 실물 구동" style="width:70px">
+    <option value="sim">sim</option><option value="real">real</option></select>
+  <button id="cell-btn" title="셀 실행기(cell_orchestrator) 시작/정지 — 서버팀이 /cell/execute_task 를 호출하려면 켜져 있어야 함">셀 시작</button>
+  <span id="rchips">
+    <span class="rchip" id="ch-srv" title="팀 서버(셀 오케스트레이터) — /cell/status 1Hz 하트비트">서버</span>
+    <span class="rchip" id="ch-zk1">ZK1</span><span class="rchip" id="ch-zk2">ZK2</span><span class="rchip" id="ch-fr5">FR5</span></span>
+  <button id="unfreeze" title="FR5 동결 해제 — 펜던트(192.168.58.2) 빨간 ⚠ Clear 를 사람이 먼저 확인한 뒤 클릭. 갇힌 스택 정리→재기동→검증 자동(약 2분)" onclick="if(confirm('FR5 동결 해제(스택 재기동)를 실행할까요?\n\n※ 펜던트(192.168.58.2)의 빨간 ⚠ 는 먼저 Clear 되어 있어야 합니다.\n약 2분 걸리며, 완료 전까지 FR5 명령은 실패합니다.'))fetch(state.bridge+'/rescue/fr5',{method:'POST'}).then(r=>r.json()).then(j=>log('sys','동결 해제',JSON.stringify(j))).catch(e=>log('err','동결 해제',e+''))">🧊 동결 해제</button>
+  <button id="estop" title="세 로봇 모두 정지 명령 전송">■ STOP ALL</button>
+</header>
+
+<main>
+<div id="ctrlcol">
+<section class="panel" id="left">
+
+  <!-- ZK1 / ZK2 -->
+  <div class="view active" id="v-zk1"></div>
+  <div class="view" id="v-zk2"></div>
+
+</section>
+
+<!-- FR5 상시 도킹 — ZK와 동시 컨트롤 -->
+<section class="panel" id="dock-fr5">
+  <h2 style="margin-top:0">FR5 · 6축</h2>
+  <div class="inline">
+    <label>Speed %</label><input type="number" id="fr5-speed" value="5" min="1" max="100" style="width:64px">
+    <button onclick="cmd('fr5','speed',{value:+$('fr5-speed').value})">적용</button>
+    <label>Step</label>
+    <div class="seg" id="fr5-step">
+      <button data-s="0.5">0.5</button><button data-s="1" class="on">1</button><button data-s="5">5</button>
+    </div><label>° / mm</label>
+  </div>
+  <div class="inline">
+    <div class="seg" id="fr5-mode"><button data-m="joint" class="on">Joint</button><button data-m="cart">Cartesian</button></div>
+  </div>
+  <div id="fr5-joint">
+    <div class="row" style="font:18px var(--mono);color:var(--muted)"><span></span><span></span><span></span><span>현재각도</span><span>바꿀각도</span><span></span></div>
+    <div id="fr5-jrows"></div>
+  </div>
+  <div id="fr5-cart" style="display:none">
+    <div class="row" style="font:18px var(--mono);color:var(--muted)"><span></span><span></span><span></span><span>현재</span><span>목표</span><span></span></div>
+    <div id="fr5-crows"></div>
+  </div>
+  <h2>CONTROL MODE</h2>
+  <div class="inline">
+    <button class="primary" onclick="if(confirm('⚠ 수동모드 주의\n\n페이로드(0.7kg)는 8/25 등록됨. 그래도 충돌감지가 예민하니\n구조물 근처·뻗은 자세에서는 드래그를 피하세요.\n(충돌 알람 → 통신 동결 이력 8/24·8/25)\n계속할까요?'))cmd('fr5','manual',{on:true})">✋ Manual</button>
+    <button onclick="cmd('fr5','manual',{on:false})">▶ Auto</button>
+    <button class="danger" title="동결(관절상태 멈춤·이동 전부 ABORTED) 시: 펜던트 ⚠ Clear 후 이 버튼 — 스택 자동 재기동(~2분)" onclick="if(confirm('FR5 복구(fr5_rescue.sh)를 실행할까요?\n\n※ 펜던트(192.168.58.2)에 빨간 ⚠ 가 있으면 먼저 Clear!\n스택을 내렸다 올리므로 약 2분 걸립니다.'))fetch(state.bridge+'/rescue/fr5',{method:'POST'}).then(r=>r.json()).then(j=>log('sys','fr5 rescue',JSON.stringify(j))).catch(e=>log('err','fr5 rescue',e+''))">🚑 복구</button>
+    <label>현재</label><span id="fr5-manual" style="font:800 22px var(--mono);color:var(--muted)">자동</span>
+  </div>
+  <h2>그리퍼</h2>
+  <div class="inline">
+    <label>열린 정도</label>
+    <input type="number" id="fr5-grip" min="1" max="100" value="50" style="width:80px;font-size:18px;font-weight:700" title="1~100 입력 후 Enter">
+    <label>현재</label><input readonly id="fr5-gripcur" style="width:60px" value="50">
+    <span id="fr5-gripsrc" style="font:12px var(--mono);color:#888">명령</span>
+    <label title="켜면 유휴 상태에서만 2.5s 간격으로 그리퍼를 실측(8/19 서보 굶김 사고 방지 7중 게이트, 30s 자동만료). 모션 중엔 자동으로 안 읽음."><input type="checkbox" id="fr5-gripwatch"> 실측</label>
+    <label style="color:#888">1~100 · 풀스트로크 ≈11초</label>
+  </div>
+  <div class="inline">
+    <button class="fr5" onclick="cmd('fr5','home')">Home</button>
+    <button class="danger" onclick="cmd('fr5','stop')">Stop</button>
+    <label>연결상태</label><span id="fr5-conn" style="font:18px var(--mono)">—</span>
+  </div>
+  <h2>POSE</h2>
+  <div class="inline">
+    <select id="fr5-posesel" style="min-width:140px"></select>
+    <button onclick="movePose('fr5',$('fr5-posesel').value)">Go Pose</button>
+    <input placeholder="Pose name" id="fr5-posename" style="width:130px">
+    <button class="primary" onclick="savePose('fr5')">Save Pose</button>
+  </div>
+</section>
+</div>
+
+<div class="vsplit" id="split1" title="드래그해서 폭 조절"></div>
+
+<section class="right">
+  <div id="twinwrap">
+    <canvas id="twin"></canvas>
+    <div id="twinlabel">DIGITAL TWIN · drag=move · right-drag/wheel=rotate · empty=camera</div>
+    <div style="position:absolute;top:8px;right:10px;z-index:5;display:flex;gap:8px">
+      <button id="tg-joint" title="켜면 로봇 링크를 잡아끌어 관절을 움직입니다(고스트 미리보기 → 놓으면 실제 이동). 배치 이동은 꺼짐">🖐 관절 드래그</button>
+      <button id="tg-zk1"></button><button id="tg-zk2"></button><button id="tg-conv"></button><button id="tg-cam"></button><button id="tg-scam"></button><button id="tg-rvw"></button><button id="tg-ncam"></button><button id="tg-gcam"></button></div>
+    <div id="twinstate"></div>
+    <div id="camwrap" class="campanel" title="손목캠(D435 :8766) — 클릭=그 점 추적 고정 · 더블클릭=해제">
+      <div class="chdr"><span id="camhdr-t">손목캠 </span><span><button class="c-pop" title="별창으로">⧉</button><button class="c-x" title="빼기">✕</button></span></div>
+      <img id="cam" alt="wrist cam"><div class="cgrip" title="드래그해서 크기 조절"></div>
+    </div>
+    <div id="scamwrap" class="campanel" title="측면 카메라(C270 :8771)">
+      <div class="chdr"><span id="scamhdr-t">측면캠 </span><span><button class="c-pop" title="별창으로">⧉</button><button class="c-x" title="빼기">✕</button></span></div>
+      <img id="scam" alt="side cam"><div class="cgrip" title="드래그해서 크기 조절"></div>
+    </div>
+    <div id="rvwrap" class="campanel" title="랙 관측 뷰(:8774) — 벽 양끝점·중앙점">
+      <div class="chdr"><span id="rvwhdr-t">랙관측 </span><span><button class="c-pop" title="별창으로">⧉</button><button class="c-x" title="빼기">✕</button></span></div>
+      <img id="rvw" alt="rack view"><div class="cgrip" title="드래그해서 크기 조절"></div>
+    </div>
+    <div id="ncamwrap" class="campanel" title="새 카메라(USB /dev/video0 → :8768) — ⟳ = 90° 회전">
+      <div class="chdr"><span id="ncamhdr-t">새카메라 </span><span><button class="c-rot" title="90° 회전">⟳</button><button class="c-pop" title="별창으로">⧉</button><button class="c-x" title="빼기">✕</button></span></div>
+      <img id="ncam" alt="new usb cam"><div class="cgrip" title="드래그해서 크기 조절"></div>
+    </div>
+    <div id="gcamwrap" class="campanel" title="글로벌캠(C270 → 비전팀 factory_view 퍼블리셔 → ROS domain 90 → :8779) — 셀 전체 탑뷰 1280x960">
+      <div class="chdr"><span id="gcamhdr-t">글로벌캠 </span><span><button class="c-pop" title="별창으로">⧉</button><button class="c-x" title="빼기">✕</button></span></div>
+      <img id="gcam" alt="global cam">
+      <div id="grec" style="display:flex;gap:5px;align-items:center;padding:4px 5px;font-size:11px">
+        <button id="grec-go"  style="padding:3px 9px">⏺ 녹화</button>
+        <button id="grec-sv"  style="padding:3px 9px" disabled>💾 저장</button>
+        <button id="grec-rm"  style="padding:3px 9px" disabled>🗑 삭제</button>
+        <span id="grec-st" style="opacity:.75">1920×1440 · 15fps → ~/Videos</span>
+      </div>
+      <div class="cgrip" title="드래그해서 크기 조절"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>LIVE LOG</h2>
+    <div id="log"></div>
+  </div>
+</section>
+
+<div class="vsplit" id="split2" title="드래그해서 폭 조절"></div>
+
+<!-- Recorder 상시 도킹 (SO-ARM 관제탑 Recorder 동일 컨셉: 현재 자세 캡처 → 순차 재생) -->
+<section class="panel" id="dock-report">
+  <!-- ★9/12: 한 콘솔에서 보도록 도킹 탭. 사이클(:8776) / 리코더 중 고른 것이 이 자리에 뜬다. -->
+  <h2 style="margin-top:0;display:flex;align-items:center;gap:8px">
+    <span id="dock-title">사이클</span>
+    <span style="margin-left:auto;display:flex;gap:4px">
+      <button id="dock-tab-cycle" onclick="dockMode('cycle')" title="집 사이클(:8776) — 베이스→랙→파지→운반→정렬→하강">사이클</button>
+      <button id="dock-tab-rec"   onclick="dockMode('rec')"   title="자세 캡처·순차 재생 레코더">리코더</button>
+      <button onclick="dockReload()" title="새로고침">⟳</button>
+    </span></h2>
+  <div id="dock-cycle"><iframe id="cycleframe" style="width:100%;height:640px;border:1px solid var(--line);border-radius:6px;background:#111;display:block"></iframe></div>
+  <div id="dock-rec" style="display:none">
+  <div class="inline"><input id="rec-name" value="Untitled" style="width:130px">
+    <span id="rec-count" style="font:18px var(--mono);color:var(--muted)">0 스텝</span>
+    <select id="rec-list" style="min-width:120px"></select>
+    <button onclick="recLoad()">Load</button>
+    <button class="primary" id="rec-playall" onclick="recPlayAll()" title="1번부터 전체 재생 (Loop 체크 시 반복)">▶ All Play</button></div>
+  <div id="rec-steps"></div>
+  <div class="inline">
+    <button onclick="recAdd('zk1')">＋ ZK1</button>
+    <button onclick="recAdd('zk2')">＋ ZK2</button>
+    <button onclick="recAdd('fr5')">＋ FR5</button>
+    <button onclick="recAddWait()">＋ Wait</button>
+    <input id="rec-wait" type="number" value="1" step="0.5" min="0.1" style="width:64px"><label>초</label></div>
+  <div class="inline">
+    <select id="rec-pose" style="min-width:190px"></select>
+    <button onclick="recAddPose()">＋ Saved Pose</button>
+    <button id="rec-vision" onclick="recAddVision()" disabled
+      title="production_valid=false — 비전 자동파지 미승인(8/17 협의, 고정 티칭이 본선). 브리지가 비전 승인 신호를 주면 자동 해제.">🔒 Vision Pick</button></div>
+  <div class="inline">
+    <button class="primary" id="rec-play" onclick="recStepOnce()" title="선택한 스텝 실행 후 다음 스텝 선택 — 연타로 한 칸씩 진행. 전체 재생은 위 All Play">▶ Play</button>
+    <button class="danger" onclick="scStop()">■ Stop</button>
+    <label style="font:18px var(--mono)"><input type="checkbox" id="rec-loop" style="width:auto"> Loop</label>
+    <button onclick="recMove(-1)">▲ Up</button>
+    <button onclick="recMove(1)">▼ Down</button>
+    <button onclick="recDel()">✕ Delete</button>
+    <button onclick="recNew()">⧉ New</button>
+    <button class="primary" onclick="recSaveAs()">Save</button></div>
+  </div>
+</section>
+</main>
+
+<!-- 모달: 포즈/시나리오/설정 — 로봇 컨트롤을 가리지 않는 별도 창 -->
+<div id="modal-back" onclick="closeModal()"></div>
+<div id="modal">
+  <div id="modal-head"><span id="modal-title"></span><button onclick="closeModal()">✕ 닫기</button></div>
+  <div id="modal-body">
+  <!-- POSES -->
+  <div class="view" id="v-poses">
+    <div class="inline">
+      <label>로봇</label><select id="pose-filter"><option value="">전체</option><option value="zk1">ZK1</option><option value="zk2">ZK2</option><option value="fr5">FR5</option></select>
+      <button onclick="exportJSON('poses')">JSON 내보내기</button>
+      <button onclick="importJSON('poses')">JSON 가져오기</button>
+    </div>
+    <table><thead><tr><th>로봇</th><th>이름</th><th>값</th><th>저장시각</th><th></th></tr></thead><tbody id="pose-tbody"></tbody></table>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="view" id="v-settings">
+    <h2>브리지 연결</h2>
+    <div class="inline">
+      <label>URL</label><input id="bridge-url" value="" style="width:260px">
+      <button onclick="connectBridge()">연결</button>
+      <button onclick="disconnectBridge()">SIM으로</button>
+    </div>
+    <div class="inline">
+      <label>실기(REAL) 명령 허용</label><input type="checkbox" id="allow-real">
+      <label>체크 안 하면 브리지 연결 중에도 명령은 dry_run=true로 전송됨</label>
+    </div>
+    <h2>ZK 링크 길이 (트윈용, mm)</h2>
+    <div class="inline">
+      <label>상완 L1</label><input id="zk-l1" type="number" value="300" style="width:80px">
+      <label>전완 L2</label><input id="zk-l2" type="number" value="300" style="width:80px">
+      <label>베이스 높이</label><input id="zk-h0" type="number" value="120" style="width:80px">
+      <button onclick="applySettings()">적용</button>
+    </div>
+    <div class="note red">ZK 링크 길이는 실측값이 없어 임의 기본값. 트윈 형상만 영향, 명령값엔 무관. zk_profiles.py 또는 실측 후 교체.</div>
+    <h2>ZK 조인트 한계 (°)</h2>
+    <div class="inline">
+      <label>A1</label><input id="lim-a1" value="-190,2" style="width:90px">
+      <label>A2</label><input id="lim-a2" value="-55,2" style="width:90px">
+      <label>A3</label><input id="lim-a3" value="-110,2" style="width:90px">
+    </div>
+    <div class="note">실측 한계(2026-08-06, zk_safety 와 동일). ZK 는 원점 0°가 상한 — 음(−)방향으로만 가동. UI 는 이 범위 밖 목표를 차단.</div>
+    <h2>로봇 배치 (트윈, mm / °)</h2>
+    <div class="inline">
+      <label>ZK1</label><label>x</label><input id="ly-zk1-x" type="number" style="width:80px"><label>z</label><input id="ly-zk1-z" type="number" style="width:80px"><label>회전</label><input id="ly-zk1-yaw" type="number" style="width:70px">
+    </div>
+    <div class="inline">
+      <label>ZK2</label><label>x</label><input id="ly-zk2-x" type="number" style="width:80px"><label>z</label><input id="ly-zk2-z" type="number" style="width:80px"><label>회전</label><input id="ly-zk2-yaw" type="number" style="width:70px">
+    </div>
+    <div class="inline">
+      <label>FR5</label><label>x</label><input id="ly-fr5-x" type="number" style="width:80px"><label>z</label><input id="ly-fr5-z" type="number" style="width:80px"><label>회전</label><input id="ly-fr5-yaw" type="number" style="width:70px">
+    </div>
+    <div class="inline">
+      <label>컨베이어</label><label>x</label><input id="ly-conv-x" type="number" style="width:80px"><label>z</label><input id="ly-conv-z" type="number" style="width:80px"><label>회전</label><input id="ly-conv-yaw" type="number" style="width:70px">
+      <button class="primary" onclick="applySettings()">배치 적용</button>
+    </div>
+    <div class="note">실배치가 바뀌면 여기 좌표만 고치면 트윈이 따라온다(명령값엔 무관). 8/20처럼 하루 두 번 이설돼도 재코딩 불필요.</div>
+    <h2>FR5 트윈 링크 (mm)</h2>
+    <div class="inline"><label>J2 z152 · J3 x-425 · J4 x-395.01 · J5 z102.1 · J6 z102 — 출처: FAIR-INNOVATION/frcobot_ros2 fairino5_v6.urdf (2026-08-24 확인)</label></div>
+    <div class="note">메시는 ./meshes/fr5/ → 없으면 GitHub raw 순으로 로드. file:// 로 열면 fetch가 막히니 <code>python -m http.server</code> 로 띄워서 열 것. 플랜지→그리퍼 끝 100mm, URDF 영점=실기 영점은 미검증 가정.</div>
+    <h2>데이터</h2>
+    <div class="inline">
+      <button onclick="exportJSON('all')">전체 백업(JSON)</button>
+      <button onclick="importJSON('all')">복원</button>
+      <button class="danger" onclick="if(confirm('포즈·시나리오·로그 전부 삭제?')){localStorage.clear();location.reload()}">초기화</button>
+    </div>
+    <div class="note">저장은 브라우저 localStorage. 미리보기 창에서는 저장이 안 되니 파일을 내려받아 로컬에서 열 것. 중요 데이터는 JSON 백업 병행.</div>
+  </div>
+  </div>
+</div>
+
+
+<script>
+/* ---------- 유틸 ---------- */
+const $=id=>document.getElementById(id);
+const stamp=()=>new Date().toISOString().replace(/[:T]/g,'-').slice(0,16);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const store={get(k,d){try{const v=localStorage.getItem('bf2.'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('bf2.'+k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- 상태 ---------- */
+const state={
+  mode:'sim', bridge:null, allowReal:false,
+  robots:{
+    zk1:{joints:[0,0,0],target:[0,0,0],speed:5,vac:false,conn:false},
+    zk2:{joints:[0,0,0],target:[0,0,0],speed:5,vac:false,conn:false},
+    fr5:{joints:[0,-90,90,-90,-90,0],target:[0,-90,90,-90,-90,0],tcp:[0,0,0,0,0,0],grip:50,speed:5,conn:false,manual:false}
+  },
+  home:{zk1:[0,0,0],zk2:[0,0,0],fr5:[0,-90,90,-90,-90,0]},
+  poses:store.get('poses',[]), scenarios:store.get('scenarios',{}), log:store.get('log',[]),
+  fr5step:1, fr5mode:'joint', zkstep:{zk1:5,zk2:5}, running:false, abort:false,
+  cfg:store.get('cfg',{l1:300,l2:300,h0:120,lim:{a1:[-190,2],a2:[-55,2],a3:[-110,2]}})   // 리밋=zk_safety 실측(8/6)
+};
+/* 로봇 배치(트윈) — 실배치가 바뀌는 프로젝트라 설정에서 조정 가능. mm / ° */
+const DEF_LAYOUT={zk1:{x:-600,z:150,yaw:0,on:true},zk2:{x:-100,z:300,yaw:0,on:true},fr5:{x:150,z:-350,yaw:0},conv:{x:-350,z:120,yaw:0,on:false}};
+state.cfg.layout=Object.assign({},DEF_LAYOUT,state.cfg.layout||{});
+// 구버전 임의 리밋(-90,90 등) 저장분 → 실측 리밋으로 자동 교체 (ZK 는 원점 0 이 상한, 음수 방향만 가동)
+if(JSON.stringify(state.cfg.lim)===JSON.stringify({a1:[-90,90],a2:[-30,90],a3:[-30,90]}))
+  state.cfg.lim={a1:[-190,2],a2:[-55,2],a3:[-110,2]};
+for(const k of['zk1','zk2'])if(state.cfg.layout[k].on===undefined)state.cfg.layout[k].on=true; // 구버전 저장분 보정
+
+/* ---------- 로그 ---------- */
+function log(robot,msg,result='ok'){
+  const e={t:new Date().toISOString(),robot,msg,result,mode:state.mode};
+  state.log.push(e); if(state.log.length>2000)state.log.shift(); store.set('log',state.log);
+  const line=`${e.t.slice(11,19)} [${robot.toUpperCase()}] ${msg} → ${result}\n`;
+  $('log').textContent+=line; $('log').scrollTop=1e9;
+}
+function clearLog(){state.log=[];store.set('log',[]);$('log').textContent=''}
+
+/* ---------- 명령 전송 ---------- */
+async function cmd(robot,action,args={}){
+  const r=state.robots[robot];
+  // 안전 검사 (UI 측)
+  if(robot.startsWith('zk')&&(action==='move'||action==='jog')){
+    const tgt=action==='move'?args.joints:r.joints.map((v,i)=>i===args.axis?v+args.delta:v);
+    const L=state.cfg.lim;const lims=[L.a1,L.a2,L.a3];
+    for(let i=0;i<3;i++)if(tgt[i]<lims[i][0]||tgt[i]>lims[i][1]){log(robot,`${action} ${JSON.stringify(args)}`,`차단: A${i+1} 한계 ${lims[i]} 밖`);return false}
+  }
+  if(state.mode==='bridge'){
+    const dry=!state.allowReal;
+    if(dry&&['jog','move','move_tcp','cart_jog','home','gripper','vacuum','lift'].includes(action))dryWarn();
+    try{
+      const res=await fetch(`${state.bridge}/${robot}/${action}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...args,dry_run:dry})});
+      const j=await res.json();
+      log(robot,`${action} ${JSON.stringify(args)}${dry?' (dry)':''}`,res.ok?(j.result||'ok'):`HTTP ${res.status} ${j.detail||''}`);
+      if(!res.ok)errToast(`${robot.toUpperCase()} ${action}: ${j.detail||('HTTP '+res.status)}`);
+      if(res.ok&&!dry){const rr=state.robots[robot];
+        if(action==='move')rr.target=args.joints.map(Number);
+        else if(action==='jog'){rr.target=rr.joints.slice();rr.target[args.axis]+=args.delta}
+        else if(action==='home')rr.target=state.home[robot].slice();
+        else if(action==='stop')rr.target=rr.joints.slice()}
+      return res.ok;
+    }catch(e){log(robot,`${action}`,`브리지 오류 ${e.message}`);return false}
+  }
+  // SIM
+  return simExec(robot,action,args);
+}
+async function simExec(robot,action,a){
+  const r=state.robots[robot];
+  switch(action){
+    case 'jog': r.target[a.axis]=r.joints[a.axis]+a.delta; break;
+    case 'move': r.target=a.joints.slice(); break;
+    case 'home': r.target=state.home[robot].slice(); break;
+    case 'stop': r.target=r.joints.slice(); state.abort=true; break;
+    case 'speed': r.speed=a.value; break;
+    case 'gripper': r.grip=a.pos; break;
+    case 'vacuum': r.vac=!!a.on; break;
+    case 'lift': {
+      if(!robot.startsWith('zk'))return false;
+      const rad=Math.PI/180;
+      const fk=(x,y)=>[200*Math.sin((7.741-x)*rad)+200*Math.cos((-18.932-y)*rad),200*Math.cos((7.741-x)*rad)-200*Math.sin((-18.932-y)*rad)];
+      const [rr,z0]=fk(r.joints[1],r.joints[2]),zz=z0+a.mm;
+      let a2=r.joints[1],a3=r.joints[2];
+      for(let n=0;n<60;n++){
+        const [cr,cz]=fk(a2,a3),[r2,z2]=fk(a2+.001,a3),[r3,z3]=fk(a2,a3+.001),er=rr-cr,ez=zz-cz;
+        if(Math.abs(er)<.02&&Math.abs(ez)<.02)break;
+        const j11=(r2-cr)/.001,j12=(r3-cr)/.001,j21=(z2-cz)/.001,j22=(z3-cz)/.001,det=j11*j22-j12*j21;
+        a2+=(j22*er-j12*ez)/det;a3+=(-j21*er+j11*ez)/det;
+      }
+      r.target[1]=a2;r.target[2]=a3;break;
+    }
+    case 'manual': r.manual=!!a.on; break;
+    case 'cart_jog': log(robot,'cart_jog','SIM에선 카테시안 IK 미구현 — 브리지 필요');return false;
+  }
+  log(robot,`${action} ${JSON.stringify(a)}`,'sim');
+  if(['jog','move','home','lift'].includes(action)) await waitReach(robot);
+  return !state.abort;
+}
+function waitReach(robot){return new Promise(res=>{const r=state.robots[robot];const t=setInterval(()=>{if(state.abort||r.joints.every((v,i)=>Math.abs(v-r.target[i])<0.05)){clearInterval(t);res()}},50)})}
+
+/* SIM 적분기: 속도% → deg/s (임의 스케일 60°/s @100%) */
+setInterval(()=>{for(const k in state.robots){const r=state.robots[k];const v=0.6*r.speed*0.05;r.joints=r.joints.map((j,i)=>{const d=r.target[i]-j;return Math.abs(d)<v?r.target[i]:j+Math.sign(d)*v})}
+  if(state.mode==='sim')refreshValues()},50);
+
+/* ---------- 브리지 ---------- */
+let pollTimer=null;
+async function connectBridge(quiet){
+  const url=$('bridge-url').value.replace(/\/$/,'');
+  try{const res=await fetch(url+'/status');const j=await res.json();
+    state.mode='bridge';state.bridge=url;$('cdot').className='dot on';$('ctext').textContent='브리지 '+url+(state.allowReal?' · 실기':' · 드라이(검증만)');
+    log('sys','bridge connect '+url,`ok robots=${Object.keys(j.robots||{}).join(',')}`);
+    /* 8/26: 고스트용 홈 자세는 브리지(poses.json)가 정본 — 하드코딩 [0,-90,90,-90,-90,0] 대체 */
+    try{const h=await(await fetch(url+'/homes')).json();if(h.fr5){state.home.fr5=h.fr5;log('sys','home','fr5 홈 = '+h.fr5.map(v=>v.toFixed(1)).join(', '))}}catch(e){}
+    pollTimer=setInterval(pollStatus,200);try{setSrvUI()}catch(e){}
+  }catch(e){log('sys','bridge connect '+url,'실패 '+e.message);if(!quiet)alert('브리지 응답 없음. bridge_server.py 실행 여부/URL 확인.')}
+}
+function disconnectBridge(){clearInterval(pollTimer);state.mode='sim';state.bridge=null;$('cdot').className='dot sim';$('ctext').textContent='시뮬 (브리지 미연결)';for(const k in state.robots)state.robots[k].conn=false;log('sys','sim mode','ok');try{setModeUI();setSrvUI();$('ctext').textContent='브리지 연결'}catch(e){}}
+async function pollStatus(){try{const j=await (await fetch(state.bridge+'/status')).json();state.server=j.server;
+  for(const k in j.robots){const s=j.robots[k],r=state.robots[k];r.conn=!!s.connected;if(s.joints)r.joints=s.joints;if(s.tcp)r.tcp=s.tcp;if(s.gripper!=null)r.grip=s.gripper;if('gripper_real' in s){r.gripReal=s.gripper_real;r.gripRealAge=s.gripper_real_age;r.gripWatching=s.grip_watching}if('frozen' in s){r.frozen=s.frozen;r.freezeKind=s.freeze_kind}if(s.vacuum!=null)r.vac=s.vacuum;if(s.manual!=null)r.manual=s.manual;r.busy=!!s.busy;if(s.busy===false)r.target=r.joints.slice();
+    if(s.err&&s.err.t>(r._errT||0)){r._errT=s.err.t;errToast(`${k.toUpperCase()}: ${s.err.msg}`);log(k,'⛔ 실행 오류',s.err.msg)}}  // 유휴=목표 동기화(낡은 고스트 방지)
+  const ve=!!(j.vision&&j.vision.production_valid);
+  if(ve!==VISION.enabled){VISION.enabled=ve;updateVisionBtn();recRender();log('sys','vision',ve?'승인 — 비전 파지 해제':'잠금')}
+  try{setSrvUI()}catch(e){}
+  refreshValues()}catch(e){}}
+
+/* ---------- ZK 패널 생성 ---------- */
+function buildZK(id){
+  const v=$('v-'+id);
+  v.innerHTML=`
+  <h2 style="margin-top:0">${id.toUpperCase()} · 3축</h2>
+  <div class="inline"><label>Speed %</label><input type="number" id="${id}-speed" value="5" min="1" max="100" style="width:64px">
+    <button onclick="cmd('${id}','speed',{value:+$('${id}-speed').value})">적용</button>
+    <label>Step</label><div class="seg" id="${id}-step"><button data-s="1">1°</button><button data-s="5" class="on">5°</button><button data-s="10">10°</button></div></div>
+  <div class="row" style="font:18px var(--mono);color:var(--muted)"><span></span><span></span><span></span><span>현재각도</span><span>원하는각도</span><span></span></div>
+  ${[1,2,3].map(i=>`<div class="row"><span class="ax">A${i}</span>
+    <button class="pm" id="${id}-m${i}" onclick="cmd('${id}','jog',{axis:${i-1},delta:-state.zkstep.${id}})">−</button>
+    <button class="pm" id="${id}-p${i}" onclick="cmd('${id}','jog',{axis:${i-1},delta:state.zkstep.${id}})">＋</button>
+    <input readonly class="cur" id="${id}-cur${i}" value="0.00">
+    <input type="number" step="0.1" id="${id}-tgt${i}" placeholder="°">
+    <button onclick="zkMoveOne('${id}',${i-1})">이동</button></div>`).join('')}
+  <div class="inline"><button class="zk" onclick="zkMoveAll('${id}')">Move All 3</button>
+    <button class="zk" onclick="cmd('${id}','home')">Home</button>
+    <button class="danger" onclick="cmd('${id}','stop')">Stop</button>
+    <label>연결상태</label><span id="${id}-conn" style="font:18px var(--mono)">—</span></div>
+  <h2>VACUUM</h2>
+  <div class="inline">
+    <button class="primary" onclick="cmd('${id}','vacuum',{on:true})">● Vacuum ON</button>
+    <button onclick="cmd('${id}','vacuum',{on:false})">○ Release</button>
+    <label>상태</label><span id="${id}-vac" style="font:800 22px var(--mono)">OFF</span>
+    <label>해제 시 밸브 1초 블로우 후 닫힘</label>
+  </div>
+  <h2>VERTICAL LIFT</h2>
+  <div class="inline">
+    <label>이동량 mm</label><input type="number" id="${id}-lift" value="10" min="1" max="50" step="1" style="width:90px">
+    <button class="zk" onclick="zkLift('${id}',1)">▲ Up</button>
+    <button onclick="zkLift('${id}',-1)">▼ Down</button>
+  </div>
+  <h2>POSE</h2>
+  <div class="inline"><select id="${id}-posesel" style="min-width:140px"></select><button onclick="movePose('${id}',$('${id}-posesel').value)">Go Pose</button>
+    <input placeholder="Pose name" id="${id}-posename" style="width:130px"><button class="primary" onclick="savePose('${id}')">Save Pose</button></div>
+`;
+  v.querySelectorAll(`#${id}-step button`).forEach(b=>b.onclick=()=>{v.querySelectorAll(`#${id}-step button`).forEach(x=>x.classList.remove('on'));b.classList.add('on');state.zkstep[id]=+b.dataset.s});
+  [1,2,3].forEach(i=>{const el=$(`${id}-tgt${i}`);if(el)el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();zkMoveOne(id,i-1)}}});
+}
+function zkMoveOne(id,i){const r=state.robots[id];const t=r.joints.slice();const v=parseFloat($(`${id}-tgt${i+1}`).value);if(isNaN(v))return;t[i]=v;cmd(id,'move',{joints:t})}
+function zkMoveAll(id){const r=state.robots[id];const t=r.joints.map((j,i)=>{const v=parseFloat($(`${id}-tgt${i+1}`).value);return isNaN(v)?j:v});cmd(id,'move',{joints:t})}
+function zkLift(id,dir){
+  const v=Math.abs(+$(`${id}-lift`).value||0);
+  if(v<1||v>50)return alert('리프트 이동량은 1~50mm로 입력하세요.');
+  if(state.mode==='bridge'&&state.allowReal&&!confirm(`${id.toUpperCase()} 수직 ${dir>0?'상승':'하강'} ${v}mm\\n흡착물과 이동 경로의 간섭이 없는지 확인했습니까?`))return;
+  cmd(id,'lift',{mm:dir*v});
+}
+
+/* ---------- FR5 패널 ---------- */
+function buildFR5(){
+  $('fr5-jrows').innerHTML=[1,2,3,4,5,6].map(i=>`<div class="row"><span class="ax">J${i}</span>
+    <button class="pm" onclick="cmd('fr5','jog',{axis:${i-1},delta:-state.fr5step})">−</button>
+    <button class="pm" onclick="cmd('fr5','jog',{axis:${i-1},delta:state.fr5step})">＋</button>
+    <input readonly class="cur" id="fr5-cur${i}"><input type="number" step="0.1" id="fr5-tgt${i}" placeholder="°">
+    <button onclick="fr5MoveOne(${i-1})">이동</button></div>`).join('')+
+    `<div class="inline"><button class="fr5" onclick="fr5MoveAll()">Move All 6 (MoveJ)</button></div>`;
+  $('fr5-crows').innerHTML=['X','Y','Z','RX','RY','RZ'].map((n,i)=>`<div class="row"><span class="ax">${n}</span>
+    <button class="pm" onclick="cmd('fr5','cart_jog',{axis:${i},delta:-state.fr5step})">−</button>
+    <button class="pm" onclick="cmd('fr5','cart_jog',{axis:${i},delta:state.fr5step})">＋</button>
+    <input readonly class="cur" id="fr5-ccur${i}"><input type="number" step="0.1" id="fr5-ctgt${i}">
+    <button onclick="fr5CartOne(${i})">이동</button></div>`).join('')+
+    `<div class="inline"><button class="fr5" onclick="fr5MoveCart()">TCP 목표로 이동 (MoveL)</button></div>`;
+  $('fr5-step').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('fr5-step').querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');state.fr5step=+b.dataset.s});
+  $('fr5-mode').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('fr5-mode').querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');state.fr5mode=b.dataset.m;$('fr5-joint').style.display=state.fr5mode==='joint'?'':'none';$('fr5-cart').style.display=state.fr5mode==='cart'?'':'none'});
+  /* 목표 입력칸에서 Enter = 그 축 바로 이동 (행별 이동 버튼과 동일) */
+  for(let i=1;i<=6;i++)bindEnter(`fr5-tgt${i}`,()=>fr5MoveOne(i-1));
+  for(let i=0;i<6;i++)bindEnter(`fr5-ctgt${i}`,()=>fr5CartOne(i));
+  const sendGrip=()=>{const v=clamp(Math.round(+$('fr5-grip').value||0),1,100);$('fr5-grip').value=v;if(v!==state.robots.fr5.grip)cmd('fr5','gripper',{pos:v})};
+  // 8/27 그리퍼 실측 토글: 켜면 12s 마다 grip_watch 연장(브리지가 유휴에서만 2.5s 간격 실측). 끄면 폴링 안 함.
+  let gripWatchTimer=null;
+  const gwCb=$('fr5-gripwatch');
+  if(gwCb)gwCb.onchange=()=>{
+    if(gripWatchTimer){clearInterval(gripWatchTimer);gripWatchTimer=null}
+    if(gwCb.checked){
+      if(state.mode==='sim'){log('sys','grip watch','시뮬 모드 — 실측 불가');gwCb.checked=false;return}
+      const ping=()=>cmd('fr5','grip_watch',{sec:30});ping();
+      gripWatchTimer=setInterval(ping,12000);
+      log('sys','grip watch','실측 ON — 유휴에서만 2.5s 간격(서보 보호)');
+    }else log('sys','grip watch','실측 OFF');
+  };
+  $('fr5-grip').onchange=sendGrip;$('fr5-grip').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();sendGrip()}};
+}
+function fr5MoveOne(i){const t=state.robots.fr5.joints.slice();const v=parseFloat($(`fr5-tgt${i+1}`).value);if(isNaN(v))return;t[i]=v;cmd('fr5','move',{joints:t})}
+function fr5MoveAll(){const t=state.robots.fr5.joints.map((j,i)=>{const v=parseFloat($(`fr5-tgt${i+1}`).value);return isNaN(v)?j:v});cmd('fr5','move',{joints:t})}
+/* 8/26 사고: 페이지 새로고침 직후 status 수신 전(tcp 전부 0) 에 이동 → move_tcp [0,0,0,0,0,0] 원점행 명령.
+   빈 칸은 "현재 TCP 유지"인데 그 현재값이 아직 없으면 보내지 않는다. */
+function fr5TcpReady(){const t=state.robots.fr5.tcp;if(!t||t.every(v=>Math.abs(+v)<1e-6)){log('err','fr5 cart','현재 TCP 미수신(0,0,0) — 1초 뒤 다시 누르세요');return false}return true}
+function fr5MoveCart(){if(!fr5TcpReady())return;const t=state.robots.fr5.tcp.map((j,i)=>{const v=parseFloat($(`fr5-ctgt${i}`).value);return isNaN(v)?j:v});cmd('fr5','move_tcp',{tcp:t})}
+function fr5CartOne(i){const v=parseFloat($(`fr5-ctgt${i}`).value);if(isNaN(v))return;if(!fr5TcpReady())return;const t=state.robots.fr5.tcp.slice();t[i]=v;cmd('fr5','move_tcp',{tcp:t})}
+let _errToastT=0;
+function errToast(msg){ /* 명령 거부(리밋·BUSY 등)를 화면에 크게 — 로그만으론 놓친다 */
+  if(Date.now()-_errToastT<1500)return;_errToastT=Date.now();
+  let t=$('errtoast');if(!t){t=document.createElement('div');t.id='errtoast';document.body.appendChild(t)}
+  t.textContent='⛔ '+msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
+let _dryWarnT=0;
+function dryWarn(){ /* DRY 로 전송됨을 크게 알림 — 새로고침마다 REAL 이 꺼지는 걸 매번 놓침 */
+  const seg=$('mode-seg');seg.classList.add('pulse');setTimeout(()=>seg.classList.remove('pulse'),2500);
+  if(Date.now()-_dryWarnT<4000)return;_dryWarnT=Date.now();
+  let t=$('drytoast');if(!t){t=document.createElement('div');t.id='drytoast';document.body.appendChild(t)}
+  t.textContent='⚠ DRY 모드 — 검증만 됨. 실물을 움직이려면 상단 REAL 을 켜세요';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
+function bindEnter(id,fn){const el=$(id);if(el)el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();fn()}}}
+
+/* ---------- 값 갱신 ---------- */
+function refreshValues(){
+  for(const id of['zk1','zk2']){const r=state.robots[id];for(let i=0;i<3;i++)$(`${id}-cur${i+1}`).value=r.joints[i].toFixed(2);const vs=$(`${id}-vac`);vs.textContent=r.vac?'ON':'OFF';vs.style.color=r.vac?'var(--hz)':'var(--muted)';
+    const cn=$(`${id}-conn`);cn.textContent=state.mode==='sim'?'시뮬':(r.busy?'⚙ 동작중…':(r.conn?'연결됨':'끊김'));cn.style.color=r.busy?'var(--hz)':'';
+    const lims=[state.cfg.lim.a1,state.cfg.lim.a2,state.cfg.lim.a3];
+    for(let i=0;i<3;i++){const st=state.zkstep[id];
+      const p=$(`${id}-p${i+1}`),m=$(`${id}-m${i+1}`);
+      if(p){p.disabled=r.joints[i]+st>lims[i][1];p.title=p.disabled?`상한 ${lims[i][1]}° — ZK 는 0°에서 음(−)방향으로만 갑니다`:''}
+      if(m){m.disabled=r.joints[i]-st<lims[i][0];m.title=m.disabled?`하한 ${lims[i][0]}°`:''}}}
+  const f=state.robots.fr5;for(let i=0;i<6;i++)$(`fr5-cur${i+1}`).value=f.joints[i].toFixed(2);
+  if(state.mode==='sim')f.tcp=fk(f.joints);for(let i=0;i<6;i++)$(`fr5-ccur${i}`).value=f.tcp[i].toFixed(1);
+  $('fr5-conn').textContent=state.mode==='sim'?'시뮬':(f.conn?'연결됨':'끊김');(function(){const gc=$('fr5-gripcur'),gs=$('fr5-gripsrc');
+  if(f.gripReal!=null){gc.value=f.gripReal;gs.textContent='실측'+(f.gripRealAge!=null?` ${f.gripRealAge}s전`:'');gs.style.color=(f.gripRealAge!=null&&f.gripRealAge<5)?'#3a3':'#c80'}
+  else{gc.value=f.grip;gs.textContent='명령';gs.style.color='#888'}
+  const cb=$('fr5-gripwatch');if(cb&&cb.checked&&!f.gripWatching&&state.mode!=='sim')gs.textContent+=' (대기)';})();
+  const fm=$('fr5-manual');fm.textContent=f.manual?'수동':'자동';fm.style.color=f.manual?'var(--hz)':'var(--muted)';
+  $('twinstate').textContent=`ZK1 ${state.robots.zk1.joints.map(v=>v.toFixed(1)).join(' ')}   ZK2 ${state.robots.zk2.joints.map(v=>v.toFixed(1)).join(' ')}\nFR5 ${f.joints.map(v=>v.toFixed(1)).join(' ')}   그리퍼 ${f.grip}`;
+  updateTwin();
+}
+
+/* ---------- 포즈 ---------- */
+function savePose(robot){const name=$(robot+'-posename').value.trim();if(!name)return alert('Pose 이름 입력');
+  const r=state.robots[robot];const p={robot,name,joints:r.joints.map(v=>+v.toFixed(3)),tcp:robot==='fr5'?r.tcp.map(v=>+v.toFixed(2)):null,grip:robot==='fr5'?r.grip:null,vac:robot!=='fr5'?r.vac:null,t:new Date().toISOString(),mode:state.mode};
+  const i=state.poses.findIndex(x=>x.robot===robot&&x.name===name);if(i>=0){if(!confirm(`'${name}' 덮어쓰기?`))return;state.poses[i]=p}else state.poses.push(p);
+  store.set('poses',state.poses);log(robot,`pose save '${name}' ${JSON.stringify(p.joints)}`,state.mode==='sim'?'sim값 저장(실기 아님)':'ok');renderPoses()}
+function movePose(robot,name){const p=state.poses.find(x=>x.robot===robot&&x.name===name);if(!p)return;return cmd(robot,'move',{joints:p.joints})}
+function delPose(i){state.poses.splice(i,1);store.set('poses',state.poses);renderPoses()}
+function renderPoses(){
+  const f=$('pose-filter').value;
+  $('pose-tbody').innerHTML=state.poses.map((p,i)=>(f&&p.robot!==f)?'':`<tr><td><span class="tag ${p.robot}">${p.robot.toUpperCase()}</span></td><td>${p.name}${p.mode==='sim'?' <span style="color:var(--amber)">sim</span>':''}</td><td>${p.joints.join(', ')}${p.grip!=null?` · 그리퍼 ${p.grip}`:''}</td><td>${((p.t||p.saved||'')+'').slice(5,16).replace('T',' ')}</td><td><button onclick="movePose('${p.robot}','${p.name}')">이동</button> <button onclick="delPose(${i})">삭제</button></td></tr>`).join('')||'<tr><td colspan=5 style="color:var(--muted)">저장된 포즈 없음. 각 로봇 탭에서 자세 저장.</td></tr>';
+  for(const id of['zk1','zk2','fr5']){const s=$(id+'-posesel');s.innerHTML=state.poses.filter(p=>p.robot===id).map(p=>`<option>${p.name}</option>`).join('')||'<option value="">(없음)</option>'}
+  const rp=$('rec-pose');if(rp)rp.innerHTML=state.poses.map((p,i)=>`<option value="${i}">${p.robot.toUpperCase()}:${p.name}</option>`).join('')||'<option value="">(포즈 없음)</option>';
+}
+
+/* ---------- 전체 정지 ---------- */
+function scStop(){state.abort=true;for(const k of['zk1','zk2','fr5'])cmd(k,'stop')}
+$('estop').onclick=scStop;
+
+/* ---------- 비전 파지 (잠금) ----------
+   8/17 협의: production_valid=false 인 동안 비전 자동파지 금지 — 고정 티칭이 본선.
+   해제 경로: 브리지 /status 가 vision:{production_valid:true} 를 주면 자동 활성화.
+   실행(관측→검출→파지)은 셀 오케스트레이터 경유 예정 — 콘솔은 트리거만. */
+const VISION={enabled:false};
+function updateVisionBtn(){const b=$('rec-vision');b.disabled=!VISION.enabled;
+  b.textContent=(VISION.enabled?'＋ ':'🔒 ')+'Vision Pick'}
+function recAddVision(){if(!VISION.enabled){log('sys','vision step','잠금 — production_valid=false');return}
+  const at=rec.sel>=0?rec.sel+1:rec.steps.length;
+  rec.steps.splice(at,0,{t:'vision',robot:'fr5'});rec.sel=at;recRender()}
+
+/* ---------- Recorder (SO-ARM 관제탑 Recorder 동일 컨셉) ---------- */
+const rec={steps:store.get('rec_steps',[]),sel:-1,cur:-1};
+const recDB=()=>store.get('recordings',{});
+const DOT_KO={blue:'파랑',green:'초록',red:'빨강',yellow:'노랑'};
+function recFmt(s){if(s.t==='wait')return `대기 ${s.sec}초`;
+  if(s.t==='dot')return `FR5 도트 파지 [${DOT_KO[s.kind]||s.kind}] z${s.pz} ${s.auto?'자동하강':'수동확인'}${s.gp?' ·파지정지':''}`;
+  if(s.t==='dotplace')return `FR5 도트 place [${DOT_KO[s.kind]||s.kind}] 호버 정지 → [▶ 삽입] 필수`;
+  if(s.t==='vision')return `FR5 비전 파지 (OBSERVE→검출→파지)${VISION.enabled?'':' 🔒'}`;
+  const ex=s.robot==='fr5'?`그리퍼 ${s.grip}`:`흡착 ${s.vac?'ON':'OFF'}`;
+  const nm=s.name?`'${s.name}' `:'';
+  const tcp=s.tcp?`  TCP(${s.tcp.slice(0,3).map(v=>v.toFixed(0)).join(',')})`:'';
+  return `${s.robot.toUpperCase()} ${nm}(${s.joints.map(v=>v.toFixed(1)).join(', ')}) ${ex}${tcp}`}
+function recRender(){$('rec-steps').innerHTML=rec.steps.map((s,i)=>
+  `<div class="step${i===rec.sel?' sel':''}${i===rec.cur?' running':''}" onclick="rec.sel=${i};recRender()" ondblclick="recEdit(${i})" title="더블클릭=수정"><span>${i+1}</span><span>${recFmt(s)}</span><span></span></div>`).join('');
+  $('rec-count').textContent=rec.steps.length+' 스텝';store.set('rec_steps',rec.steps)}
+/* 스텝 더블클릭 편집기 */
+function recEdit(i){const s=rec.steps[i];if(!s)return;
+  if(s.t==='vision'){log('sys','step edit','비전 스텝은 수정할 값이 없음');return}
+  if(s.t==='dotplace'){
+    const k=prompt('색 (blue/green/red/yellow)',s.kind);if(k===null)return;
+    if(DOT_KO[k])s.kind=k;recRender();return}
+  if(s.t==='dot'){
+    const k=prompt('색 (blue/green/red/yellow)',s.kind);if(k===null)return;
+    if(DOT_KO[k])s.kind=k;
+    const z=prompt('정지 높이 z (mm)',s.pz);if(z!==null&&+z)s.pz=+z;
+    s.auto=confirm('z'+s.pz+' 에서 자동으로 하강할까요? (취소 = [▶ 하강] 수동 확인)');
+    recRender();return}
+  if(state.running){log('sys','step edit','재생 중엔 수정 불가');return}
+  rec.sel=i;recRender();
+  let ed=$('rec-edit');if(!ed){ed=document.createElement('div');ed.id='rec-edit';document.body.appendChild(ed)}
+  const jn=s.t==='pose'?(s.robot==='fr5'?['J1','J2','J3','J4','J5','J6']:['A1','A2','A3']):[];
+  ed.innerHTML=`<div class="re-head">스텝 ${i+1} 수정 — ${s.t==='wait'?'대기':s.robot.toUpperCase()+(s.name?` '${s.name}'`:'')}</div>`+
+   (s.t==='wait'
+     ?`<div class="inline"><label>대기</label><input id="re-sec" type="number" step="0.5" min="0.1" value="${s.sec}" style="width:90px"><label>초</label></div>`
+     :`<div class="re-grid">${jn.map((n,k)=>`<label>${n}</label><input id="re-j${k}" type="number" step="0.1" value="${s.joints[k]}">`).join('')}</div>`+
+      (s.robot==='fr5'
+        ?`<div class="inline"><label>그리퍼</label><input id="re-grip" type="number" min="0" max="100" value="${s.grip!=null?s.grip:0}" style="width:80px"></div>`
+        :`<div class="inline"><label>흡착</label><select id="re-vac" style="width:100px"><option value="1"${s.vac?' selected':''}>ON</option><option value="0"${!s.vac?' selected':''}>OFF</option></select></div>`)+
+      `<div class="inline"><label>이름</label><input id="re-name" value="${s.name||''}" placeholder="(선택)" style="width:170px"></div>`+
+      `<div class="inline"><button onclick="recEditNow(${i})">지금 로봇 자세로 교체</button></div>`)+
+   `<div class="inline"><button class="primary" onclick="recEditSave(${i})">Save</button><button onclick="recEditClose()">취소</button></div>`;
+  ed.classList.add('open')}
+function recEditClose(){const ed=$('rec-edit');if(ed)ed.classList.remove('open')}
+function recEditNow(i){const s=rec.steps[i];const r=state.robots[s.robot];
+  s.joints=r.joints.map(v=>+v.toFixed(2));
+  if(s.robot==='fr5'){s.grip=r.grip;s.tcp=r.tcp.map(v=>+(+v).toFixed(1))}else s.vac=r.vac;
+  delete s.name;recRender();recEdit(i)}
+function recEditSave(i){const s=rec.steps[i];
+  if(s.t==='wait'){s.sec=Math.max(0.1,+$('re-sec').value||1)}
+  else{const nj=[];
+    for(let k=0;k<s.joints.length;k++){const v=parseFloat($(`re-j${k}`).value);
+      if(isNaN(v)){log('sys','step edit',`${k+1}번째 값이 숫자가 아님`);return}nj.push(+v.toFixed(2))}
+    if(JSON.stringify(nj)!==JSON.stringify(s.joints)){s.joints=nj;delete s.tcp} // 값 바꾸면 TCP 무효(이름은 이름칸에서 관리)
+    if(s.robot==='fr5')s.grip=clamp(Math.round(+$('re-grip').value||0),0,100);
+    else s.vac=$('re-vac').value==='1';
+    const nm=$('re-name').value.trim();if(nm)s.name=nm;else delete s.name}
+  recEditClose();recRender();log('sys',`recorder 스텝 ${i+1} 수정`,'ok')}
+async function recAdd(robot){const r=state.robots[robot];
+  if(robot==='fr5'&&state.mode==='bridge'){
+    /* 캡처 순간 그리퍼 1회 실측(8/25) — 브리지는 평소 "명령값"만 추적(연속 폴링은
+       8/19 ServoJ 굶김 금지)이라, 캡처 때만 GetGripperCurPosition 을 읽어 최신화 */
+    try{const j=await(await fetch(state.bridge+'/fr5/grip_read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dry_run:!state.allowReal})})).json();
+      if(typeof j.result==='number'){r.grip=j.result;$('fr5-gripcur').value=j.result}}catch(e){}}
+  const s={t:'pose',robot,joints:r.joints.map(v=>+v.toFixed(2))};
+  if(robot==='fr5'){s.grip=r.grip;s.tcp=r.tcp.map(v=>+(+v).toFixed(1))} // TCP 병기(표시·기록용 — 실행은 조인트)
+  else s.vac=r.vac;
+  const at=rec.sel>=0?rec.sel+1:rec.steps.length;rec.steps.splice(at,0,s);rec.sel=at;recRender()}
+function recAddPose(){const p=state.poses[+$('rec-pose').value];if(!p)return;
+  const s={t:'pose',robot:p.robot,name:p.name,joints:p.joints.slice()};
+  if(p.robot==='fr5')s.grip=p.grip!=null?p.grip:state.robots.fr5.grip;else s.vac=state.robots[p.robot].vac;
+  const at=rec.sel>=0?rec.sel+1:rec.steps.length;rec.steps.splice(at,0,s);rec.sel=at;recRender()}
+/* 8/27 도트 파지 스텝 — 오늘 완성한 dot_pick 파이프라인을 Recorder 에 연결.
+   (기존 'vision' 스텝은 8/17 비전팀 협의(production_valid) 잠금 그대로 두고 별도 타입으로 둔다) */
+function recAddWait(){const at=rec.sel>=0?rec.sel+1:rec.steps.length;
+  rec.steps.splice(at,0,{t:'wait',sec:+$('rec-wait').value||1});rec.sel=at;recRender()}
+function recMove(d){const i=rec.sel,j=i+d;if(i<0||j<0||j>=rec.steps.length)return;
+  [rec.steps[i],rec.steps[j]]=[rec.steps[j],rec.steps[i]];rec.sel=j;recRender()}
+function recDel(){if(rec.sel<0)return;rec.steps.splice(rec.sel,1);rec.sel=-1;recRender()}
+function recNew(){if(rec.steps.length&&!confirm('스텝을 모두 비울까요?'))return;
+  rec.steps=[];rec.sel=-1;$('rec-name').value='Untitled';recRender()}
+function recSaveAs(){const n=$('rec-name').value.trim()||'Untitled';const db=recDB();
+  db[n]=JSON.parse(JSON.stringify(rec.steps));store.set('recordings',db);recFillList();
+  $('rec-list').value=n;log('sys',`recorder save '${n}'`,rec.steps.length+' 스텝')}
+function recFillList(){const db=recDB();
+  $('rec-list').innerHTML=Object.keys(db).map(n=>`<option>${n}</option>`).join('')||'<option value="">(없음)</option>'}
+function recLoad(){const n=$('rec-list').value;const db=recDB();if(!db[n])return;
+  rec.steps=JSON.parse(JSON.stringify(db[n]));rec.sel=-1;$('rec-name').value=n;recRender();
+  log('sys',`recorder load '${n}'`,rec.steps.length+' 스텝')}
+function recReach(robot,tgt){
+  if(state.mode==='bridge'&&!state.allowReal)return Promise.resolve(true); // dry_run: 실물 안 움직임
+  const tol=robot==='fr5'?1.0:0.7;const t0=Date.now();
+  return new Promise(res=>{const t=setInterval(()=>{const cur=state.robots[robot].joints;
+    if(state.abort||Date.now()-t0>90000){clearInterval(t);res(!state.abort);return}
+    if(cur.every((v,i)=>Math.abs(v-tgt[i])<tol)){clearInterval(t);res(true)}},100)})}
+async function recIdle(robot,timeout=30){ /* 브리지 busy 해제 대기 — ★캐시가 아니라 직접 조회(200ms 폴링 캐시는 명령 직후 stale — 8/24 실증) */
+  if(state.mode!=='bridge'||!state.allowReal)return true;
+  const t0=Date.now();
+  while(Date.now()-t0<timeout*1000){
+    if(state.abort)return false;
+    try{const j=await(await fetch(state.bridge+'/status')).json();
+      if(!j.robots[robot].busy)return true}catch(e){}
+    await new Promise(r=>setTimeout(r,200))}
+  return false}
+/* 도트 파지 실행 — 브리지 /fr5/dot_pick → (게이트) → /fr5/dot_pick_continue → 파지 상태코드 확인.
+   판정은 브리지 로그 문구로 한다(오늘 CLI 시연과 동일 게이트): ⚠ 가 있으면 자동하강 금지. */
+async function recBridgeLog(sinceT){
+  try{const r=await fetch(`${state.bridge}/log`,{cache:'no-store'});const j=await r.json();
+      return j.filter(e=>e.t>sinceT)}catch(e){return []}}
+async function recWaitLog(sinceT,keys,timeoutMs){
+  const t0=Date.now();let seen=0;
+  while(Date.now()-t0<timeoutMs&&!state.abort){
+    const es=await recBridgeLog(sinceT);
+    for(const e of es.slice(seen))log('fr5','dot_pick',String(e.result||''));
+    seen=es.length;
+    const txt=es.map(e=>String(e.result||'')).join(' ');
+    if(keys.some(k=>txt.includes(k)))return txt;
+    await new Promise(x=>setTimeout(x,700));
+  }
+  return (await recBridgeLog(sinceT)).map(e=>String(e.result||'')).join(' ');
+}
+async function recExecDot(s){
+  if(!state.allowReal){log('sys','dot pick','드라이 모드 — REAL 로 전환 필요');return false}
+  const t0=Date.now()/1000-0.5;
+  const ok0=await cmd('fr5','dot_pick',{kind:s.kind,pause_z:s.pz,grip_pause:!!s.gp});
+  if(!ok0)return false;
+  const txt=await recWaitLog(t0,['하강 신호 대기','중단','ERR'],240000);
+  if(!txt.includes('하강 신호 대기')){log('sys','dot pick',`[${s.kind}] 정렬 실패 — 중단`);return false}
+  if(txt.includes('⚠')){
+    log('sys','dot pick',`[${s.kind}] 2차 검증 경고 — 자동 하강 금지, 눈으로 확인 후 [▶ 하강]`);
+    if(s.auto)return false;
+  }
+  if(!s.auto){
+    log('sys','dot pick',`[${s.kind}] z${s.pz} 정지 — [▶ 하강] 대기(최대 900s)`);
+    const t1=Date.now();
+    while(Date.now()-t1<900000&&!state.abort){
+      const st=await recBridgeLog(t0);
+      if(st.some(e=>String(e.action||'')==='dot_pick_continue'))break;
+      await new Promise(x=>setTimeout(x,500));
+    }
+    if(state.abort)return false;
+  }else{
+    const t2=Date.now()/1000-0.5;
+    if(!await cmd('fr5','dot_pick_continue',{}))return false;
+    const g=await recWaitLog(t2,['그리퍼 명령','헛집음','놓침','ERR'],180000);
+    if(!g.includes('상태 2')){log('sys','dot pick',`[${s.kind}] 파지 실패`);return false}
+    log('sys','dot pick',`[${s.kind}] 파지 성공(상태 2)`);
+    return await recIdle('fr5');
+  }
+  const g2=await recWaitLog(t0,['그리퍼 명령','헛집음','놓침','ERR'],180000);
+  if(!g2.includes('상태 2')){log('sys','dot pick',`[${s.kind}] 파지 실패`);return false}
+  log('sys','dot pick',`[${s.kind}] 파지 성공(상태 2)`);
+  return await recIdle('fr5');
+}
+/* 도트 place 실행 — 자동 삽입 없음: 호버 정지까지 자동, 그 뒤 사람이 [▶ 삽입] 을 누를 때까지 대기(900s). */
+async function recExecPlace(s){
+  if(!state.allowReal){log('sys','dot place','드라이 모드 — REAL 로 전환 필요');return false}
+  const t0=Date.now()/1000-0.5;
+  if(!await cmd('fr5','dot_place',{kind:s.kind}))return false;
+  const txt=await recWaitLog(t0,['호버 정지','중단','ERR'],300000);
+  if(!txt.includes('호버 정지')){log('sys','dot place',`[${s.kind}] 정렬 실패 — 중단`);return false}
+  if(txt.includes('⚠'))log('sys','dot place',`[${s.kind}] ⚠ 2차 보정 미적용 — 특히 잘 확인할 것`);
+  log('sys','dot place',`[${s.kind}] 호버 정지 — 눈으로 확인 후 [▶ 삽입] (최대 900s)`);
+  const t1=Date.now();
+  while(Date.now()-t1<900000&&!state.abort){
+    const es=await recBridgeLog(t0);
+    const done=es.map(e=>String(e.result||'')).join(' ');
+    if(done.includes('place 완료')){log('sys','dot place',`[${s.kind}] place 완료`);return await recIdle('fr5')}
+    if(done.includes('ERR')||done.includes('취소'))return false;
+    await new Promise(x=>setTimeout(x,700));
+  }
+  return false;
+}
+async function recExecStep(s){let ok=true;
+  try{
+    if(s.t==='dot')return await recExecDot(s);
+    if(s.t==='dotplace')return await recExecPlace(s);
+    if(s.t==='vision'){
+      if(!VISION.enabled){log('sys','vision step','잠금(production_valid=false) — 스텝 건너뛸 수 없어 중단');return false}
+      log('sys','vision step','브리지 비전 파지 경로 미구현 — 통합 시 셀 오케스트레이터 트리거로 대체');return false}
+    if(s.t==='wait'){const t0=Date.now();
+      while(Date.now()-t0<s.sec*1000&&!state.abort)await new Promise(x=>setTimeout(x,100))}
+    else{ok=await cmd(s.robot,'move',{joints:s.joints});
+      if(ok)ok=await recReach(s.robot,s.joints);
+      if(ok)ok=await recIdle(s.robot);                       // ★도달 후 busy 해제까지 (안 기다리면 그리퍼가 BUSY 거절 — 8/24 실증)
+      if(ok&&s.robot==='fr5'&&s.grip!=null&&s.grip!==state.robots.fr5.grip){
+        ok=await cmd('fr5','gripper',{pos:s.grip});
+        if(ok)ok=await recIdle('fr5');}                      // ★그리퍼 완료(최대 11s 스트로크)까지
+      if(ok&&s.robot!=='fr5'&&s.vac!=null&&s.vac!==state.robots[s.robot].vac)ok=await cmd(s.robot,'vacuum',{on:s.vac})}
+  }catch(e){ok=false}
+  return ok&&!state.abort}
+async function recStepOnce(){
+  /* 스텝별 Play: 선택 스텝(없으면 1번)을 실행하고 다음 스텝을 선택해 둔다 — 연타로 이어감 */
+  if(state.running||!rec.steps.length)return;
+  state.running=true;state.abort=false;$('rec-play').disabled=true;
+  const i=rec.sel>=0&&rec.sel<rec.steps.length?rec.sel:0;
+  rec.cur=i;recRender();
+  const ok=await recExecStep(rec.steps[i]);
+  rec.cur=-1;if(ok&&i+1<rec.steps.length)rec.sel=i+1;recRender();
+  state.running=false;$('rec-play').disabled=false;
+  log('sys',`recorder 스텝 ${i+1}/${rec.steps.length}`,ok?'ok':'중단/실패')}
+async function recPlayAll(){if(state.running||!rec.steps.length)return;
+  state.running=true;state.abort=false;$('rec-playall').disabled=true;
+  log('sys',`recorder all play '${$('rec-name').value}'`,`${rec.steps.length} 스텝 ${$('rec-loop').checked?'(loop)':''}`);
+  do{for(let i=0;i<rec.steps.length;i++){rec.cur=i;recRender();
+    const ok=await recExecStep(rec.steps[i]);
+    if(state.abort||!ok){state.abort=true;break}}
+  }while(!state.abort&&$('rec-loop').checked);
+  rec.cur=-1;recRender();state.running=false;$('rec-playall').disabled=false;
+  log('sys','recorder '+(state.abort?'중단':'완료'),state.abort?'fail':'ok')}
+
+/* ---------- 리포트 ---------- */
+function downloadText(t,n){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'}));a.download=n;a.click()}
+function exportJSON(what){const d=what==='poses'?{poses:state.poses}:{poses:state.poses,scenarios:state.scenarios,cfg:state.cfg,log:state.log};downloadText(JSON.stringify(d,null,2),`bf2_${what}_${stamp()}.json`)}
+function importJSON(what){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=()=>{const f=i.files[0];const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.poses){state.poses=d.poses;store.set('poses',d.poses)}if(what==='all'){if(d.scenarios){state.scenarios=d.scenarios;store.set('scenarios',d.scenarios)}if(d.cfg){state.cfg=d.cfg;store.set('cfg',d.cfg)}}renderPoses();renderScList();log('sys','import '+f.name,'ok')}catch(e){alert('JSON 파싱 실패')}};r.readAsText(f)};i.click()}
+function applySettings(){state.cfg.l1=+$('zk-l1').value;state.cfg.l2=+$('zk-l2').value;state.cfg.h0=+$('zk-h0').value;
+  state.cfg.lim={a1:$('lim-a1').value.split(',').map(Number),a2:$('lim-a2').value.split(',').map(Number),a3:$('lim-a3').value.split(',').map(Number)};
+  for(const k of['zk1','zk2','fr5','conv']){if(!$(`ly-${k}-x`))continue;Object.assign(state.cfg.layout[k],{x:+$(`ly-${k}-x`).value,z:+$(`ly-${k}-z`).value,yaw:+$(`ly-${k}-yaw`).value})}
+  store.set('cfg',state.cfg);buildTwin();log('sys','settings apply','ok')}
+$('allow-real').onchange=e=>{state.allowReal=e.target.checked;if(state.allowReal&&!confirm('실기 명령을 허용합니다. 안전 확인:\n- 작업 영역 사람 없음\n- Speed 5% 이하\n- ESTOP 손에 닿는 위치'))state.allowReal=e.target.checked=false;if(state.mode==='bridge')$('ctext').textContent='브리지 '+state.bridge+(state.allowReal?' · 실기':' · 드라이(검증만)');log('sys','allow_real='+state.allowReal);setModeUI()};
+
+/* ---------- 탭 ---------- */
+const MODAL_TABS={poses:'저장된 포즈',settings:'설정'};
+function openModal(v){$('modal-title').textContent=MODAL_TABS[v];
+  document.querySelectorAll('#modal-body .view').forEach(x=>x.classList.remove('active'));
+  $('v-'+v).classList.add('active');$('modal').classList.add('open');$('modal-back').classList.add('open')}
+function closeModal(){$('modal').classList.remove('open');$('modal-back').classList.remove('open')}
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();recEditClose()}});
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{const v=t.dataset.v;
+  if(MODAL_TABS[v]){openModal(v);return}
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');
+  document.querySelectorAll('#left .view').forEach(x=>x.classList.remove('active'));$('v-'+v).classList.add('active')});
+$('pose-filter').onchange=renderPoses;
+
+/* ---------- 디지털 트윈 (three.js r128) ---------- */
+const D2R=Math.PI/180;let scene,cam,renderer,twin={};
+function mkBox(w,h,d,c){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:c}));m.castShadow=true;return m}
+function mkCyl(r,h,c){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,24),new THREE.MeshStandardMaterial({color:c}));return m}
+/* ZK — zkbot_description/urdf/zkbot.urdf (STEP 조립체 실측 추출, RViz 표시 검증 8/8).
+   조인트값 = PLC 각도 직결(zk_ros2_node 가 라디안 그대로 퍼블리시하던 방식과 동일).
+   메시 단위 m → parseSTL 기본 스케일(×1000)로 mm 변환. */
+const ZK_URDF=[{n:'a1',xyz:[0,0,0],mesh:'link_a1'},
+  {n:'a2',xyz:[-4.27,0,143.01],mesh:'link_a2'},
+  {n:'a3',xyz:[155.05,0,126.33],mesh:'link_a3'}];
+const ZK_COLORS={base_link:0x1A1A1C,link_a1:0xEDEBE6,link_a2:0x232326,link_a3:0x232326,link_tool:0xF2F0EB}; // 실물(8/24 사진+사용자 정정): 검정 밑판+흰 바디+검정 팔+흰 흡착
+function buildZKModel(color,ghost){
+  const g=new THREE.Group();const zup=new THREE.Group();zup.rotation.x=-Math.PI/2;g.add(zup); // Z-up → Y-up
+  const mat=c=>new THREE.MeshStandardMaterial(ghost?{color:0xFFB300,transparent:true,opacity:.3,depthWrite:false}:{color:c,metalness:.2,roughness:.6});
+  const holders={base_link:zup};let parent=zup;const rots={};
+  for(const j of ZK_URDF){const f=new THREE.Group();f.position.set(...j.xyz);parent.add(f);rots[j.n]=f;holders[j.mesh]=f;parent=f}
+  // 양옆 돌출 모터 2개 = 실물 검정 (link_a1 메시가 단색이라 검정 실린더로 덮음, bbox 실측)
+  if(true){const mm=()=>new THREE.Mesh(new THREE.CylinderGeometry(40,40,60,20),
+      new THREE.MeshStandardMaterial(ghost?{color:0xFFB300,transparent:true,opacity:.3,depthWrite:false}:{color:0x1E1E20,metalness:.3,roughness:.5}));
+    const m1=mm();m1.position.set(-4,102,143);rots.a1.add(m1);
+    const m2=mm();m2.position.set(-4,-102,143);rots.a1.add(m2)}
+  const tool=new THREE.Group();tool.position.set(122.81,0,-157.81);parent.add(tool);holders.link_tool=tool;
+  { // 펌프(8/24 v2): STL 브래킷의 구멍판 밑면(로컬 -z, 판면 z≈-11)에 직접 부착 — 사용자 캡처 지시
+    const gm=c=>new THREE.MeshStandardMaterial(ghost?{color:0xFFB300,transparent:true,opacity:.3,depthWrite:false}:{color:c,metalness:.2,roughness:.6});
+    const pump=new THREE.Mesh(new THREE.CylinderGeometry(13,13,34,20),gm(0xEDEBE6));
+    pump.rotation.x=Math.PI/2;pump.position.set(25,0,-28);tool.add(pump);
+    for(const[r1,r2,z]of[[10,14,-47],[13,17,-53],[15,19,-59]]){ // 벨로우즈 흡착컵
+      const seg=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,6,20),gm(0xD8D4CC));
+      seg.rotation.x=Math.PI/2;seg.position.set(25,0,z);tool.add(seg)}
+  }
+  for(const m of Object.keys(holders)){
+    loadSTL(m+'.stl',['./meshes/zk/'],1000).then(geo=>{
+      if(geo){const mesh=new THREE.Mesh(geo,mat(ZK_COLORS[m]));mesh.castShadow=!ghost;holders[m].add(mesh)}
+      else{ // 파일 없을 때만 간이 근사
+        const fb={base_link:[120,120,20,0,0,10],link_a1:[90,90,143,0,0,71],link_a2:[40,26,210,75,0,63],
+                  link_a3:[40,22,200,60,0,-79],link_tool:[46,46,36,0,0,-18]}[m];
+        const b=new THREE.Mesh(new THREE.BoxGeometry(fb[0],fb[1],fb[2]),mat(color||0x1a9aaa));
+        b.position.set(fb[3],fb[4],fb[5]);holders[m].add(b);twin.meshFail=(twin.meshFail||0)+1}})}
+  return {g,kind:'mesh',a1:rots.a1,a2:rots.a2,a3:rots.a3,tool}}
+/* FR5 — FAIR-INNOVATION/frcobot_ros2 fairino_description/urdf/fairino5_v6.urdf 에서 추출(2026-08-24 확인). 단위 m→mm.
+   URDF 영점 = 실기 조인트 영점이라고 가정(공식 ROS2 드라이버가 이 URDF로 MoveIt 구동) — 실기 대조는 8/18 이후 확인. */
+const FR5_URDF=[ // [parent-origin xyz(mm), rpy(rad)] 각 조인트 회전축은 로컬 Z
+  {n:'j1',xyz:[0,0,0],rpy:[0,0,0],mesh:'shoulder_link'},
+  {n:'j2',xyz:[0,0,152],rpy:[1.5708,0,0],mesh:'upperarm_link'},
+  {n:'j3',xyz:[-425,0,0],rpy:[0,0,0],mesh:'forearm_link'},
+  {n:'j4',xyz:[-395.01,0,0],rpy:[0,0,0],mesh:'wrist1_link'},
+  {n:'j5',xyz:[0,0,102.1],rpy:[1.5708,0,0],mesh:'wrist2_link'},
+  {n:'j6',xyz:[0,0,102],rpy:[-1.5708,0,0],mesh:'wrist3_link'}];
+const MESH_SRC=['./meshes/fr5/','https://raw.githubusercontent.com/FAIR-INNOVATION/frcobot_ros2/main/fairino_description/meshes/fairino5_v6/'];
+function parseSTL(buf,s=1000){const dv=new DataView(buf);const n=dv.getUint32(80,true);const pos=new Float32Array(n*9),nor=new Float32Array(n*9);let o=84;
+  for(let i=0;i<n;i++){const nx=dv.getFloat32(o,true),ny=dv.getFloat32(o+4,true),nz=dv.getFloat32(o+8,true);o+=12;
+    for(let k=0;k<3;k++){pos[i*9+k*3]=dv.getFloat32(o,true)*s;pos[i*9+k*3+1]=dv.getFloat32(o+4,true)*s;pos[i*9+k*3+2]=dv.getFloat32(o+8,true)*s;nor[i*9+k*3]=nx;nor[i*9+k*3+1]=ny;nor[i*9+k*3+2]=nz;o+=12}o+=2}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('normal',new THREE.BufferAttribute(nor,3));return g}
+async function loadSTL(name,srcs=MESH_SRC,s=1000){for(const base of srcs){try{const r=await fetch(base+name);if(!r.ok)continue;return parseSTL(await r.arrayBuffer(),s)}catch(e){}}return null}
+function buildFR5Model(ghost){const c=0xE9E6E0; /* 실물 대조(8/24): 흰색 본체 */ const g=new THREE.Group();const zup=new THREE.Group();zup.rotation.x=-Math.PI/2;g.add(zup); // URDF Z-up → three.js Y-up
+  const links={};let parent=zup;links.base_link=zup;
+  const nodes=FR5_URDF.map(j=>{const f=new THREE.Group();f.position.set(...j.xyz);f.rotation.set(j.rpy[0],j.rpy[1],j.rpy[2],'ZYX');parent.add(f);
+    const rot=new THREE.Group();f.add(rot);links[j.mesh]=rot;parent=rot;return rot});
+  /* PGEA-100-40 그리퍼 — fairino_description URDF 실측 배치 그대로:
+     wrist3 플랜지면 z=99mm → 어댑터판 10mm → gripper_link. 메시는 mm 단위(스케일 1),
+     X축 -1 미러(벤더 STL 손좌표계 — RViz 실물 대조로 확정), 죠 스트로크 0~21mm. */
+  // 공식 제품사진 + 공식 STL 외측면 기준. 조인트마다 축 방향이 다르므로
+  // 모든 링을 local-Z에 두면 J2/J5/J6가 허공에 뜬다. 각 부모 링크의 실제
+  // 바깥쪽 면에 평면 환형을 붙여 메시와 함께 회전하도록 한다.
+  if(!ghost){
+    const orange=new THREE.MeshStandardMaterial({color:0xE8501A,metalness:.15,roughness:.55,side:THREE.DoubleSide});
+    const face=(node,xyz,r,w=8,rot=null)=>{const m=new THREE.Mesh(new THREE.RingGeometry(r-w,r,64),orange);
+      m.position.set(...xyz);if(rot)m.rotation.set(...rot);m.renderOrder=2;node.add(m);return m};
+    // J2: shoulder_link의 카메라 쪽 외측면(y=-64.80), 중심 z=152.
+    face(nodes[0],[0,-65.2,152],58,9,[Math.PI/2,0,0]);
+    // J3: upperarm_link 끝단의 외측면. 중심은 링크 원점이 아니라 x=-425.
+    face(nodes[1],[-425,0,203.8],58,9);
+    // J4: forearm_link 끝단(z=-49.48)의 작은 외측면.
+    face(nodes[2],[-395.01,0,-49.9],32.5,3.5);
+    // J5/J6: 축이 local-Y이므로 링도 XZ 평면이다. 넓은 외측 커버 면만 사용.
+    face(nodes[3],[0,49.9,102.1],32.5,3.5,[Math.PI/2,0,0]);
+    face(nodes[4],[0,-49.9,102],32.5,3.5,[Math.PI/2,0,0]);
+    // 툴 플랜지(J6 바깥면).
+    face(nodes[5],[0,0,99.4],31.5,3.5);
+  }
+  const tcp=new THREE.Group();tcp.position.set(0,0,99);parent.add(tcp);
+  const gmat=()=>new THREE.MeshStandardMaterial(ghost?{color:0xFFB300,transparent:true,opacity:.3,depthWrite:false}:{color:0x1a1a1a,metalness:.3,roughness:.5,side:THREE.DoubleSide});
+  const adap=new THREE.Mesh(new THREE.CylinderGeometry(32,32,10,24),gmat());adap.rotation.x=Math.PI/2;adap.position.z=5;tcp.add(adap);
+  const grip=new THREE.Group();grip.position.z=10;tcp.add(grip);
+  const jawR=new THREE.Group(),jawL=new THREE.Group();grip.add(jawR,jawL);
+  const gWrap=()=>{const w=new THREE.Group();w.position.set(2.8,-325.639,71.98);w.rotation.x=1.5708;return w};
+  /* 죠 배정: 파일명 그대로 (8/24 디버그 색칠 실측 — jaw_right.stl 이 미러 후 로컬 +X 에 앉음.
+     스왑하면 닫을수록 죠가 바깥으로 벌어진다) */
+  [['pgea_100_40_body.stl',grip],['pgea_100_40_jaw_right.stl',jawR],['pgea_100_40_jaw_left.stl',jawL]].forEach(([fn,pg])=>{
+    loadSTL('gripper/'+fn,['./meshes/fr5/'],1).then(geo=>{if(!geo)return;
+      const w=gWrap();const mesh=new THREE.Mesh(geo,gmat());mesh.scale.set(-1,1,1);w.add(mesh);pg.add(w)})});
+  const padR=new THREE.Mesh(new THREE.BoxGeometry(16.1,15.6,18),gmat());padR.position.set(31.2,0,147);jawR.add(padR); // 1.8cm 연장 손끝 — 죠 팁 실측 중심(8/24)
+  const padL=padR.clone();padL.position.x=-25.6;jawL.add(padL); // 미러 비대칭(2.8×2) 보정 — 한쪽만 어긋나던 원인
+  // 메시 비동기 로드, 실패 시 박스 대체
+  const fallback=[[70,60,120],[60,60,120],[425,60,60],[395,50,50],[45,45,102],[40,40,102],[60,60,60]];
+  ['base_link',...FR5_URDF.map(j=>j.mesh)].forEach((m,i)=>{loadSTL(m+'.STL').then(geo=>{const holder=links[m];
+    if(geo){holder.add(new THREE.Mesh(geo,new THREE.MeshStandardMaterial(ghost?{color:0xFFB300,transparent:true,opacity:.3,depthWrite:false}:{color:i?c:0xD8D6D0,metalness:.15,roughness:.55})));if(!ghost&&twin.fr5&&twin.fr5.g===g)twin.meshOK=(twin.meshOK||0)+1}  // 재생성된 구모델의 늦은 로드는 카운트 제외
+    else{const b=mkBox(...fallback[i],c);if(i===2)b.position.x=-212;if(i===3)b.position.x=-197;if(i===4||i===5)b.position.z=51;holder.add(b);twin.meshFail=(twin.meshFail||0)+1}
+    $('twinlabel').textContent=`디지털 트윈 · 로봇 드래그=배치 이동 · FR5 메시 ${twin.meshOK||0}/7${twin.meshFail?` (${twin.meshFail} 박스 대체)`:''}`})});
+  return {g,j:nodes,tcp,jawR,jawL}}
+function buildTwin(){
+  const cv=$('twin');if(!renderer){renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});renderer.shadowMap.enabled=true}
+  scene=new THREE.Scene();scene.background=new THREE.Color(0x14161a);twin.meshOK=0;twin.meshFail=0;
+  cam=new THREE.PerspectiveCamera(40,1,10,10000);
+  scene.add(new THREE.AmbientLight(0xffffff,.65));const dl=new THREE.DirectionalLight(0xffffff,.7);dl.position.set(600,1200,800);dl.castShadow=true;scene.add(dl);
+  const grid=new THREE.GridHelper(2400,24,0x4a515c,0x22262c);scene.add(grid);
+  const table=mkBox(2000,40,1000,0x2e333b);table.position.set(200,-20,0);table.receiveShadow=true;scene.add(table);
+  // 배치: 사진(Image 1) 레이아웃 근사 — ZK1 좌측, 컨베이어 중앙, ZK2 우측, FR5 뒤쪽 테이블. 실측 배치 아님.
+  const LY=state.cfg.layout, place=(m,k)=>{m.g.position.set(LY[k].x,0,LY[k].z);m.g.rotation.y=LY[k].yaw*D2R;
+    // 보이지 않는 넉넉한 잡기 영역 — 팔이 가늘어 레이캐스트가 빗나가는 문제 해결(드래그 배치용)
+    const hit=new THREE.Mesh(new THREE.CylinderGeometry(150,150,320,12),
+      new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+    hit.position.y=160;m.g.add(hit)};
+  twin.zk1=twin.zk2=null;
+  if(LY.zk1.on!==false){twin.zk1=buildZKModel(0x1a9aaa);place(twin.zk1,'zk1');scene.add(twin.zk1.g)}
+  if(LY.zk2.on!==false){twin.zk2=buildZKModel(0x1a9aaa);place(twin.zk2,'zk2');scene.add(twin.zk2.g)}
+  // 컨베이어: 기본 없음 — [＋ 컨베이어] 버튼으로 생성, 로봇처럼 드래그 이동
+  twin.conv=null;
+  if(LY.conv&&LY.conv.on){const cg=new THREE.Group();
+    const body=mkBox(500,30,110,0x33363c);body.position.y=15;cg.add(body);
+    const lA=mkBox(500,6,8,0xf5b301);lA.position.set(0,33,51);cg.add(lA);
+    const lB=lA.clone();lB.position.z=-51;cg.add(lB);
+    const hit=new THREE.Mesh(new THREE.BoxGeometry(540,140,170),
+      new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hit.position.y=50;cg.add(hit);
+    cg.position.set(LY.conv.x,0,LY.conv.z);cg.rotation.y=(LY.conv.yaw||0)*D2R;
+    scene.add(cg);twin.conv={g:cg}}
+  twin.fr5=buildFR5Model();place(twin.fr5,'fr5');scene.add(twin.fr5.g);twin.fr5.g.scale.setScalar(1);
+  /* RViz(MoveIt2)식 고스트 미리보기 — 목표각을 반투명 주황 로봇으로 표시 */
+  const ghostify=m=>{m.g.traverse(o=>{if(o.isMesh){o.material=new THREE.MeshStandardMaterial({color:0xFFB300,transparent:true,opacity:.3,depthWrite:false});o.castShadow=false}});m.g.visible=false;scene.add(m.g);return m};
+  /* FR5 팔끝 카테시안 축 표시 — 방향은 base_link 기준(조그 버튼이 쓰는 좌표계), 위치만 TCP 추종 */
+  twin.tcpAxes=(()=>{const g=new THREE.Group();
+    const lab=(txt,color)=>{const c=document.createElement('canvas');c.width=c.height=64;
+      const x=c.getContext('2d');x.font='bold 46px monospace';x.fillStyle=color;x.textAlign='center';x.textBaseline='middle';x.fillText(txt,32,34);
+      const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));s.scale.set(42,42,1);return s};
+    for(const[dir,color,name]of[[[1,0,0],0xFF4040,'X'],[[0,1,0],0x35D435,'Y'],[[0,0,1],0x4585FF,'Z']]){
+      const v=new THREE.Vector3(...dir);
+      g.add(new THREE.ArrowHelper(v,new THREE.Vector3(),95,color,20,10));
+      const l=lab(name,'#'+color.toString(16).padStart(6,'0'));l.position.copy(v.clone().multiplyScalar(120));g.add(l)}
+    scene.add(g);return g})();
+  twin.ghost={zk1:ghostify(buildZKModel(0,true)),zk2:ghostify(buildZKModel(0,true)),fr5:(()=>{const m=buildFR5Model(true);m.g.traverse(o=>{if(o.isMesh){o.material=new THREE.MeshStandardMaterial({color:0xFFB300,transparent:true,opacity:.3,depthWrite:false});o.castShadow=false}});m.g.visible=false;scene.add(m.g);return m})()};
+  cam.position.set(1400,1100,1600);cam.lookAt(0,200,0);orbit.th=Math.atan2(1400,1600);orbit.ph=0.75;orbit.r=2400;
+  resize();updateTwin();}
+const orbit={th:0.7,ph:0.75,r:2400,drag:false,x:0,y:0};
+function camUpdate(){cam.position.set(orbit.r*Math.sin(orbit.ph)*Math.sin(orbit.th),orbit.r*Math.cos(orbit.ph),orbit.r*Math.sin(orbit.ph)*Math.cos(orbit.th));cam.lookAt(0,200,0)}
+/* 로봇 직접 드래그 배치: 로봇을 잡으면 바닥 평면 위로 끌어 옮긴다 (빈 곳 드래그=카메라 회전).
+   놓는 순간 cfg.layout 에 저장 → 새로고침에도 유지, 설정 탭 입력값도 동기화. 트윈 표시만 이동(명령값 무관). */
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),floorPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+let dragRobot=null;
+function castFrom(e){const r=$('twin').getBoundingClientRect();ndc.x=((e.clientX-r.left)/r.width)*2-1;ndc.y=-((e.clientY-r.top)/r.height)*2+1;ray.setFromCamera(ndc,cam)}
+function floorPt(e){castFrom(e);const p=new THREE.Vector3();return ray.ray.intersectPlane(floorPlane,p)?p:null}
+let jointDragMode=false, jdrag=null;
+$('tg-joint').onclick=()=>{jointDragMode=!jointDragMode;
+  $('tg-joint').style.background=jointDragMode?'var(--hz)':'';$('tg-joint').style.color=jointDragMode?'#111':'';};
+function hitJoint(){ // 레이 교차 메시 → (로봇, 관절 idx) — 부모 체인에서 회전 프레임 찾기
+  for(const k of['fr5','zk1','zk2']){
+    if(!twin[k])continue;
+    const hits=ray.intersectObject(twin[k].g,true);
+    if(!hits.length)continue;
+    let o=hits[0].object;
+    while(o){
+      if(k==='fr5'){const i=twin.fr5.j.indexOf(o);if(i>=0)return {robot:'fr5',idx:i}}
+      else{const m=twin[k];for(const[nm,idx]of[['a1',0],['a2',1],['a3',2]])if(m[nm]===o)return {robot:k,idx}}
+      o=o.parent}
+    return null}
+  return null}
+$('twin').addEventListener('pointerdown',e=>{
+  castFrom(e);
+  if(jointDragMode){const hj=hitJoint();
+    if(hj){const r=state.robots[hj.robot];
+      jdrag={...hj,tgt:r.joints.map(v=>+v.toFixed(2)),lx:e.clientX};
+      window._jdragGhost=jdrag;setGlow(hj.robot,true);$('twin').style.cursor='ew-resize'}
+    return} // 관절 모드에선 배치·카메라 드래그 금지(오조작 방지)
+  // 겹쳐 있을 땐 카메라에서 가장 가까운 것을 잡는다 (컨베이어 위 로봇 등)
+  let best=null;
+  for(const k of['zk1','zk2','fr5','conv']){
+    if(!twin[k])continue;
+    const hits=ray.intersectObject(twin[k].g,true);
+    if(hits.length&&(!best||hits[0].distance<best.d))best={k,d:hits[0].distance};
+  }
+  if(best){const p=floorPt(e);
+    if(p){const k=best.k;
+      dragRobot={k,dx:twin[k].g.position.x-p.x,dz:twin[k].g.position.z-p.z,
+                 lx:e.clientX,rotate:e.button===2};   // 우클릭 드래그 = 회전
+      setGlow(k,true);$('twin').style.cursor='grabbing';return}}
+  if(e.button===2)return;                              // 빈 곳 우클릭은 무시
+  orbit.drag=true;orbit.x=e.clientX;orbit.y=e.clientY});
+$('twin').addEventListener('contextmenu',e=>e.preventDefault());
+window.addEventListener('pointerup',()=>{
+  if(jdrag){const d=jdrag;jdrag=null;window._jdragGhost=null;
+    setGlow(d.robot,false);$('twin').style.cursor='';
+    const cur=state.robots[d.robot].joints;
+    if(Math.abs(d.tgt[d.idx]-cur[d.idx])>0.3){
+      log(d.robot,`트윈 관절드래그 ${d.robot==='fr5'?'J':'A'}${d.idx+1} → ${d.tgt[d.idx].toFixed(1)}°`,'전송');
+      cmd(d.robot,'move',{joints:d.tgt})}
+    return}
+  if(dragRobot){const k=dragRobot.k,g=twin[k].g;
+    state.cfg.layout[k].x=Math.round(g.position.x);state.cfg.layout[k].z=Math.round(g.position.z);
+    state.cfg.layout[k].yaw=Math.round(g.rotation.y/D2R);
+    store.set('cfg',state.cfg);
+    if($('ly-'+k+'-x')){$('ly-'+k+'-x').value=state.cfg.layout[k].x;$('ly-'+k+'-z').value=state.cfg.layout[k].z;$('ly-'+k+'-yaw').value=state.cfg.layout[k].yaw}
+    log('sys',`배치 이동 ${k}`,`x=${state.cfg.layout[k].x} z=${state.cfg.layout[k].z} 회전=${state.cfg.layout[k].yaw}°`);
+    setGlow(k,false);dragRobot=null;$('twin').style.cursor=''}
+  orbit.drag=false});
+function setGlow(k,on){twin[k].g.traverse(o=>{if(o.isMesh&&o.material&&o.material.emissive)o.material.emissive.setHex(on?0x6b5500:0x000000)});renderer.render(scene,cam)}
+window.addEventListener('pointermove',e=>{
+  if(jdrag){const dx=e.clientX-jdrag.lx;jdrag.lx=e.clientX;
+    const lims=jdrag.robot==='fr5'?[[-175,175],[-265,85],[-160,160],[-265,85],[-175,175],[-175,175]]
+                                   :[state.cfg.lim.a1,state.cfg.lim.a2,state.cfg.lim.a3];
+    const l=lims[jdrag.idx];
+    jdrag.tgt[jdrag.idx]=clamp(jdrag.tgt[jdrag.idx]+dx*0.25,l[0],l[1]);
+    renderer.render(scene,cam);return}
+  if(dragRobot){const g=twin[dragRobot.k].g;
+    const dx=e.clientX-(dragRobot.lx??e.clientX);dragRobot.lx=e.clientX;
+    if(dragRobot.rotate||e.shiftKey){g.rotation.y+=dx*0.008;renderer.render(scene,cam);return} // 우클릭드래그·Shift=회전(≈0.46°/px)
+    const p=floorPt(e);if(p){g.position.x=clamp(p.x+dragRobot.dx,-1500,1500);g.position.z=clamp(p.z+dragRobot.dz,-1500,1500);renderer.render(scene,cam)}return} // ±1.5m 클램프(수평선 레이캐스트 폭주 방지 — zk2 가 -11m 로 날아간 사고)
+  if(orbit.drag){orbit.th-=(e.clientX-orbit.x)*.005;orbit.ph=clamp(orbit.ph-(e.clientY-orbit.y)*.005,.15,1.5);orbit.x=e.clientX;orbit.y=e.clientY;camUpdate();return}
+  if(e.target===$('twin')&&scene){castFrom(e);let hit=false;
+    for(const k of['zk1','zk2','fr5','conv'])if(twin[k]&&ray.intersectObject(twin[k].g,true).length){hit=true;break}
+    $('twin').style.cursor=hit?'grab':''}});
+$('twin').addEventListener('wheel',e=>{e.preventDefault();
+  if(dragRobot){twin[dragRobot.k].g.rotation.y+=(e.deltaY>0?-5:5)*D2R;renderer.render(scene,cam);return} // 잡은 채 휠=5°씩 회전
+  orbit.r=clamp(orbit.r*(1+e.deltaY*.001),600,6000);camUpdate()},{passive:false});
+function resize(){const w=$('twinwrap').clientWidth,h=$('twinwrap').clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+window.addEventListener('resize',resize);
+function updateTwin(){if(!scene)return;
+  for(const k of['zk1','zk2']){const m=twin[k];if(!m)continue;const j=state.robots[k].joints;
+    /* ZK 표시 보정(8/24 실물 원점 대조 실측): URDF 조립자세(상완 50.8°·전완 -52.1°)가
+       실기 원점(상완 7.74°·전완 +18.93° — zk_pose Q20/Q30 실측 모델)과 달라서 오프셋+부호 반전.
+       평행사변형 기구: 전완 세계각 = A3 만의 함수(상완 상쇄 = +A2 항), 툴은 항상 수직(= +A3 상쇄). */
+    m.a1.rotation.z=j[0]*D2R;
+    m.a2.rotation.y=(-43.06-j[1])*D2R;
+    m.a3.rotation.y=(-27.97+j[1]-j[2])*D2R;
+    m.tool.rotation.y=(j[2]+66)*D2R}   // +66 = 구멍판(펌프 장착면)이 바닥 향하는 툴 영점(8/24 법선 실측)
+  const f=twin.fr5,j=state.robots.fr5.joints;for(let i=0;i<6;i++)f.j[i].rotation.z=j[i]*D2R;
+  const q=(1-clamp(state.robots.fr5.grip,0,100)/100)*21;f.jawR.position.x=-q;f.jawL.position.x=q; // 0=닫힘 21mm 스트로크
+  if(twin.tcpAxes){twin.tcpAxes.position.copy(f.tcp.localToWorld(new THREE.Vector3(0,0,150))); // 그리퍼 죠 사이 정가운데
+    f.g.children[0].getWorldQuaternion(twin.tcpAxes.quaternion)} // zup = base_link 자세
+  if(twin.ghost){
+    for(const k of['zk1','zk2']){const gh=twin.ghost[k],gj=twin[k]?ghostJointsOf(k):null;gh.g.visible=!!gj;
+      if(gj){gh.g.position.copy(twin[k].g.position);gh.g.rotation.y=twin[k].g.rotation.y;
+        gh.a1.rotation.z=gj[0]*D2R;gh.a2.rotation.y=(-43.06-gj[1])*D2R;
+        gh.a3.rotation.y=(-27.97+gj[1]-gj[2])*D2R;gh.tool.rotation.y=(gj[2]+66)*D2R}}
+    const gf=twin.ghost.fr5,gj=ghostJointsOf('fr5');gf.g.visible=!!gj;
+    if(gj){gf.g.position.copy(twin.fr5.g.position);gf.g.rotation.y=twin.fr5.g.rotation.y;
+      for(let i=0;i<6;i++)gf.j[i].rotation.z=gj[i]*D2R}}
+  renderer.render(scene,cam)}
+/* 고스트 목표각: ①목표각 입력칸에 숫자가 있으면 그 자세 ②이동 중이면 이동 목표 ③없으면 숨김 */
+function ghostJointsOf(k){const r=state.robots[k],n=r.joints.length;let any=false;const gj=r.joints.slice();
+  const jd=window._jdragGhost;
+  if(jd&&jd.robot===k)return jd.tgt.slice();   // 관절 드래그 중 = 드래그 목표를 고스트로
+  for(let i=0;i<n;i++){const el=$(`${k}-tgt${i+1}`);if(!el)continue;const v=parseFloat(el.value);
+    if(el.value!==''&&!isNaN(v)){gj[i]=v;any=true}}
+  if(!any){if(r.target&&r.target.some((t,i)=>Math.abs(t-r.joints[i])>0.5))return r.target.slice();return null}
+  if(gj.every((v,i)=>Math.abs(v-r.joints[i])<0.3))return null;
+  return gj}
+function fk(j){twin.fr5&&updateTwin();const v=new THREE.Vector3();twin.fr5.tcp.getWorldPosition(v);const b=twin.fr5.g.position;return [v.x-b.x,v.z-b.z,v.y,0,0,0]} // 근사: RX/RY/RZ 미계산
+setInterval(()=>{if(scene)renderer.render(scene,cam)},100);
+
+/* ---------- 초기화 ---------- */
+buildZK('zk1');buildZK('zk2');buildFR5();recFillList();recRender();
+$('zk-l1').value=state.cfg.l1;$('zk-l2').value=state.cfg.l2;$('zk-h0').value=state.cfg.h0;$('lim-a1').value=state.cfg.lim.a1;$('lim-a2').value=state.cfg.lim.a2;$('lim-a3').value=state.cfg.lim.a3;
+for(const k of['zk1','zk2','fr5','conv']){if(!$(`ly-${k}-x`))continue;$(`ly-${k}-x`).value=state.cfg.layout[k].x;$(`ly-${k}-z`).value=state.cfg.layout[k].z;$(`ly-${k}-yaw`).value=state.cfg.layout[k].yaw}
+/* 트윈 표시 토글: ZK1/ZK2/컨베이어 를 원할 때 추가·제거 (FR5 는 상시) */
+const TWIN_TOGGLES={zk1:'ZK1',zk2:'ZK2',conv:'Conveyor'};
+function updateToggleBtns(){for(const k in TWIN_TOGGLES)
+  $('tg-'+k).textContent=(state.cfg.layout[k].on!==false?'✕ ':'＋ ')+TWIN_TOGGLES[k]}
+for(const k in TWIN_TOGGLES)$('tg-'+k).onclick=()=>{
+  state.cfg.layout[k].on=!(state.cfg.layout[k].on!==false);store.set('cfg',state.cfg);
+  buildTwin();updateToggleBtns();log('sys',TWIN_TOGGLES[k],state.cfg.layout[k].on?'트윈 추가':'트윈 제거')};
+/* SIM/REAL 모드 스위치 — SIM=시뮬만(실기 무관), REAL=브리지 연결+실기 명령 허용(트윈=실기 관절 추종) */
+function setSrvUI(){
+  const chips={zk1:'ch-zk1',zk2:'ch-zk2',fr5:'ch-fr5'};
+  for(const k in chips){const el=$(chips[k]);if(!el)continue;
+    if(state.mode!=='bridge'){el.className='rchip'}
+    else el.className='rchip '+(state.robots[k].conn?'on':'off')}
+  const sv=$('ch-srv');
+  const cb=$('cell-btn');
+  if(cb)cb.textContent=(state.mode==='bridge'&&state.server&&state.server.alive)?'셀 정지':'셀 시작';
+  if(sv){const s=state.server;
+    if(state.mode!=='bridge'||!s){sv.className='rchip';sv.textContent='서버'}
+    else if(s.alive){sv.className='rchip on';sv.textContent='서버'+(s.state?' '+s.state:'')}
+    else{sv.className='rchip off';sv.textContent='서버 없음';
+      sv.title='팀 서버(/cell/status 하트비트) 미수신 — 셀 오케스트레이터/FMS 미기동 또는 도메인 불일치'}}}
+$('cell-btn').onclick=async()=>{
+  if(state.mode!=='bridge'){errToast('브리지 먼저 연결하세요');return}
+  const alive=state.server&&state.server.alive;
+  const url=state.bridge+(alive?'/cellctl/stop':'/cellctl/start');
+  try{
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(alive?{}:{mode:$('cell-mode').value})});
+    const j=await res.json();
+    log('sys',alive?'셀 실행기 정지':'셀 실행기 시작('+$('cell-mode').value+')',res.ok?j.result:(j.detail||'실패'));
+    if(!res.ok)errToast('셀 실행기: '+(j.detail||'실패'));
+  }catch(e){errToast('셀 실행기 요청 실패: '+e.message)}};
+$('srv-btn').onclick=async()=>{
+  $('ctext').textContent='연결 중…';$('cdot').className='dot sim';
+  await connectBridge();setSrvUI();
+  if(state.mode!=='bridge'){$('ctext').textContent='브리지 연결 실패 — 다시 클릭';$('cdot').className='dot'}};
+function setModeUI(){const real=state.mode==='bridge'&&state.allowReal;
+  $('mode-seg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',(b.dataset.m==='real')===real))}
+$('mode-seg').querySelectorAll('button').forEach(b=>b.onclick=async()=>{
+  if(b.dataset.m==='sim'){state.allowReal=false;$('allow-real').checked=false;disconnectBridge();setModeUI();return}
+  if(state.mode!=='bridge')await connectBridge();          // 설정의 브리지 URL 사용
+  if(state.mode==='bridge'&&!state.allowReal){$('allow-real').checked=true;
+    $('allow-real').onchange({target:$('allow-real')})}     // 기존 안전 확인(confirm) 경로 재사용
+  setModeUI()});
+/* 브리지 주소 = 이 페이지를 연 호스트(:8765) — 어느 PC 에서 열어도 자동으로 맞는다 */
+$('bridge-url').value=`http://${location.hostname||'localhost'}:8765`;
+/* ★9/12 도킹 탭: 사이클(:8776) / 리코더 — 고른 것만 그 자리에 표시(선택은 localStorage 기억) */
+function dockMode(m){
+  try{localStorage.setItem('dock.mode',m)}catch(e){}
+  var C=$('dock-cycle'),R=$('dock-rec'),tc=$('dock-tab-cycle'),tr=$('dock-tab-rec');
+  var on=m==='cycle';
+  C.style.display=on?'':'none'; R.style.display=on?'none':'';
+  $('dock-title').textContent=on?'사이클':'RECORDER';
+  if(tc)tc.className=on?'primary':''; if(tr)tr.className=on?'':'primary';
+  if(on){var f=$('cycleframe'); if(!f.src)f.src='http://'+(location.hostname||'localhost')+':8776/'; dockFit();}
+}
+/* 사이클 화면을 리코더처럼 아래끝까지 — 남는 높이를 전부 준다 */
+function dockFit(){try{
+  var f=$('cycleframe'),C=$('dock-cycle'); if(!f||!C)return;
+  if(C.style.display==='none')return;
+  var t=f.getBoundingClientRect().top;
+  /* ★9/12 방어: top 이 음수(패널 스크롤)면 높이가 계속 커진다 → 뷰포트 높이로 상한 */
+  var h=Math.round(window.innerHeight-Math.max(0,t)-14);
+  f.style.height=Math.min(window.innerHeight, Math.max(420,h))+'px';
+}catch(e){}}
+window.addEventListener('resize',dockFit);
+function dockReload(){var m=(localStorage.getItem('dock.mode')||'cycle');
+  if(m==='cycle'){var f=$('cycleframe');f.src='http://'+(location.hostname||'localhost')+':8776/?t='+Date.now();}else{try{recRefresh&&recRefresh()}catch(e){}}}
+window.addEventListener('load',function(){try{dockMode(localStorage.getItem('dock.mode')||'cycle')}catch(e){dockMode('cycle')}setTimeout(dockFit,300);});
+
+/* 8/26 카메라 플로팅 패널 2종(손목캠 :8766 · 측면캠 :8771 · 새카메라 :8768) — 이동/크기/빼기·넣기/별창, 위치·크기·표시 localStorage 기억 */
+function camPanel(id,btnId,label,streamUrl,def){
+  const W=$(id),im=W.querySelector('img'),hdr=W.querySelector('.chdr'),grip=W.querySelector('.cgrip'),box=$('twinwrap');
+  let st=Object.assign({},def);try{Object.assign(st,JSON.parse(localStorage.getItem('campanel.'+id)||'{}'))}catch(e){}
+  const save=()=>{try{localStorage.setItem('campanel.'+id,JSON.stringify(st))}catch(e){}};
+  const apply=()=>{const R=box.getBoundingClientRect();W.style.width=st.w+'px';
+    const ww=W.offsetWidth,hh=W.offsetHeight;st.x=Math.max(0,Math.min(R.width-ww,st.x));st.y=Math.max(0,Math.min(R.height-hh,st.y));
+    W.style.left=st.x+'px';W.style.top=st.y+'px';W.style.right='';W.style.bottom='';W.style.display=st.on?'':'none';
+    const b=$(btnId);if(b)b.textContent=(st.on?'✕ ':'＋ ')+label};
+  const connect=()=>{im.src=streamUrl+'?t='+Date.now()};
+  im.onerror=()=>setTimeout(connect,3000);
+  if(st.on)connect();
+  $(btnId).onclick=()=>{st.on=!st.on;if(st.on)connect();else im.src='';apply();save()};
+  W.querySelector('.c-x').onclick=e=>{e.stopPropagation();st.on=false;im.src='';apply();save()};
+  W.querySelector('.c-pop').onclick=e=>{e.stopPropagation();window.open(streamUrl,'pop_'+id,'width='+Math.round(st.w*1.5)+',height='+Math.round(im.offsetHeight*1.5+40))};
+  hdr.onpointerdown=e=>{if(e.target.tagName==='BUTTON')return;e.preventDefault();const x0=e.clientX,y0=e.clientY,sx=st.x,sy=st.y;
+    const mv=ev=>{st.x=sx+ev.clientX-x0;st.y=sy+ev.clientY-y0;apply()};
+    const up=()=>{window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',up);save()};
+    window.addEventListener('pointermove',mv);window.addEventListener('pointerup',up)};
+  grip.onpointerdown=e=>{e.preventDefault();e.stopPropagation();const x0=e.clientX,w0=st.w;
+    const max=box.getBoundingClientRect().width-st.x-4;
+    const mv=ev=>{st.w=Math.min(max,Math.max(160,w0+(ev.clientX-x0)));apply()};
+    const up=()=>{window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',up);save()};
+    window.addEventListener('pointermove',mv);window.addEventListener('pointerup',up)};
+  window.addEventListener('resize',apply);
+  // 첫 배치: 이미지 로드 후 크기 확정되면 위치 클램프
+  im.addEventListener('load',apply,{once:true});apply();
+  return {connect,W,im,st};
+}
+(()=>{const H=location.hostname||'localhost';const CAM=`http://${H}:8766`,SCAM=`http://${H}:8771`,PCAM=`http://${H}:8773`,RVIEW=`http://${H}:8774`;/* ★9/5: 손목캠 패널은 '기둥 검출 뷰'(:8773)를 띄운다. cam_server 오버레이는 벽 스티커용 임계값이라
+   기둥 색점(노랑 S120·파랑 S246)을 놓치고 밑판 높이의 유령 파랑을 그렸다(사용자 확인).
+   8773 은 같은 카메라 영상 위에 기둥 검출·정답위치·걸러낸 유령을 그린다. 해상도가 같아
+   클릭 추적 좌표는 그대로 8766 으로 보내면 된다. */
+ const R=$('twinwrap').getBoundingClientRect();
+ const wc=camPanel('camwrap','tg-cam','손목캠·기둥검출',PCAM+'/stream',{x:Math.max(0,R.width-430),y:Math.max(0,R.height-260),w:420,on:true});
+ const sc=camPanel('scamwrap','tg-scam','측면캠',SCAM+'/stream',{x:10,y:Math.max(0,R.height-260),w:380,on:true});
+ const rv=camPanel('rvwrap','tg-rvw','랙관측',RVIEW+'/stream',{x:8,y:Math.max(0,R.height-520),w:420,on:false});
+ /* 9/1 새 USB 카메라(뎁스 반대편, :8768) */
+ const NCAM=`http://${H}:8768`;
+ /* 옛 세션의 '닫힘' 상태가 남아 패널이 안 보이는 사고 방지 — 최초 1회만 초기화 */
+ try{if(!localStorage.getItem('ncam.v1')){localStorage.removeItem('campanel.ncamwrap');localStorage.setItem('ncam.v1','1')}}catch(e){}
+ const nc=camPanel('ncamwrap','tg-ncam','새카메라',NCAM+'/stream',{x:10,y:10,w:420,on:true});
+ nc.W.querySelector('.c-rot').onclick=async e=>{e.stopPropagation();
+   try{const j=await(await fetch(NCAM+'/rot',{cache:'no-store'})).json();log('sys','ncam','새카메라 회전 '+j.rot+'°')}catch(err){}
+   setTimeout(()=>nc.connect(),300)};
+ let nBoot=null,nFail=0;
+ setInterval(async()=>{if(!nc.st.on)return;try{const j=await(await fetch(NCAM+'/health',{cache:'no-store'})).json();nFail=0;
+   if(nBoot!==null&&j.boot!==nBoot){nc.connect();log('sys','ncam','새카메라 서버 재시작 감지 → 재접속')}
+   nBoot=j.boot;$('ncamhdr-t').textContent='새카메라 '+j.rot+'° ';
+   if(j.age!=null&&j.age>5)nc.connect()}catch(e){if(++nFail===3){nc.connect()}}},3000);
+ /* 9/11 글로벌캠 — 비전 PC 가 HMV1/UDP 로 쏘는 셀 탑뷰를 global_udp_cam.py(:8779)가 MJPEG 로 중계. 콘솔은 640 축소본(무선 부하) */
+ const GCAM=`http://${H}:8779`;
+ /* 8/26 RTSP 글로벌캠 패널이 같은 id 로 '닫힘' 상태를 남겨 새 패널이 숨겨졌다(9/11 실측) — 최초 1회만 초기화 */
+ try{if(!localStorage.getItem('gcam.v2')){localStorage.removeItem('campanel.gcamwrap');localStorage.setItem('gcam.v2','1')}}catch(e){}
+ const gc=camPanel('gcamwrap','tg-gcam','글로벌캠',GCAM+'/stream?w=640',{x:Math.max(0,R.width-430),y:10,w:420,on:true});
+ let gBoot=null,gFail=0;
+ setInterval(async()=>{if(!gc.st.on)return;try{const j=await(await fetch(GCAM+'/health',{cache:'no-store'})).json();gFail=0;
+   if(gBoot!==null&&j.boot!==gBoot){gc.connect();log('sys','gcam','글로벌캠 중계 재시작 감지 → 재접속')}
+   gBoot=j.boot;$('gcamhdr-t').textContent=`글로벌캠 ${j.fps}fps${j.dropped?' 손실'+j.dropped:''} `;
+   if(j.age!=null&&j.age>5)gc.connect()}catch(e){if(++gFail===3){gc.connect()}}},3000);
+ /* ★9/13 글로벌캠 녹화 — 시작/저장/삭제. 서버(global_udp_cam.py)가 JPEG 를 그대로 ffmpeg 로 넘긴다. */
+ (function(){
+   const go=$('grec-go'),sv=$('grec-sv'),rm=$('grec-rm'),st=$('grec-st');
+   const IDLE='1920×1440 · 15fps → ~/Videos';
+   let on=false;
+   const paint=()=>{go.disabled=on;sv.disabled=!on;rm.disabled=!on;
+                    go.textContent=on?'⏺ 녹화 중':'⏺ 녹화';go.style.color=on?'#EB6A2A':''};
+   const call=async(a)=>{try{const r=await fetch(GCAM+'/rec/'+a,{cache:'no-store'});return await r.json()}
+                         catch(e){return {ok:false,msg:'서버 응답 없음'}}};
+   go.onclick=async()=>{const j=await call('start');
+     if(!j.ok){st.textContent='시작 실패 — '+j.msg;log('err','gcam','녹화 시작 실패: '+j.msg);return}
+     on=true;paint();log('sys','gcam','녹화 시작')};
+   sv.onclick=async()=>{st.textContent='저장 중…';const j=await call('save');
+     on=false;paint();st.textContent=j.ok?('저장 '+j.msg):('저장 실패 — '+j.msg);
+     log(j.ok?'sys':'err','gcam',(j.ok?'녹화 저장: ':'저장 실패: ')+j.msg)};
+   rm.onclick=async()=>{if(!confirm('이번 녹화를 삭제할까요? 되돌릴 수 없습니다.'))return;
+     const j=await call('discard');on=false;paint();st.textContent=j.ok?'삭제함':('삭제 실패 — '+j.msg);
+     log('sys','gcam','녹화 삭제')};
+   setInterval(async()=>{if(!gc.st.on)return;const j=await call('status');
+     if(j.on===undefined)return;
+     if(j.on!==on){on=j.on;paint();if(!on&&st.textContent.indexOf('저장')<0)st.textContent=IDLE}
+     if(on){const m=String(Math.floor(j.sec/60)).padStart(2,'0'),x=String(Math.floor(j.sec%60)).padStart(2,'0');
+            st.textContent=`● ${m}:${x} · ${j.frames}프레임 · ${j.file}`}},1000);
+   paint();
+ })();
+ const im=wc.im;
+ /* 워치독: cam_server 재시작(boot 변경)·응답 없음이면 재접속 — MJPEG 는 끊겨도 onerror 가 안 뜬다 */
+ let camBoot=null,camFail=0;
+ setInterval(async()=>{if(!wc.st.on)return;try{const j=await(await fetch(CAM+'/dots',{cache:'no-store'})).json();camFail=0;
+   if(camBoot!==null&&j.boot!==camBoot){wc.connect();log('sys','cam','손목캠 서버 재시작 감지 → 재접속')}
+   camBoot=j.boot;const srcTag=(j.source&&j.source!=='rs')?('['+j.source.toUpperCase()+'] '):'';$('camhdr-t').textContent=srcTag+(j.focus?('손목캠 · FOCUS '+j.focus.join('+')+' '):'손목캠·기둥검출 ')}
+  catch(e){if(++camFail===3){wc.connect()}}},3000);
+ /* 측면캠(8771)은 단순 MJPEG — camPanel 의 img.onerror 재접속으로 충분(별도 워치독 불필요) */
+ im.onclick=e=>{const r=im.getBoundingClientRect();const x=(e.clientX-r.left)*1280/r.width,y=(e.clientY-r.top)*720/r.height;
+   fetch(`${CAM}/click?x=${x.toFixed(0)}&y=${y.toFixed(0)}`,{mode:'no-cors'}).catch(()=>{})};
+ im.ondblclick=()=>fetch(CAM+'/click?clear=1',{mode:'no-cors'}).catch(()=>{});})();
+/* localhost 로 열면 저장소(origin)가 팀 주소와 분리돼 "저장했는데 안 보임" 사고가 난다(8/24 두 차례) */
+if(location.hostname==='localhost'||location.hostname==='127.0.0.1'){
+  const b=document.createElement('div');
+  b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:300;background:var(--warn);color:#fff;font:800 17px var(--mono);padding:10px 16px;text-align:center';
+  b.innerHTML='⚠ localhost 주소는 저장소가 분리됩니다 — 팀 주소로 이동해서 쓰세요 &nbsp;<button style="font:800 15px var(--mono);padding:6px 14px" onclick="location.href=location.href.replace(location.hostname,\'192.168.20.10\')">192.168.20.10 으로 이동</button>';
+  document.body.appendChild(b)}
+buildTwin();renderPoses();updateToggleBtns();setModeUI();updateVisionBtn();
+/* 8/27 시작 자동 점검 — 켜면 로봇·서버·카메라 연결을 한 번에 검사해 배너로 보여준다 */
+async function startupCheck(){
+  const H=location.hostname||'localhost';
+  const items=[];
+  // 1) 브리지 + FR5
+  let j=null;
+  try{j=await(await fetch(`http://${H}:8765/status`,{cache:'no-store'})).json()}catch(e){}
+  items.push({k:'브리지(:8765)', ok:!!j, v:j?'응답':'무응답 — start_console.sh 확인'});
+  if(j){
+    const f=j.robots&&j.robots.fr5;
+    items.push({k:'FR5 로봇', ok:!!(f&&f.connected), v:f&&f.connected?`연결 · J1 ${(f.joints?.[0]??0).toFixed(1)}° · 그리퍼 ${f.gripper}`:'미연결 — fr5_up.sh 확인'});
+    if(f&&f.frozen)items.push({k:'🧊 FR5 동결', ok:false, v:(f.freeze_kind==='controller_dead'?'컨트롤러 앱 사망 → 전원 재투입 [🧊 동결 해제]':f.freeze_kind==='comms'?'통신/랜선형 → [🚑 복구]':'감지됨 → fr5_up.sh')});
+    else if(f&&f.stale)items.push({k:'FR5 관절상태', ok:false, v:'동결(stale) — fr5_up.sh 재기동'});
+    const zk1=j.robots&&j.robots.zk1, zk2=j.robots&&j.robots.zk2;
+    items.push({k:'ZK1/ZK2', ok:!!(zk1&&zk1.connected)||!!(zk2&&zk2.connected), v:`${zk1&&zk1.connected?'ZK1✔':'ZK1✘'} ${zk2&&zk2.connected?'ZK2✔':'ZK2✘'} (없어도 FR5 작업 가능)`, warn:true});
+    items.push({k:'팀 서버(/cell/status)', ok:!!(j.server&&j.server.alive), v:(j.server&&j.server.alive)?'하트비트 수신':'미수신 — 서버팀 미기동/도메인 불일치(데모엔 무관)', warn:true});
+  }
+  // 2) 카메라
+  for(const [nm,port] of [['손목캠',8766],['기둥검출',8773],['랙관측',8774],['새카메라',8768],['측면캠',8771]]){
+    let h=null;try{h=await(await fetch(`http://${H}:${port}/health`,{cache:'no-store'})).json()}catch(e){}
+    // 카메라 정상 판정: cam_server 는 ok 필드, 측면캠은 ok, age<3s 면 수신중
+    const camOk=!!(h&&(h.ok===true||(h.age!=null&&h.age<3)));
+    items.push({k:`${nm}(:${port})`, ok:camOk, v:h?`${h.source||'live'} ${camOk?'수신중':'신호없음'}${h.age!=null?` (${h.age}s)`:''}`:'무응답', warn:nm==='측면캠'});
+  }
+  // 배너 렌더
+  let bar=$('startup-bar');
+  if(!bar){bar=document.createElement('div');bar.id='startup-bar';
+    bar.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:400;background:var(--panel,#222);border:2px solid var(--line,#444);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.4);font:14px var(--mono);max-width:640px';
+    document.body.appendChild(bar)}
+  const fails=items.filter(i=>!i.ok&&!i.warn).length;
+  const warns=items.filter(i=>!i.ok&&i.warn).length;
+  bar.innerHTML=`<div style="font-weight:800;margin-bottom:6px">시작 점검 ${fails===0?'✅ 정상':'⛔ 문제 '+fails+'건'}${warns?` · ⚠${warns}`:''}
+    <button style="float:right;font:12px var(--mono);padding:2px 8px" onclick="this.closest('#startup-bar').remove()">✕</button>
+    <button style="float:right;font:12px var(--mono);padding:2px 8px;margin-right:6px" onclick="startupCheck()">↻ 재검사</button></div>`+
+    items.map(i=>`<div style="padding:2px 0;color:${i.ok?'#3a3':(i.warn?'#c90':'#e55')}">${i.ok?'✔':(i.warn?'⚠':'✘')} <b>${i.k}</b> — ${i.v}</div>`).join('');
+  log('sys','시작점검',`정상 ${items.filter(i=>i.ok).length}/${items.length}`+(fails?` · 문제 ${fails}`:''));
+  return fails===0;
+}
+connectBridge(true).then(()=>setTimeout(startupCheck,800));   // 자동 연결 후 점검
+/* 컬럼 폭 드래그 조절 (저장됨) */
+const cols=store.get('cols',{c1:620,c3:490});
+const mainEl=document.querySelector('main');
+function applyCols(){mainEl.style.setProperty('--c1',cols.c1+'px');mainEl.style.setProperty('--c3',cols.c3+'px');try{resize()}catch(e){}}
+applyCols();
+let splitDrag=null;
+for(const[id,key,dir]of[['split1','c1',1],['split2','c3',-1]]){
+  $(id).addEventListener('pointerdown',e=>{splitDrag={key,dir,x:e.clientX,v:cols[key]};$(id).classList.add('on');e.preventDefault()})}
+window.addEventListener('pointermove',e=>{if(!splitDrag)return;
+  cols[splitDrag.key]=clamp(splitDrag.v+splitDrag.dir*(e.clientX-splitDrag.x),340,940);applyCols()});
+window.addEventListener('pointerup',()=>{if(splitDrag){store.set('cols',cols);splitDrag=null;
+  document.querySelectorAll('.vsplit').forEach(x=>x.classList.remove('on'))}});
+$('log').textContent=state.log.slice(-100).map(e=>`${e.t.slice(11,19)} [${e.robot.toUpperCase()}] ${e.msg} → ${e.result}`).join('\n')+'\n';
+log('sys','console start','sim');
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# FMS -> Robot Cell 고수준 Task (계약서 v0.2 §2 + 서버 검토 반영)
+# task_type: MATERIAL_FEED | INSTALL_FLOOR | INSTALL_INNER_WALL | INSTALL_FURNITURE
+#            | INSTALL_OUTER_WALL | INSTALL_WINDOW_DOOR | INSTALL_ROOF
+string ver              # 스키마 버전 "0.2.1" (2026-08-13 개정 확정)
+string req_id           # uuid — 멱등 키 (동일 req_id 재수신 시 재실행 금지)
+string job_id           # "JOB-001"
+string step_id          # "S4"
+string task_type
+string product          # "HOUSE_A" | "HOUSE_B"
+string parts_json       # 가변 부품 목록 '[{"slot":"IW1","class":"wall_int"},...]' (BOM 확정 전 유연화)
+---
+string status           # "SUCCEEDED" | "FAILED" | "CANCELED"  (CANCELED=관리자 ABORT/취소, FAILED=장비·비전 오류)
+string error_code       # 실패 시 E1xx~E5xx, 그 외 ""
+string detail           # 사람이 읽는 설명
+string completed_json   # 완료한 슬롯 목록 '["IW1"]' — 부분 실패 시 재작업 판단용
+---
+string phase            # OBSERVE|PICK|REORIENT|PLACE_APPROACH|INSERT|RETREAT|MOVE|SUCTION|RELEASE
+uint32 current_item     # 1부터
+uint32 total_items
+float32 progress        # 0.0~1.0 (표시용 — 완료 판정에 사용 금지)
+string robot            # "fr5" | "zk1" | "zk2"

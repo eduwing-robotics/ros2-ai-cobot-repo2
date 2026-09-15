@@ -1,0 +1,40 @@
+# /vision/get_pick_pose — D435(Eye-in-Hand) 정밀 Pick 좌표 요청
+# ★확정판 v0.3 (2026-08-11 비전 회신으로 6건 전부 합의 — 필드 변경 없음)
+#
+# 근거: FMS-RobotCell-Vision 연동구조 v0.3 Final 합의 (2026-08-10)
+#   - Robot Cell 이 Observation Pose 도착·정지 후 호출한다.
+#   - Vision 은 "요청 이후 획득한" 최신 프레임으로 측정한다 (이동 중 프레임 금지).
+#   - Vision 은 camera frame 기준 좌표만 반환 — Robot/Workcell 변환은 Robot Cell.
+#   - candidates[] 기본 상위 3건 / 최대 5건, 전 후보에 yaw 포함.
+#   - Freshness: 초기 baseline 1.0s (최종값 E2E 측정 후 확정).
+#
+# 오류코드 (계약 v0.2 §6 + v0.3 Final):
+#   E501 depth_invalid    재요청 2회 -> FAILED
+#   E502 tf_fail          ★비전 내부 카메라 체인 TF 실패로 한정 (셀 TF 실패는 셀 오류)
+#   E503 calibration_invalid_or_mismatch  즉시 FAILED (실행 차단)
+#        ★판정 주체 정리(8/11 확정): Vision 은 자신의 활성 캘리브 상태/버전까지만
+#        반환. 응답 calibration_version 과 셀 활성 버전의 대조·차단은 Robot Cell.
+#        Vision 자체도 유효 캘리브 없이 production 요청을 받으면 E503 으로 차단.
+#   E504 target_lost      관찰 자세 변경 1회 -> FAILED
+#   E505 stale_frame      재요청 2회 -> FAILED
+#   E506 no_valid_candidate  검출은 됐으나 전 후보가 측정 품질 탈락 (Vision 소유)
+#   (E204 candidates_unreachable 은 셀 검증 실패 — 이 서비스 응답에 나타나지 않는다)
+
+string ver                        # "0.3"
+string req_id                     # uuid — 요청/응답 대조·로그용
+string part_code                  # 1차 식별자 (part_code<->class_name 매핑 원본 = FMS/DB)
+string class_name                 # 7종: wall_ext|wall_int|window|door|base|furniture|roof
+                                  #   (매핑표 확정 전 과도기 병행 — 비전은 class 로 인식)
+string zone_id                    # 글로벌캠 존 (참고 문맥 — 관찰 자세 티칭은 로봇 소유)
+uint8 max_candidates              # 0=기본(3), 최대 5
+bool test_mode                    # true=스텁/개발 응답 허용. ★test_mode 응답은
+                                  #   실기 FR5 자동 실행에 사용 금지 (8/8 합의)
+---
+bool pose_valid                   # 유효 후보 1건 이상 존재
+cell_interfaces/PickCandidate[] candidates   # 품질 순 정렬 (Vision), 최종 선택 = Robot Cell
+string error_code                 # "" | E501~E506
+string detail                     # 사람이 읽는 실패 설명
+string calibration_version        # "handeye_YYYYMMDD_vN" — Vision 활성 버전.
+                                  #   셀이 잡 로그에 기록 + 셀 활성 버전과 대조,
+                                  #   불일치 시 셀이 실행 차단 (E503)
+bool production_valid             # false = Hand-Eye 캘리브 전/스텁 좌표 (실기 사용 금지)

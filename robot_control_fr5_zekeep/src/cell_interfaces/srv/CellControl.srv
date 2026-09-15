@@ -1,0 +1,24 @@
+# FMS -> Robot Cell 생산 제어 (계약서 v0.3 §3)
+# cmd: PAUSE | RESUME | ABORT | RESET
+#
+# ★v0.3 의미 정리 (2026-09-09 서버팀 지적 반영):
+#   응답은 **즉시 ACK** 이며 "정지 요청을 받았는지 / 어떤 방식으로 세울 것인지" 만 말한다.
+#   **실제 정지 완료의 authority 는 /cell/status 의 cell_state == "HELD" 다.**
+#   deferred 구간에서는 ACK 시점에 정지 지점을 확정할 수 없으므로,
+#   "실제로 멈춘 지점"(held_at)은 이 응답이 아니라 /cell/status 의 hold 블록에 싣는다.
+string ver        # "0.3"
+string cmd
+string req_id     # uuid
+bool   immediate  # v0.3 신규. true = 현재 모션까지 즉시 감속 정지(안전 구간이면)
+                  # false/미지정 = 현재 phase 완료 후 HELD  ← 기본값(v0.2 동작, 하위 호환)
+---
+bool   accepted
+string cell_state # IDLE|EXECUTE|HELD|ABORTED|FAULT  (ACK 시점 상태 — 아직 HELD 가 아닐 수 있다)
+string detail
+string stop_mode  # v0.3 신규. ★"어떻게 세울 것인가"에 대한 약속이지 결과가 아니다.
+                  #   IMMEDIATE          현재 모션을 지금 감속 정지시킨다
+                  #   AT_PHASE_BOUNDARY  현재 phase 를 끝내고 세운다 (immediate=false)
+                  #   DEFERRED_UNSAFE    지금 구간은 즉시정지 불가 — 가장 가까운 safe point 에서 세운다
+                  #   NOT_APPLICABLE     PAUSE 가 아닌 cmd 이거나 이미 HELD
+string eta_ms     # v0.3 신규. HELD 도달까지의 **최악 예상 지연**(ms). UX 문구 선택용.
+                  #   IMMEDIATE ~0 / STEP_BOUNDARY ~1000 / 그리퍼 개폐 구간 ~11000

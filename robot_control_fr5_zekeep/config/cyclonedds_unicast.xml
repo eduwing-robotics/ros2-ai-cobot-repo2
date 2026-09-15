@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  CycloneDDS 유니캐스트 설정
+  ==========================================
+  ★2026-09-10 네트워크 갱신: 192.168.40.x 대역이 사라지고 LAN 이 192.168.20.x 로 바뀜.
+    · 이 PC:  enp3s0 = 192.168.58.10 (FR5 전용망)  /  WiFi = 192.168.20.10 (팀 LAN)
+    · 서버  : 192.168.20.20  (사용자 확인, ping 1.4ms)
+    옛 설정은 enp3s0 하나만 고정 + Peers 가 전부 192.168.40.x 라 서버와 discovery 불가였다.
+    → 두 인터페이스를 모두 열고 Peers 를 현재 대역으로 교체.
+  · 멀티캐스트는 spdp 만 (WiFi 유실 대비 유니캐스트 discovery)
+  적용: export CYCLONEDDS_URI=file:///home/ar/cyclonedds_unicast.xml
+  옛 판: cyclonedds_unicast.xml.BEFORE_NET20_0910
+-->
+<CycloneDDS xmlns="https://cdds.io/config"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
+  <Domain id="any">
+    <General>
+      <Interfaces>
+        <NetworkInterface name="wlxb0386cf70271" priority="default" multicast="default"/>
+        <NetworkInterface name="enp3s0" priority="default" multicast="default"/>
+      </Interfaces>
+      <AllowMulticast>spdp</AllowMulticast>
+      <MaxMessageSize>65500B</MaxMessageSize>
+    </General>
+    <Discovery>
+      <ParticipantIndex>auto</ParticipantIndex>
+      <MaxAutoParticipantIndex>64</MaxAutoParticipantIndex>
+      <Peers>
+        <Peer address="192.168.20.10"/>   <!-- 이 PC (팀 LAN, WiFi) -->
+        <Peer address="192.168.20.20"/>   <!-- 서버 — 9/10 사용자 확인 -->
+        <Peer address="192.168.20.100"/>  <!-- 터틀봇 Pi -->
+        <Peer address="192.168.58.10"/>   <!-- 이 PC (FR5 전용망) -->
+      </Peers>
+    </Discovery>
+    <Internal>
+      <SocketReceiveBufferSize min="10MB"/>
+      <Watermarks><WhcHigh>2MB</WhcHigh></Watermarks>
+    </Internal>
+  </Domain>
+</CycloneDDS>
