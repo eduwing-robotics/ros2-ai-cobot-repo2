@@ -56,7 +56,7 @@ FR5 · Zekeep · TurtleBot · AI Vision · 음성 비서 · Unity 디지털 트�
 
 - **반복 · 고강도 작업 부담** : 벽체와 지붕 설치처럼 반복적이고 정밀한 작업의 작업자 부담을 줄일 필요가 있습니다.
 - **공정 연계의 복잡성** : 자재 검사 → 운반 → 조립 → 검사 → 다음 공정의 순서가 정확히 연결되어야 합니다.
-- **품질 편차 관리** : 자재 상태와 조립 위치를 작업자의 육안 확인에만 의존하지 않고 Vision AI 기반으로 확인할 필요가 있습니다.
+- **품질 편차 관리** : 자재 상태와 조립 위치를 작업자의 육안 확인에만 의존하지 않고 AI Vision 기반으로 확인할 필요가 있습니다.
 - **실시간 운영 가시성** : 생산 공정, 로봇 상태, 재고, 검사 결과가 분산되면 관리자 판단이 늦어질 수 있습니다.
 - **사람 중심 제어 보완** : 음성 명령과 통합 관제를 통해 관리자가 공장 상태를 빠르게 파악하고 대응할 수 있어야 합니다.
 
@@ -239,7 +239,7 @@ FR5 · Zekeep · TurtleBot · AI Vision · 음성 비서 · Unity 디지털 트�
 
 | 경로 | 역할 |
 | --- | --- |
-| [ai_perception/](ai_perception/README.md) | 수입검사 QC 및 구조물 품질검사, Vision AI 파이프라인 |
+| [ai_perception/](ai_perception/README.md) | 수입검사 QC 및 구조물 품질검사, AI Vision 파이프라인 |
 | [controltower_gui/](controltower_gui/README.md) | Unity 기반 생산 관제 · 디지털 트윈 화면 |
 | [forklift_turtlebot3/](forklift_turtlebot3/README.md) | TurtleBot3 자재 팔레트 운반과 포크 리프트 제어 |
 | [llm_stt_tts/](llm_stt_tts/README.md) | Voice AI 기능 · 명령 · 검증 문서 진입점 |
@@ -264,7 +264,7 @@ Voice Runtime의 실행 source는 production / Redis / API contract와 함께 �
 | Robot Middleware | ROS 2 (Topic, Action), CycloneDDS, MoveIt2 |
 | Robot / Hardware | FR5 6축, Zekeep 3축, TurtleBot3 |
 | Voice AI | sherpa-onnx, faster-whisper, Ollama, EXAONE, Edge TTS |
-| Vision AI | Python, YOLO, PyTorch, OpenCV, NumPy |
+| AI Vision | Python, YOLO, PyTorch, OpenCV, NumPy |
 | Digital Twin / GUI | Unity, C#, HTML |
 | Collaboration / Project Management | Git, GitHub, Jira, Confluence, Slack |
 
