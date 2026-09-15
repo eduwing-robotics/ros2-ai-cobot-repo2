@@ -27,6 +27,35 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
 조립식 주택 생산에 필요한 자재 수입검사, 팔레트 운반, 베이스 · 벽체 · 지붕 설치, 조립 결과 검사, 완성 주택 출고 과정을 하나의 생산 시스템으로 연결합니다.
 두 주택 모델(`HOUSE_A`, `HOUSE_B`)의 Recipe를 기반으로 생산 순서를 관리하고, 각 설비의 실제 상태와 생산 진행 상황을 Unity 관제 화면 및 음성 비서에 반영합니다.
 
+### 생산 대상 주택 모델
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>HOUSE_A</strong>
+    </td>
+    <td align="center" width="50%">
+      <strong>HOUSE_B</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./assets/house_A.jpg" alt="HOUSE_A 완성 주택 모델" width="95%" />
+    </td>
+    <td align="center" width="50%">
+      <img src="./assets/house_B.jpg" alt="HOUSE_B 완성 주택 모델" width="95%" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      HOUSE_A
+    </td>
+    <td align="center">
+      HOUSE_B
+    </td>
+  </tr>
+</table>
+
 ## 3. 주제 선정 이유
 
 조립식 주택은 공장에서 규격화된 부품을 조립해 생산 시간을 단축할 수 있지만, 실제 공정에서는 반복 작업 · 설비 간 순서 제어 · 품질 확인 · 현장 정보 분산 문제가 함께 발생합니다.
