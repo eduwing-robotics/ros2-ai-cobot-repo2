@@ -40,10 +40,10 @@ FR5 · Zekeep · TurtleBot · Vision AI · 음성 비서 · Unity 디지털 트�
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="./assets/house_A.jpg" alt="HOUSE_A 완성 주택 모델" width="95%" />
+      <img src="./assets/house_A.png" alt="HOUSE_A 완성 주택 모델" width="95%" />
     </td>
     <td align="center" width="50%">
-      <img src="./assets/house_B.jpg" alt="HOUSE_B 완성 주택 모델" width="95%" />
+      <img src="./assets/house_B.png" alt="HOUSE_B 완성 주택 모델" width="95%" />
     </td>
   </tr>
 </table>
