@@ -195,11 +195,7 @@ FR5 · Zekeep · TurtleBot · AI Vision · 음성 비서 · Unity 디지털 트�
 
 ### Scenario #2 - 주택 생산 공정
 
-<img src="./assets/sequence_diagram2-1.png" alt="Scenario 2 시퀀스 다이어그램 1" width="100%" />
-
-<img src="./assets/sequence_diagram2-2.png" alt="Scenario 2 시퀀스 다이어그램 2" width="100%" />
-
-<img src="./assets/sequence_diagram2-3.png" alt="Scenario 2 시퀀스 다이어그램 3" width="100%" />
+<img src="./assets/sequence_diagram2.png" alt="Scenario 2 시퀀스 다이어그램" width="100%" />
 
 ### Scenario #3 - 품질검사 및 불량 감지
 
