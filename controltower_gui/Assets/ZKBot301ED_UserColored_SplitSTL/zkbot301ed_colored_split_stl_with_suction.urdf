@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="zkbot">
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/base_link_white.stl" />
+      </geometry>
+      <material name="ZK_White_Cover">
+        <color rgba="0.72 0.72 0.68 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="package://zkbot_description/meshes/base_link_black.stl" /></geometry>
+      <material name="ZK_Black_Frame"><color rgba="0.018 0.018 0.018 1" /></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/base_link.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+    </inertial>
+  </link>
+  <link name="link_a1">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/link_a1_white.stl" />
+      </geometry>
+      <material name="ZK_White_Cover">
+        <color rgba="0.72 0.72 0.68 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="package://zkbot_description/meshes/link_a1_black.stl" /></geometry>
+      <material name="ZK_Black_Frame"><color rgba="0.018 0.018 0.018 1" /></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/link_a1.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+    </inertial>
+  </link>
+  <link name="link_a2">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/link_a2_white.stl" />
+      </geometry>
+      <material name="ZK_White_Cover">
+        <color rgba="0.72 0.72 0.68 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="package://zkbot_description/meshes/link_a2_black.stl" /></geometry>
+      <material name="ZK_Black_Frame"><color rgba="0.018 0.018 0.018 1" /></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/link_a2.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+    </inertial>
+  </link>
+  <link name="link_a3">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/link_a3_white.stl" />
+      </geometry>
+      <material name="ZK_White_Cover">
+        <color rgba="0.72 0.72 0.68 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="package://zkbot_description/meshes/link_a3_black.stl" /></geometry>
+      <material name="ZK_Black_Frame"><color rgba="0.018 0.018 0.018 1" /></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/link_a3.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+    </inertial>
+  </link>
+  <link name="link_tool">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/link_tool_white.stl" />
+      </geometry>
+      <material name="ZK_White_Cover">
+        <color rgba="0.72 0.72 0.68 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="package://zkbot_description/meshes/link_tool_black.stl" /></geometry>
+      <material name="ZK_Black_Frame"><color rgba="0.018 0.018 0.018 1" /></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/link_tool.stl" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+    </inertial>
+  </link>
+  <joint name="a1_joint" type="revolute">
+    <parent link="base_link" />
+    <child link="link_a1" />
+    <origin xyz="-0.00000 0.00000 0.00000" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.31613" upper="0.03491" effort="20" velocity="0.6" />
+  </joint>
+  <joint name="a2_joint" type="revolute">
+    <parent link="link_a1" />
+    <child link="link_a2" />
+    <origin xyz="-0.00427 0.00000 0.14301" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-0.95993" upper="0.03491" effort="20" velocity="0.6" />
+  </joint>
+  <joint name="a3_joint" type="revolute">
+    <parent link="link_a2" />
+    <child link="link_a3" />
+    <origin xyz="0.15505 0.00000 0.12633" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+    <limit lower="-1.91986" upper="0.03491" effort="20" velocity="0.6" />
+  </joint>
+  <joint name="tool_joint" type="fixed">
+    <parent link="link_a3" />
+    <child link="link_tool" />
+    <origin xyz="0.12281 0.00000 -0.15781" rpy="0 0 0" />
+  </joint>
+  <link name="suction_cup">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://zkbot_description/meshes/suction_cup_white.stl" />
+      </geometry>
+      <material name="ZK_White_Cover">
+        <color rgba="0.72 0.72 0.68 1" />
+      </material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="package://zkbot_description/meshes/suction_cup_black.stl" /></geometry>
+      <material name="ZK_Black_Frame"><color rgba="0.018 0.018 0.018 1" /></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="package://zkbot_description/meshes/suction_cup.stl" /></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.05" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001" />
+    </inertial>
+  </link>
+  <joint name="suction_joint" type="fixed">
+    <parent link="link_tool" />
+    <child link="suction_cup" />
+    <origin xyz="0.035 0 0.000" rpy="0 0 0" />
+  </joint>
+</robot>
