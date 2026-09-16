@@ -7,7 +7,9 @@
 FR5 · Zekeep · TurtleBot · AI Vision · 음성 비서 · Unity 디지털 트윈을 연동하여 조립식 주택의 자재 검사, 운반, 구조 조립, 품질검사, 출고 완료까지의 생산 흐름을 자동화 · 관제하는 스마트 팩토리 프로젝트입니다.
 관리자는 음성으로 생산을 요청하고, 관제 화면에서 생산 공정 · 로봇 · 재고 · 검사 결과를 실시간으로 확인할 수 있습니다.
 
-<img src="./assets/youtube_card_harmony.png" alt="시연 영상 유튜브 링크 연결" width="100%" />
+<a href="https://youtu.be/2UZpkZqx2cw" target="_blank" rel="noopener">
+  <img src="./assets/youtube_card_harmony.png" alt="시연 영상 보기 — AI 기반 조립식 주택 자동화 공장 (YouTube)" width="100%" />
+</a>
 
 ---
 
